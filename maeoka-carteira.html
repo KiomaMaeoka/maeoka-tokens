@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maeoka Tokens - Conectar Carteira</title>
+    <script src="https://unpkg.com/@tonconnect/ui@2.0.9/dist/tonconnect-ui.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #1a3a52 0%, #2c5282 100%);
+            margin: 0;
+            padding: 20px;
+            color: white;
+            min-height: 100vh;
+        }
+        
+        .container {
+            background: white;
+            color: #1a3a52;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 500px;
+            margin: 0 auto;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            text-align: center;
+            color: #1a3a52;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+        }
+        
+        .status-box {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .desconectado {
+            background: #fef2e7;
+            color: #f6ad55;
+            border: 2px solid #f6ad55;
+        }
+        
+        .conectado {
+            background: #e6fffa;
+            color: #38b2ac;
+            border: 2px solid #38b2ac;
+        }
+        
+        .token-info {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #1a3a52;
+            display: none;
+        }
+        
+        .saldo {
+            font-size: 32px;
+            font-weight: bold;
+            color: #1a3a52;
+            text-align: center;
+            margin: 15px 0;
+        }
+        
+        .beneficios {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 25px 0;
+        }
+        
+        .beneficio {
+            background: #f0f8ff;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .beneficio-numero {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1a3a52;
+        }
+        
+        .beneficio-texto {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .info-carteira {
+            background: #e8f4f8;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            display: none;
+        }
+        
+        .endereco {
+            font-family: monospace;
+            background: #fff;
+            padding: 8px;
+            border-radius: 4px;
+            word-break: break-all;
+            font-size: 12px;
+        }
+        
+        .botao-desconectar {
+            background: #dc2626;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 15px;
+        }
+        
+        .botao-desconectar:hover {
+            background: #b91c1c;
+        }
+        
+        .demo-aviso {
+            background: #fef2e7;
+            color: #f6ad55;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            text-align: center;
+            margin: 10px 0;
+        }
+        
+        #tonConnectButton {
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                margin: 10px;
+                padding: 20px;
+            }
+            
+            .beneficios {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            
+            .saldo {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">🏗️ MAEOKA TOKENS</div>
+        <div class="subtitle">Sistema de Recompensas em Reformas</div>
+        
+        <div class="status-box desconectado" id="statusCarteira">
+            🔗 Carteira Desconectada
+        </div>
+        
+        <div id="tonConnectButton"></div>
+        
+        <div class="token-info" id="infoTokens">
+            <h3 style="text-align: center; margin-top: 0;">💰 Seus Tokens Maeoka</h3>
+            <div class="saldo" id="saldoTokens">0 MAEOKA</div>
+            <p style="text-align: center; color: #666;">
+                Equivale a: R$ <span id="valorReais">0,00</span>
+            </p>
+        </div>
+        
+        <div class="info-carteira" id="infoCarteira">
+            <h4>📱 Informações da Carteira</h4>
+            <p><strong>Endereço:</strong></p>
+            <div class="endereco" id="enderecoCarteira">Não conectado</div>
+            <p style="margin-top: 15px;"><strong>Status:</strong> <span id="statusConexao">Desconectado</span></p>
+            
+            <button class="botao-desconectar" onclick="desconectarCarteira()" id="btnDesconectar" style="display: none;">
+                🚪 Desconectar Carteira
+            </button>
+        </div>
+        
+        <div class="beneficios">
+            <div class="beneficio">
+                <div class="beneficio-numero">10%</div>
+                <div class="beneficio-texto">Desconto usando tokens</div>
+            </div>
+            <div class="beneficio">
+                <div class="beneficio-numero">3%</div>
+                <div class="beneficio-texto">Cashback em obras</div>
+            </div>
+            <div class="beneficio">
+                <div class="beneficio-numero">40%</div>
+                <div class="beneficio-texto">Máximo em tokens por obra</div>
+            </div>
+            <div class="beneficio">
+                <div class="beneficio-numero">4%</div>
+                <div class="beneficio-texto">Bônus por indicação</div>
+            </div>
+        </div>
+        
+        <div style="text-align: center; margin-top: 30px; color: #666; font-size: 12px;">
+            <p><strong>Token Maeoka:</strong></p>
+            <div class="endereco" style="margin: 10px 0;">
+                EQCUgsVus4fW5TY2bxBQWSyiwLETOr2iNlVied-szVuJ1t4W
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuração do TON Connect
+        const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
+            manifestUrl: 'https://ton-connect.github.io/demo-dapp-with-wallet/tonconnect-manifest.json',
+            buttonRootId: 'tonConnectButton'
+        });
+
+        // Endereço do token Maeoka
+        const TOKEN_MAEOKA = 'EQCUgsVus4fW5TY2bxBQWSyiwLETOr2iNlVied-szVuJ1t4W';
+
+        // Elementos da página
+        const statusCarteira = document.getElementById('statusCarteira');
+        const infoTokens = document.getElementById('infoTokens');
+        const saldoTokens = document.getElementById('saldoTokens');
+        const valorReais = document.getElementById('valorReais');
+        const infoCarteira = document.getElementById('infoCarteira');
+        const enderecoCarteira = document.getElementById('enderecoCarteira');
+        const statusConexao = document.getElementById('statusConexao');
+        const btnDesconectar = document.getElementById('btnDesconectar');
+
+        // Monitorar mudanças na conexão da carteira
+        tonConnectUI.onStatusChange(walletInfo => {
+            if (walletInfo) {
+                // Carteira conectada
+                statusCarteira.textContent = '✅ Carteira Conectada';
+                statusCarteira.className = 'status-box conectado';
+                
+                // Mostrar informações da carteira
+                const endereco = walletInfo.account.address;
+                enderecoCarteira.textContent = endereco;
+                statusConexao.textContent = 'Conectado';
+                infoCarteira.style.display = 'block';
+                btnDesconectar.style.display = 'block';
+                
+                // Buscar saldo dos tokens
+                buscarSaldoTokens(endereco);
+                
+            } else {
+                // Carteira desconectada
+                statusCarteira.textContent = '🔗 Carteira Desconectada';
+                statusCarteira.className = 'status-box desconectado';
+                
+                // Ocultar informações
+                infoTokens.style.display = 'none';
+                infoCarteira.style.display = 'none';
+                btnDesconectar.style.display = 'none';
+                
+                // Resetar valores
+                saldoTokens.textContent = '0 MAEOKA';
+                valorReais.textContent = '0,00';
+            }
+        });
+
+        // Função para buscar saldo dos tokens
+        async function buscarSaldoTokens(endereco) {
+            try {
+                // Por enquanto, vamos simular o saldo para demonstração
+                // Em produção, você faria uma consulta real à blockchain TON
+                const saldoSimulado = Math.floor(Math.random() * 2000) + 100;
+                
+                saldoTokens.textContent = `${saldoSimulado.toLocaleString('pt-BR')} MAEOKA`;
+                valorReais.textContent = saldoSimulado.toLocaleString('pt-BR', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
+                
+                infoTokens.style.display = 'block';
+                
+                // Adicionar aviso de demonstração
+                if (!document.getElementById('avisoDemo')) {
+                    const avisoDemo = document.createElement('div');
+                    avisoDemo.id = 'avisoDemo';
+                    avisoDemo.className = 'demo-aviso';
+                    avisoDemo.textContent = '⚠️ Saldo simulado para demonstração - conecte à mainnet para valores reais';
+                    infoTokens.appendChild(avisoDemo);
+                }
+                
+                console.log('Carteira conectada:', endereco);
+                console.log('Saldo simulado:', saldoSimulado, 'MAEOKA');
+                
+            } catch (error) {
+                console.error('Erro ao buscar saldo:', error);
+                
+                // Em caso de erro, mostrar mensagem
+                saldoTokens.textContent = 'Erro ao carregar';
+                valorReais.textContent = '0,00';
+            }
+        }
+
+        // Função para desconectar carteira
+        function desconectarCarteira() {
+            tonConnectUI.disconnect();
+        }
+
+        // Log para debug
+        console.log('Widget Maeoka Tokens carregado');
+        console.log('Token address:', TOKEN_MAEOKA);
+    </script>
+</body>
+</html>
