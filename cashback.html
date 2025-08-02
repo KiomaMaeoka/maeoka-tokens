@@ -297,7 +297,7 @@
                     document.getElementById('recompensaInfo').style.display = 'block';
                     
                     // VERIFICAR STATUS DO CLAIM
-                    if (data.claimed === 'TRUE') {
+                    if (data.claimed === 'TRUE' || data.claimed === true) {
                         // JÁ FOI RESGATADO - Buscar dados da carteira
                         buscarDadosCompletos(obra, senha);
                     } else {
@@ -346,8 +346,8 @@
             document.getElementById('statusClaim').innerHTML = `
                 <div style="background: #fef2e7; padding: 15px; border-radius: 8px; margin: 15px 0; border: 2px solid #f6ad55;">
                     <h4 style="margin: 0 0 10px 0; color: #f6ad55;">⚠️ CLAIM JÁ EMITIDO!</h4>
-                    <p style="margin: 0 0 10px 0; color: #856404;">Esta recompensa já foi solicitada e processada.</p>
-                    <p style="margin: 0; color: #856404;"><strong>Carteira que solicitou:</strong></p>
+                    <p style="margin: 0 0 10px 0; color: #856404;">Esta recompensa não está mais disponível pois já foi solicitada.</p>
+                    <p style="margin: 0; color: #856404;"><strong>Carteira que já solicitou:</strong></p>
                     <div style="background: #fff; padding: 8px; border-radius: 4px; word-break: break-all; font-family: monospace; font-size: 11px; color: #1a3a52; margin: 5px 0;">
                         ${carteira}
                     </div>
