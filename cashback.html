@@ -324,32 +324,33 @@
             try {
                 const quantidade = dadosRecompensa.tokens;
                 
-                // Usar TonWeb para transferência automática
+                // CORREÇÃO: Usar carteira DA EMPRESA como remetente
                 const jettonMinter = new TonWeb.token.jetton.JettonMinter(tonweb.provider, {
                     address: TOKEN_MAEOKA
                 });
                 
-                const userJettonWalletAddress = await jettonMinter.getJettonWalletAddress(
-                    new TonWeb.utils.Address(enderecoUsuario)
+                // Buscar jetton wallet DA EMPRESA (não do usuário)
+                const empresaJettonWalletAddress = await jettonMinter.getJettonWalletAddress(
+                    new TonWeb.utils.Address(CARTEIRA_MAEOKA_EMPRESA)
                 );
                 
                 const jettonWallet = new TonWeb.token.jetton.JettonWallet(tonweb.provider, {
-                    address: userJettonWalletAddress
+                    address: empresaJettonWalletAddress
                 });
                 
                 const transferBody = await jettonWallet.createTransferBody({
                     jettonAmount: TonWeb.utils.toNano(quantidade.toString()),
-                    toAddress: new TonWeb.utils.Address(enderecoUsuario),
+                    toAddress: new TonWeb.utils.Address(enderecoUsuario), // PARA o usuário
                     forwardAmount: TonWeb.utils.toNano('0.01'),
                     forwardPayload: new TextEncoder().encode(`Cashback automático obra ${document.getElementById('obraNumero').value}`),
-                    responseAddress: new TonWeb.utils.Address(enderecoUsuario)
+                    responseAddress: new TonWeb.utils.Address(CARTEIRA_MAEOKA_EMPRESA)
                 });
                 
                 const transaction = {
                     validUntil: Date.now() + 5 * 60 * 1000,
                     messages: [
                         {
-                            address: userJettonWalletAddress.toString(),
+                            address: empresaJettonWalletAddress.toString(),
                             amount: TonWeb.utils.toNano('0.05').toString(),
                             payload: TonWeb.utils.bytesToBase64(await transferBody.toBoc())
                         }
@@ -358,10 +359,10 @@
                 
                 const result = await tonConnectUI.sendTransaction(transaction);
                 
-                // Marcar como claimed
+                // Marcar como claimed E salvar carteira
                 const obra = document.getElementById('obraNumero').value;
                 const senha = document.getElementById('senhaRecompensa').value;
-                await fetch(`${API_URL}?action=claim&obra=${obra}&senha=${senha}`);
+                await fetch(`${API_URL}?action=claim&obra=${obra}&senha=${senha}&carteira=${enderecoUsuario}`);
                 
                 // Sucesso automático
                 document.getElementById('resultado').innerHTML = `
@@ -404,10 +405,10 @@
             try {
                 const quantidade = dadosRecompensa.tokens;
                 
-                // Marcar como claimed na planilha
+                // Marcar como claimed na planilha E salvar carteira
                 const obra = document.getElementById('obraNumero').value;
                 const senha = document.getElementById('senhaRecompensa').value;
-                const response = await fetch(`${API_URL}?action=claim&obra=${obra}&senha=${senha}`);
+                const response = await fetch(`${API_URL}?action=claim&obra=${obra}&senha=${senha}&carteira=${enderecoUsuario}`);
                 const result = await response.json();
                 
                 if (result.sucesso) {
