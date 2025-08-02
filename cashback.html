@@ -196,24 +196,28 @@
                 Equivale a: R$ <span id="infoValorTokens">0,00</span>
             </p>
             
-            <div id="tonConnectButton"></div>
+            <div id="statusClaim"></div>
             
-            <div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin: 15px 0; color: #856404;">
-                <h4 style="margin: 0 0 10px 0;">📝 COMO FUNCIONA:</h4>
-                <p style="margin: 0 0 10px 0; font-size: 13px;">
-                    1. Conecte sua carteira TON<br>
-                    2. Clique em "SOLICITAR RECOMPENSA"<br>
-                    3. Kioma enviará seus tokens em até 24 horas<br>
-                    4. Sem taxas para você!
-                </p>
-                <p style="margin: 0; font-size: 12px; color: #856404;">
-                    💡 <strong>Seguro:</strong> Envio manual garante máxima segurança dos tokens.
-                </p>
+            <div id="areaConexao" style="display: none;">
+                <div id="tonConnectButton"></div>
+                
+                <div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin: 15px 0; color: #856404;">
+                    <h4 style="margin: 0 0 10px 0;">📝 COMO FUNCIONA:</h4>
+                    <p style="margin: 0 0 10px 0; font-size: 13px;">
+                        1. Conecte sua carteira TON<br>
+                        2. Clique em "SOLICITAR RECOMPENSA"<br>
+                        3. Kioma enviará seus tokens em até 24 horas<br>
+                        4. Sem taxas para você!
+                    </p>
+                    <p style="margin: 0; font-size: 12px; color: #856404;">
+                        💡 <strong>Seguro:</strong> Envio manual garante máxima segurança dos tokens.
+                    </p>
+                </div>
+                
+                <button class="botao" id="btnClaimManual" onclick="claimManual()" disabled>
+                    📝 SOLICITAR RECOMPENSA (Grátis)
+                </button>
             </div>
-            
-            <button class="botao" id="btnClaimManual" onclick="claimManual()" disabled>
-                📝 SOLICITAR RECOMPENSA (Grátis)
-            </button>
         </div>
     </div>
 
@@ -281,12 +285,7 @@
                 if (data.encontrado) {
                     dadosRecompensa = data;
                     
-                    if (data.claimed === 'TRUE') {
-                        resultado.innerHTML = '<div class="erro">⚠️ Esta recompensa já foi resgatada!</div>';
-                        return;
-                    }
-                    
-                    // Preencher informações
+                    // Preencher informações básicas
                     document.getElementById('infoObra').textContent = obra;
                     document.getElementById('infoCliente').textContent = data.cliente;
                     document.getElementById('infoIndicador').textContent = data.indicador;
@@ -296,6 +295,15 @@
                     
                     resultado.style.display = 'none';
                     document.getElementById('recompensaInfo').style.display = 'block';
+                    
+                    // VERIFICAR STATUS DO CLAIM
+                    if (data.claimed === 'TRUE') {
+                        // JÁ FOI RESGATADO - Buscar dados da carteira
+                        buscarDadosCompletos(obra, senha);
+                    } else {
+                        // LIBERADO PARA CLAIM
+                        mostrarClaimLiberado();
+                    }
                     
                 } else {
                     resultado.innerHTML = '<div class="erro">❌ Recompensa não encontrada! Verifique os dados.</div>';
@@ -307,85 +315,46 @@
             }
         }
 
-        async function claimAutomatico() {
-            if (!dadosRecompensa || !enderecoUsuario) {
-                alert('Conecte sua carteira primeiro!');
-                return;
-            }
-            
-            const btnAuto = document.getElementById('btnClaimAuto');
-            btnAuto.disabled = true;
-            btnAuto.innerHTML = '⚡ Processando automático...';
-            
+        async function buscarDadosCompletos(obra, senha) {
             try {
-                const quantidade = dadosRecompensa.tokens;
+                // Buscar dados completos incluindo carteira (precisamos acessar a planilha diretamente)
+                const response = await fetch(`${API_URL}?action=buscarCompleto&obra=${obra}&senha=${senha}`);
+                const data = await response.json();
                 
-                // CORREÇÃO: Usar carteira DA EMPRESA como remetente
-                const jettonMinter = new TonWeb.token.jetton.JettonMinter(tonweb.provider, {
-                    address: TOKEN_MAEOKA
-                });
-                
-                // Buscar jetton wallet DA EMPRESA (não do usuário)
-                const empresaJettonWalletAddress = await jettonMinter.getJettonWalletAddress(
-                    new TonWeb.utils.Address(CARTEIRA_MAEOKA_EMPRESA)
-                );
-                
-                const jettonWallet = new TonWeb.token.jetton.JettonWallet(tonweb.provider, {
-                    address: empresaJettonWalletAddress
-                });
-                
-                const transferBody = await jettonWallet.createTransferBody({
-                    jettonAmount: TonWeb.utils.toNano(quantidade.toString()),
-                    toAddress: new TonWeb.utils.Address(enderecoUsuario), // PARA o usuário
-                    forwardAmount: TonWeb.utils.toNano('0.01'),
-                    forwardPayload: new TextEncoder().encode(`Cashback automático obra ${document.getElementById('obraNumero').value}`),
-                    responseAddress: new TonWeb.utils.Address(CARTEIRA_MAEOKA_EMPRESA)
-                });
-                
-                const transaction = {
-                    validUntil: Date.now() + 5 * 60 * 1000,
-                    messages: [
-                        {
-                            address: empresaJettonWalletAddress.toString(),
-                            amount: TonWeb.utils.toNano('0.05').toString(),
-                            payload: TonWeb.utils.bytesToBase64(await transferBody.toBoc())
-                        }
-                    ]
-                };
-                
-                const result = await tonConnectUI.sendTransaction(transaction);
-                
-                // Marcar como claimed E salvar carteira
-                const obra = document.getElementById('obraNumero').value;
-                const senha = document.getElementById('senhaRecompensa').value;
-                await fetch(`${API_URL}?action=claim&obra=${obra}&senha=${senha}&carteira=${enderecoUsuario}`);
-                
-                // Sucesso automático
-                document.getElementById('resultado').innerHTML = `
-                    <div class="sucesso">
-                        <h3>⚡ CLAIM AUTOMÁTICO REALIZADO!</h3>
-                        <p><strong>Método:</strong> Transferência automática</p>
-                        <p><strong>Tokens recebidos:</strong> ${quantidade.toLocaleString('pt-BR')} MAEOKA</p>
-                        <p><strong>Valor:</strong> R$ ${quantidade.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p>
-                        <p><strong>Taxa paga:</strong> ~0.05 TON</p>
-                        <p><strong>Hash:</strong> ${result.boc.slice(0, 20)}...</p>
-                        <p style="margin-top: 15px;">✅ Tokens enviados instantaneamente para sua carteira!</p>
-                    </div>
-                `;
-                document.getElementById('resultado').style.display = 'block';
-                document.getElementById('recompensaInfo').style.display = 'none';
-                
-            } catch (error) {
-                console.error('Erro no claim automático:', error);
-                btnAuto.disabled = false;
-                btnAuto.innerHTML = '⚡ CLAIM AUTOMÁTICO (Pago ~0.05 TON)';
-                
-                if (error.message.includes('User declined')) {
-                    alert('Transação cancelada.');
+                if (data.carteira) {
+                    mostrarClaimJaEmitido(data.carteira);
                 } else {
-                    alert('Erro na transferência automática: ' + error.message + '\nTente o método manual.');
+                    mostrarClaimJaEmitido('Carteira não disponível');
                 }
+            } catch (error) {
+                mostrarClaimJaEmitido('Erro ao buscar dados');
             }
+        }
+
+        function mostrarClaimLiberado() {
+            document.getElementById('statusClaim').innerHTML = `
+                <div style="background: #e6fffa; padding: 15px; border-radius: 8px; margin: 15px 0; border: 2px solid #38b2ac;">
+                    <h4 style="margin: 0 0 10px 0; color: #38b2ac;">✅ CLAIM LIBERADO!</h4>
+                    <p style="margin: 0; color: #38b2ac; font-weight: bold;">Esta recompensa está disponível para solicitação.</p>
+                </div>
+            `;
+            
+            document.getElementById('areaConexao').style.display = 'block';
+        }
+
+        function mostrarClaimJaEmitido(carteira) {
+            document.getElementById('statusClaim').innerHTML = `
+                <div style="background: #fef2e7; padding: 15px; border-radius: 8px; margin: 15px 0; border: 2px solid #f6ad55;">
+                    <h4 style="margin: 0 0 10px 0; color: #f6ad55;">⚠️ CLAIM JÁ EMITIDO!</h4>
+                    <p style="margin: 0 0 10px 0; color: #856404;">Esta recompensa já foi solicitada e processada.</p>
+                    <p style="margin: 0; color: #856404;"><strong>Carteira que solicitou:</strong></p>
+                    <div style="background: #fff; padding: 8px; border-radius: 4px; word-break: break-all; font-family: monospace; font-size: 11px; color: #1a3a52; margin: 5px 0;">
+                        ${carteira}
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('areaConexao').style.display = 'none';
         }
 
         async function claimManual() {
@@ -450,7 +419,7 @@
             } catch (error) {
                 console.error('Erro no claim manual:', error);
                 btnManual.disabled = false;
-                btnManual.innerHTML = '📝 SOLICITAR ENVIO MANUAL (Grátis)';
+                btnManual.innerHTML = '📝 SOLICITAR RECOMPENSA (Grátis)';
                 alert('Erro ao registrar solicitação: ' + error.message);
             }
         }
