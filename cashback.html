@@ -253,7 +253,15 @@
         // Monitorar conexão da carteira
         tonConnectUI.onStatusChange(walletInfo => {
             if (walletInfo) {
-                enderecoUsuario = walletInfo.account.address;
+                // Converter para formato user-friendly
+                const endereco = walletInfo.account.address;
+                try {
+                    const address = new TonWeb.utils.Address(endereco);
+                    enderecoUsuario = address.toString(true, true, false); // user-friendly format
+                } catch (error) {
+                    enderecoUsuario = endereco; // fallback para raw se der erro
+                }
+                
                 if (dadosRecompensa && !dadosRecompensa.claimed) {
                     document.getElementById('btnClaimManual').disabled = false;
                 }
