@@ -198,13 +198,24 @@
             
             <div id="tonConnectButton"></div>
             
-            <button class="botao" id="btnClaim" onclick="claimRecompensa()" disabled>
-                🎯 CLAIM RECOMPENSA
+            <div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin: 15px 0; color: #856404;">
+                <h4 style="margin: 0 0 10px 0;">⚡ ESCOLHA O MÉTODO:</h4>
+                <p style="margin: 0 0 10px 0; font-size: 13px;">
+                    <strong>AUTOMÁTICO:</strong> Você paga ~0.05 TON de taxa e recebe instantaneamente<br>
+                    <strong>MANUAL:</strong> Sem taxas, Kioma envia manualmente em até 24h
+                </p>
+                <p style="margin: 0; font-size: 12px; color: #856404;">
+                    💡 <strong>Importante:</strong> Se você não tem TON para taxas, use o método manual.
+                </p>
+            </div>
+            
+            <button class="botao" id="btnClaimAuto" onclick="claimAutomatico()" disabled style="background: linear-gradient(135deg, #38b2ac 0%, #2c7a7b 100%); margin-bottom: 10px;">
+                ⚡ CLAIM AUTOMÁTICO (Pago ~0.05 TON)
             </button>
             
-            <div style="background: #fff3cd; padding: 10px; border-radius: 5px; margin-top: 15px; color: #856404; font-size: 12px;">
-                💡 <strong>Como funciona:</strong> Conecte sua carteira TON e clique em "CLAIM RECOMPENSA" para receber seus tokens automaticamente!
-            </div>
+            <button class="botao" id="btnClaimManual" onclick="claimManual()" disabled>
+                📝 SOLICITAR ENVIO MANUAL (Grátis)
+            </button>
         </div>
     </div>
 
@@ -242,11 +253,13 @@
             if (walletInfo) {
                 enderecoUsuario = walletInfo.account.address;
                 if (dadosRecompensa && !dadosRecompensa.claimed) {
-                    document.getElementById('btnClaim').disabled = false;
+                    document.getElementById('btnClaimAuto').disabled = false;
+                    document.getElementById('btnClaimManual').disabled = false;
                 }
             } else {
                 enderecoUsuario = '';
-                document.getElementById('btnClaim').disabled = true;
+                document.getElementById('btnClaimAuto').disabled = true;
+                document.getElementById('btnClaimManual').disabled = true;
             }
         });
 
@@ -298,46 +311,45 @@
             }
         }
 
-        async function claimRecompensa() {
+        async function claimAutomatico() {
             if (!dadosRecompensa || !enderecoUsuario) {
                 alert('Conecte sua carteira primeiro!');
                 return;
             }
             
-            const btnClaim = document.getElementById('btnClaim');
-            btnClaim.disabled = true;
-            btnClaim.innerHTML = '🔄 Processando...';
+            const btnAuto = document.getElementById('btnClaimAuto');
+            btnAuto.disabled = true;
+            btnAuto.innerHTML = '⚡ Processando automático...';
             
             try {
-                // Enviar tokens da empresa para o usuário
                 const quantidade = dadosRecompensa.tokens;
                 
-                // Usar TonWeb para enviar tokens
+                // Usar TonWeb para transferência automática
                 const jettonMinter = new TonWeb.token.jetton.JettonMinter(tonweb.provider, {
                     address: TOKEN_MAEOKA
                 });
                 
-                const empresaJettonWalletAddress = await jettonMinter.getJettonWalletAddress(
-                    new TonWeb.utils.Address(CARTEIRA_MAEOKA_EMPRESA)
+                const userJettonWalletAddress = await jettonMinter.getJettonWalletAddress(
+                    new TonWeb.utils.Address(enderecoUsuario)
                 );
                 
                 const jettonWallet = new TonWeb.token.jetton.JettonWallet(tonweb.provider, {
-                    address: empresaJettonWalletAddress
+                    address: userJettonWalletAddress
                 });
                 
                 const transferBody = await jettonWallet.createTransferBody({
                     jettonAmount: TonWeb.utils.toNano(quantidade.toString()),
                     toAddress: new TonWeb.utils.Address(enderecoUsuario),
                     forwardAmount: TonWeb.utils.toNano('0.01'),
-                    forwardPayload: new TextEncoder().encode(`Cashback obra ${document.getElementById('obraNumero').value}`),
-                    responseAddress: new TonWeb.utils.Address(CARTEIRA_MAEOKA_EMPRESA)
+                    forwardPayload: new TextEncoder().encode(`Cashback automático obra ${document.getElementById('obraNumero').value}`),
+                    responseAddress: new TonWeb.utils.Address(enderecoUsuario)
                 });
                 
                 const transaction = {
                     validUntil: Date.now() + 5 * 60 * 1000,
                     messages: [
                         {
-                            address: empresaJettonWalletAddress.toString(),
+                            address: userJettonWalletAddress.toString(),
                             amount: TonWeb.utils.toNano('0.05').toString(),
                             payload: TonWeb.utils.bytesToBase64(await transferBody.toBoc())
                         }
@@ -346,34 +358,104 @@
                 
                 const result = await tonConnectUI.sendTransaction(transaction);
                 
-                // Marcar como claimed na planilha
+                // Marcar como claimed
                 const obra = document.getElementById('obraNumero').value;
                 const senha = document.getElementById('senhaRecompensa').value;
                 await fetch(`${API_URL}?action=claim&obra=${obra}&senha=${senha}`);
                 
-                // Sucesso
+                // Sucesso automático
                 document.getElementById('resultado').innerHTML = `
                     <div class="sucesso">
-                        <h3>🎉 RECOMPENSA RECEBIDA!</h3>
+                        <h3>⚡ CLAIM AUTOMÁTICO REALIZADO!</h3>
+                        <p><strong>Método:</strong> Transferência automática</p>
                         <p><strong>Tokens recebidos:</strong> ${quantidade.toLocaleString('pt-BR')} MAEOKA</p>
                         <p><strong>Valor:</strong> R$ ${quantidade.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p>
-                        <p><strong>Hash da transação:</strong> ${result.boc.slice(0, 20)}...</p>
-                        <p style="margin-top: 15px;">✅ Os tokens foram enviados para sua carteira!</p>
+                        <p><strong>Taxa paga:</strong> ~0.05 TON</p>
+                        <p><strong>Hash:</strong> ${result.boc.slice(0, 20)}...</p>
+                        <p style="margin-top: 15px;">✅ Tokens enviados instantaneamente para sua carteira!</p>
                     </div>
                 `;
                 document.getElementById('resultado').style.display = 'block';
                 document.getElementById('recompensaInfo').style.display = 'none';
                 
             } catch (error) {
-                console.error('Erro no claim:', error);
-                btnClaim.disabled = false;
-                btnClaim.innerHTML = '🎯 CLAIM RECOMPENSA';
+                console.error('Erro no claim automático:', error);
+                btnAuto.disabled = false;
+                btnAuto.innerHTML = '⚡ CLAIM AUTOMÁTICO (Pago ~0.05 TON)';
                 
                 if (error.message.includes('User declined')) {
                     alert('Transação cancelada.');
                 } else {
-                    alert('Erro ao processar recompensa: ' + error.message);
+                    alert('Erro na transferência automática: ' + error.message + '\nTente o método manual.');
                 }
+            }
+        }
+
+        async function claimManual() {
+            if (!dadosRecompensa || !enderecoUsuario) {
+                alert('Conecte sua carteira primeiro!');
+                return;
+            }
+            
+            const btnManual = document.getElementById('btnClaimManual');
+            btnManual.disabled = true;
+            btnManual.innerHTML = '📝 Registrando solicitação...';
+            
+            try {
+                const quantidade = dadosRecompensa.tokens;
+                
+                // Marcar como claimed na planilha
+                const obra = document.getElementById('obraNumero').value;
+                const senha = document.getElementById('senhaRecompensa').value;
+                const response = await fetch(`${API_URL}?action=claim&obra=${obra}&senha=${senha}`);
+                const result = await response.json();
+                
+                if (result.sucesso) {
+                    // Sucesso manual
+                    document.getElementById('resultado').innerHTML = `
+                        <div class="sucesso">
+                            <h3>📝 SOLICITAÇÃO MANUAL REGISTRADA!</h3>
+                            <p><strong>Método:</strong> Envio manual pela Maeoka</p>
+                            <p><strong>Indicador:</strong> ${dadosRecompensa.indicador}</p>
+                            <p><strong>Tokens solicitados:</strong> ${quantidade.toLocaleString('pt-BR')} MAEOKA</p>
+                            <p><strong>Valor:</strong> R$ ${quantidade.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p>
+                            <p><strong>Carteira destino:</strong></p>
+                            <div style="background: #fff; padding: 8px; border-radius: 4px; word-break: break-all; font-family: monospace; font-size: 11px; color: #1a3a52; margin: 10px 0;">
+                                ${enderecoUsuario}
+                            </div>
+                            
+                            <div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin: 15px 0; color: #856404;">
+                                <h4 style="margin: 0 0 10px 0;">📧 NOTIFICAÇÃO PARA KIOMA:</h4>
+                                <p style="margin: 0; font-size: 13px;">
+                                    <strong>Nova solicitação manual:</strong><br>
+                                    Obra: ${obra}<br>
+                                    Indicador: ${dadosRecompensa.indicador}<br>
+                                    Enviar: ${quantidade} MAEOKA<br>
+                                    Para: ${enderecoUsuario.slice(0, 15)}...
+                                </p>
+                            </div>
+                            
+                            <div style="background: #e6fffa; padding: 15px; border-radius: 8px; margin: 15px 0; color: #38b2ac;">
+                                <p style="margin: 0; font-size: 14px;">
+                                    ✅ <strong>Solicitação registrada!</strong><br>
+                                    Kioma enviará seus tokens em até 24 horas.<br>
+                                    Sem taxas para você! 🎉
+                                </p>
+                            </div>
+                        </div>
+                    `;
+                    document.getElementById('resultado').style.display = 'block';
+                    document.getElementById('recompensaInfo').style.display = 'none';
+                    
+                } else {
+                    throw new Error('Erro ao registrar solicitação');
+                }
+                
+            } catch (error) {
+                console.error('Erro no claim manual:', error);
+                btnManual.disabled = false;
+                btnManual.innerHTML = '📝 SOLICITAR ENVIO MANUAL (Grátis)';
+                alert('Erro ao registrar solicitação: ' + error.message);
             }
         }
 
