@@ -3,78 +3,132 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Maeoka Tokens - Conectar Carteira REAL</title>
+    <title>Receber Recompensas - Maeoka Tokens</title>
     <script src="https://unpkg.com/@tonconnect/ui@2.0.9/dist/tonconnect-ui.min.js"></script>
+    <script src="https://unpkg.com/tonweb/dist/tonweb.js"></script>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Arial, sans-serif;
             background: linear-gradient(135deg, #1a3a52 0%, #2c5282 100%);
             margin: 0;
-            padding: 20px;
+            padding: 10px;
             color: white;
             min-height: 100vh;
+            line-height: 1.6;
         }
         
         .container {
             background: white;
             color: #1a3a52;
-            padding: 30px;
-            border-radius: 15px;
-            max-width: 500px;
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 100%;
             margin: 0 auto;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #1a3a52 0%, #2c5282 100%);
+            color: white;
+            padding: 20px;
+            margin: -20px -20px 20px -20px;
+            border-radius: 8px 8px 0 0;
+            text-align: center;
         }
         
         .logo {
-            font-size: 28px;
+            font-size: 18px;
             font-weight: bold;
-            text-align: center;
-            color: #1a3a52;
-            margin-bottom: 10px;
+            margin-bottom: 5px;
         }
         
         .subtitle {
-            text-align: center;
-            color: #666;
-            margin-bottom: 30px;
+            font-size: 11px;
+            opacity: 0.9;
         }
         
-        .status-box {
+        .section {
             padding: 15px;
-            border-radius: 8px;
             margin: 20px 0;
-            text-align: center;
+            background: #f8f9fa;
+            border-left: 4px solid #1a3a52;
+            border-radius: 5px;
+        }
+        
+        .input-group {
+            margin: 15px 0;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
             font-weight: bold;
+            color: #1a3a52;
+            font-size: 14px;
         }
         
-        .desconectado {
-            background: #fef2e7;
-            color: #f6ad55;
-            border: 2px solid #f6ad55;
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e8f4f8;
+            border-radius: 8px;
+            font-size: 16px;
+            box-sizing: border-box;
         }
         
-        .conectado {
+        .botao {
+            background: linear-gradient(135deg, #1a3a52 0%, #2c5282 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            margin: 10px 0;
+            transition: all 0.3s ease;
+        }
+        
+        .botao:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(26, 58, 82, 0.3);
+        }
+        
+        .botao:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .resultado {
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            display: none;
+        }
+        
+        .sucesso {
             background: #e6fffa;
             color: #38b2ac;
             border: 2px solid #38b2ac;
         }
         
-        .carregando {
-            background: #e8f4f8;
-            color: #1a3a52;
-            border: 2px solid #1a3a52;
+        .erro {
+            background: #fef2f2;
+            color: #dc2626;
+            border: 2px solid #dc2626;
         }
         
-        .token-info {
-            background: #f8f9fa;
+        .recompensa-info {
+            background: #e6fffa;
             padding: 20px;
-            border-radius: 8px;
+            border-radius: 10px;
             margin: 20px 0;
-            border-left: 4px solid #1a3a52;
+            border-left: 4px solid #38b2ac;
             display: none;
         }
         
-        .saldo {
+        .valor-destaque {
             font-size: 32px;
             font-weight: bold;
             color: #1a3a52;
@@ -82,467 +136,333 @@
             margin: 15px 0;
         }
         
-        .saldo.carregando {
-            color: #666;
-            font-size: 18px;
-        }
-        
-        .beneficios {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin: 25px 0;
-        }
-        
-        .beneficio {
-            background: #f0f8ff;
-            padding: 15px;
-            border-radius: 8px;
-            text-align: center;
-        }
-        
-        .beneficio-numero {
-            font-size: 24px;
-            font-weight: bold;
-            color: #1a3a52;
-        }
-        
-        .beneficio-texto {
-            font-size: 12px;
-            color: #666;
-            margin-top: 5px;
-        }
-        
-        .info-carteira {
-            background: #e8f4f8;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 20px 0;
-            display: none;
-        }
-        
-        .endereco {
-            font-family: monospace;
-            background: #fff;
-            padding: 8px;
-            border-radius: 4px;
-            word-break: break-all;
-            font-size: 12px;
-        }
-        
-        .botao-desconectar {
-            background: #dc2626;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            width: 100%;
-            margin-top: 15px;
-        }
-        
-        .botao-desconectar:hover {
-            background: #b91c1c;
-        }
-        
-        .sucesso-aviso {
-            background: #e6fffa;
-            color: #38b2ac;
-            padding: 10px;
-            border-radius: 5px;
-            font-size: 12px;
-            text-align: center;
-            margin: 10px 0;
-            border: 1px solid #38b2ac;
-        }
-        
-        .erro-aviso {
-            background: #fef2f2;
-            color: #dc2626;
-            padding: 10px;
-            border-radius: 5px;
-            font-size: 12px;
-            text-align: center;
-            margin: 10px 0;
-            border: 1px solid #dc2626;
-        }
-        
-        .info-aviso {
-            background: #fef2e7;
-            color: #f6ad55;
-            padding: 10px;
-            border-radius: 5px;
-            font-size: 12px;
-            text-align: center;
-            margin: 10px 0;
-            border: 1px solid #f6ad55;
-        }
-        
         #tonConnectButton {
             margin: 20px 0;
             text-align: center;
         }
         
-        .debug-info {
-            background: #f8f9fa;
-            padding: 10px;
-            border-radius: 5px;
-            font-size: 11px;
-            color: #666;
-            margin: 10px 0;
-            max-height: 100px;
-            overflow-y: auto;
-        }
-        
-        @media (max-width: 600px) {
-            .container {
-                margin: 10px;
-                padding: 20px;
-            }
-            
-            .beneficios {
-                grid-template-columns: 1fr;
-                gap: 10px;
-            }
-            
-            .saldo {
-                font-size: 24px;
-            }
+        @media (max-width: 768px) {
+            .container { padding: 10px; margin: 2px; }
+            .header { padding: 12px; margin: -10px -10px 10px -10px; }
+            .logo { font-size: 16px; }
+            .subtitle { font-size: 10px; }
+            .section { padding: 10px; margin: 10px 0; }
+            .input-group label { font-size: 13px; }
+            .input-group input { padding: 10px; font-size: 14px; }
+            .botao { padding: 12px 20px; font-size: 14px; }
+            .valor-destaque { font-size: 24px; }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="logo">🏗️ MAEOKA TOKENS</div>
-        <div class="subtitle">Sistema de Recompensas em Reformas - MAINNET</div>
-        
-        <div class="status-box desconectado" id="statusCarteira">
-            🔗 Carteira Desconectada
+        <div class="header">
+            <div class="logo">🎁 RECEBER RECOMPENSAS</div>
+            <div class="subtitle">Sistema de Cashback Maeoka Tokens</div>
         </div>
         
-        <div id="tonConnectButton"></div>
-        
-        <div class="token-info" id="infoTokens">
-            <h3 style="text-align: center; margin-top: 0;">💰 Seus Tokens Maeoka</h3>
-            <div class="saldo" id="saldoTokens">0 MAEOKA</div>
-            <p style="text-align: center; color: #666;">
-                Equivale a: R$ <span id="valorReais">0,00</span>
-            </p>
-            <div id="statusConsulta"></div>
-        </div>
-        
-        <div class="info-carteira" id="infoCarteira">
-            <h4>📱 Informações da Carteira</h4>
-            <p><strong>Endereço:</strong></p>
-            <div class="endereco" id="enderecoCarteira">Não conectado</div>
-            <p style="margin-top: 15px;"><strong>Status:</strong> <span id="statusConexao">Desconectado</span></p>
+        <div class="section">
+            <h3 style="margin-top: 0;">📝 Dados da Indicação</h3>
             
-            <button class="botao-desconectar" onclick="desconectarCarteira()" id="btnDesconectar" style="display: none;">
-                🚪 Desconectar Carteira
+            <div class="input-group">
+                <label>Número da Obra:</label>
+                <input type="text" id="obraNumero" placeholder="Ex: 2025-123">
+            </div>
+            
+            <div class="input-group">
+                <label>Senha da Recompensa:</label>
+                <input type="password" id="senhaRecompensa" placeholder="Senha fornecida pela Maeoka">
+            </div>
+            
+            <button class="botao" onclick="verificarRecompensa()">
+                🔍 VERIFICAR RECOMPENSA
             </button>
         </div>
         
-        <div class="beneficios">
-            <div class="beneficio">
-                <div class="beneficio-numero">10%</div>
-                <div class="beneficio-texto">Desconto usando tokens</div>
-            </div>
-            <div class="beneficio">
-                <div class="beneficio-numero">3%</div>
-                <div class="beneficio-texto">Cashback em obras</div>
-            </div>
-            <div class="beneficio">
-                <div class="beneficio-numero">40%</div>
-                <div class="beneficio-texto">Máximo em tokens por obra</div>
-            </div>
-            <div class="beneficio">
-                <div class="beneficio-numero">4%</div>
-                <div class="beneficio-texto">Bônus por indicação</div>
-            </div>
-        </div>
+        <div class="resultado" id="resultado"></div>
         
-        <div style="text-align: center; margin-top: 30px; color: #666; font-size: 12px;">
-            <p><strong>Token Maeoka:</strong></p>
-            <div class="endereco" style="margin: 10px 0;">
-                EQCUgsVus4fW5TY2bxBQWSyiwLETOr2iNlVied-szVuJ1t4W
+        <div class="recompensa-info" id="recompensaInfo">
+            <h3 style="text-align: center; margin-top: 0;">✅ RECOMPENSA ENCONTRADA!</h3>
+            
+            <div style="text-align: center;">
+                <p><strong>Obra:</strong> <span id="infoObra"></span></p>
+                <p><strong>Cliente:</strong> <span id="infoCliente"></span></p>
+                <p><strong>Indicador:</strong> <span id="infoIndicador"></span></p>
+                <p><strong>Valor da Obra:</strong> R$ <span id="infoValor"></span></p>
             </div>
-        </div>
-        
-        <div class="debug-info" id="debugInfo" style="display: none;">
-            <strong>Debug:</strong><br>
-            <span id="debugText">Aguardando conexão...</span>
+            
+            <div class="valor-destaque" id="infoTokens">0 MAEOKA</div>
+            <p style="text-align: center; color: #666;">
+                Equivale a: R$ <span id="infoValorTokens">0,00</span>
+            </p>
+            
+            <div id="tonConnectButton"></div>
+            
+            <div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin: 15px 0; color: #856404;">
+                <h4 style="margin: 0 0 10px 0;">⚡ ESCOLHA O MÉTODO:</h4>
+                <p style="margin: 0 0 10px 0; font-size: 13px;">
+                    <strong>AUTOMÁTICO:</strong> Você paga ~0.05 TON de taxa e recebe instantaneamente<br>
+                    <strong>MANUAL:</strong> Sem taxas, Kioma envia manualmente em até 24h
+                </p>
+                <p style="margin: 0; font-size: 12px; color: #856404;">
+                    💡 <strong>Importante:</strong> Se você não tem TON para taxas, use o método manual.
+                </p>
+            </div>
+            
+            <button class="botao" id="btnClaimAuto" onclick="claimAutomatico()" disabled style="background: linear-gradient(135deg, #38b2ac 0%, #2c7a7b 100%); margin-bottom: 10px;">
+                ⚡ CLAIM AUTOMÁTICO (Pago ~0.05 TON)
+            </button>
+            
+            <button class="botao" id="btnClaimManual" onclick="claimManual()" disabled>
+                📝 SOLICITAR ENVIO MANUAL (Grátis)
+            </button>
         </div>
     </div>
 
     <script>
+        // URL da API do Google Sheets
+        const API_URL = 'https://script.google.com/macros/s/AKfycbxWiKqFxvCaPqKgZM7sjNBrimnXOoiGOgCgXzX_UjtUV95EMotoJAzO-yzgtVl-WkyG/exec';
+        
         // Configuração do TON Connect
         const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
             manifestUrl: 'https://ton-connect.github.io/demo-dapp-with-wallet/tonconnect-manifest.json',
             buttonRootId: 'tonConnectButton'
         });
 
-        // Endereço do token Maeoka
+        // Configurações
         const TOKEN_MAEOKA = 'EQCUgsVus4fW5TY2bxBQWSyiwLETOr2iNlVied-szVuJ1t4W';
+        const CARTEIRA_MAEOKA_EMPRESA = 'UQCI80_zNVLySHf1DZbxfVw52DMPQj8EAOMcDn9TlvsjC341';
+        
+        let dadosRecompensa = null;
+        let enderecoUsuario = '';
+        let tonweb = null;
 
-        // Elementos da página
-        const statusCarteira = document.getElementById('statusCarteira');
-        const infoTokens = document.getElementById('infoTokens');
-        const saldoTokens = document.getElementById('saldoTokens');
-        const valorReais = document.getElementById('valorReais');
-        const infoCarteira = document.getElementById('infoCarteira');
-        const enderecoCarteira = document.getElementById('enderecoCarteira');
-        const statusConexao = document.getElementById('statusConexao');
-        const btnDesconectar = document.getElementById('btnDesconectar');
-        const statusConsulta = document.getElementById('statusConsulta');
-        const debugInfo = document.getElementById('debugInfo');
-        const debugText = document.getElementById('debugText');
-
-        // Função para adicionar debug
-        function addDebug(message) {
-            const timestamp = new Date().toLocaleTimeString();
-            debugText.innerHTML += `<br>[${timestamp}] ${message}`;
-            debugInfo.style.display = 'block';
-            console.log(`[MAEOKA DEBUG] ${message}`);
+        // Inicializar TonWeb
+        function inicializarTonWeb() {
+            try {
+                tonweb = new TonWeb(new TonWeb.HttpProvider('https://toncenter.com/api/v2/jsonRPC'));
+                return true;
+            } catch (error) {
+                console.error('Erro ao inicializar TonWeb:', error);
+                return false;
+            }
         }
 
-        // Monitorar mudanças na conexão da carteira
+        // Monitorar conexão da carteira
         tonConnectUI.onStatusChange(walletInfo => {
             if (walletInfo) {
-                // Carteira conectada
-                statusCarteira.textContent = '✅ Carteira Conectada';
-                statusCarteira.className = 'status-box conectado';
-                
-                // Mostrar informações da carteira
-                const endereco = walletInfo.account.address;
-                enderecoCarteira.textContent = endereco;
-                statusConexao.textContent = 'Conectado';
-                infoCarteira.style.display = 'block';
-                btnDesconectar.style.display = 'block';
-                
-                addDebug(`Carteira conectada: ${endereco.slice(0, 10)}...`);
-                
-                // Buscar saldo dos tokens na mainnet
-                buscarSaldoTokensMainnet(endereco);
-                
+                enderecoUsuario = walletInfo.account.address;
+                if (dadosRecompensa && !dadosRecompensa.claimed) {
+                    document.getElementById('btnClaimAuto').disabled = false;
+                    document.getElementById('btnClaimManual').disabled = false;
+                }
             } else {
-                // Carteira desconectada
-                statusCarteira.textContent = '🔗 Carteira Desconectada';
-                statusCarteira.className = 'status-box desconectado';
-                
-                // Ocultar informações
-                infoTokens.style.display = 'none';
-                infoCarteira.style.display = 'none';
-                btnDesconectar.style.display = 'none';
-                
-                // Resetar valores
-                saldoTokens.textContent = '0 MAEOKA';
-                valorReais.textContent = '0,00';
-                
-                addDebug('Carteira desconectada');
+                enderecoUsuario = '';
+                document.getElementById('btnClaimAuto').disabled = true;
+                document.getElementById('btnClaimManual').disabled = true;
             }
         });
 
-        // Função para buscar saldo real na mainnet TON
-        async function buscarSaldoTokensMainnet(endereco) {
+        async function verificarRecompensa() {
+            const obra = document.getElementById('obraNumero').value.trim();
+            const senha = document.getElementById('senhaRecompensa').value.trim();
+            const resultado = document.getElementById('resultado');
+            
+            if (!obra || !senha) {
+                resultado.innerHTML = '<div class="erro">❌ Preencha todos os campos!</div>';
+                resultado.style.display = 'block';
+                return;
+            }
+            
+            resultado.innerHTML = '<div style="background: #e8f4f8; color: #1a3a52; padding: 15px; border-radius: 8px;">🔄 Verificando recompensa...</div>';
+            resultado.style.display = 'block';
+            document.getElementById('recompensaInfo').style.display = 'none';
+            
             try {
-                statusCarteira.textContent = '🔄 Consultando Blockchain...';
-                statusCarteira.className = 'status-box carregando';
-                saldoTokens.textContent = 'Carregando saldo...';
-                saldoTokens.className = 'saldo carregando';
+                const response = await fetch(`${API_URL}?action=verificar&obra=${obra}&senha=${senha}`);
+                const data = await response.json();
                 
-                addDebug('Iniciando consulta na mainnet TON...');
-                addDebug(`Endereço da carteira: ${endereco}`);
-                addDebug(`Token Maeoka: ${TOKEN_MAEOKA}`);
-                
-                let saldoEncontrado = false;
-                let saldoTotal = 0;
-                
-                // Método 1: TonViewer API (como na imagem que você mostrou)
-                try {
-                    addDebug('Método 1: TonViewer API');
+                if (data.encontrado) {
+                    dadosRecompensa = data;
                     
-                    // Buscar jettons na carteira usando TonViewer
-                    const tonviewerResponse = await fetch(`https://tonviewer.com/api/v2/accounts/${endereco}/jettons`, {
-                        headers: {
-                            'Accept': 'application/json'
-                        }
-                    });
-                    
-                    if (tonviewerResponse.ok) {
-                        const tonviewerData = await tonviewerResponse.json();
-                        addDebug(`TonViewer response: ${JSON.stringify(tonviewerData).slice(0, 200)}...`);
-                        
-                        if (tonviewerData.jettons && Array.isArray(tonviewerData.jettons)) {
-                            const maeokaJetton = tonviewerData.jettons.find(jetton => 
-                                jetton.jetton_master === TOKEN_MAEOKA ||
-                                jetton.address === TOKEN_MAEOKA ||
-                                (jetton.metadata && jetton.metadata.symbol === 'MAEOKA')
-                            );
-                            
-                            if (maeokaJetton) {
-                                saldoTotal = parseFloat(maeokaJetton.balance) / Math.pow(10, maeokaJetton.decimals || 9);
-                                saldoEncontrado = true;
-                                addDebug(`✅ Saldo encontrado via TonViewer: ${saldoTotal} MAEOKA`);
-                            } else {
-                                addDebug(`Jettons encontrados: ${tonviewerData.jettons.length}, mas nenhum MAEOKA`);
-                            }
-                        }
-                    } else {
-                        addDebug(`TonViewer erro: ${tonviewerResponse.status}`);
-                    }
-                } catch (error) {
-                    addDebug(`Erro TonViewer: ${error.message}`);
-                }
-                
-                // Método 2: TonAPI.io (API oficial mais moderna)
-                if (!saldoEncontrado) {
-                    try {
-                        addDebug('Método 2: TonAPI.io');
-                        
-                        const tonapiResponse = await fetch(`https://tonapi.io/v2/accounts/${endereco}/jettons`, {
-                            headers: {
-                                'Accept': 'application/json'
-                            }
-                        });
-                        
-                        if (tonapiResponse.ok) {
-                            const tonapiData = await tonapiResponse.json();
-                            addDebug(`TonAPI jettons encontrados: ${tonapiData.balances ? tonapiData.balances.length : 0}`);
-                            
-                            if (tonapiData.balances) {
-                                const maeokaBalance = tonapiData.balances.find(balance => 
-                                    balance.jetton.address === TOKEN_MAEOKA ||
-                                    (balance.jetton.symbol === 'MAEOKA')
-                                );
-                                
-                                if (maeokaBalance) {
-                                    saldoTotal = parseInt(maeokaBalance.balance) / Math.pow(10, maeokaBalance.jetton.decimals || 9);
-                                    saldoEncontrado = true;
-                                    addDebug(`✅ Saldo encontrado via TonAPI: ${saldoTotal} MAEOKA`);
-                                }
-                            }
-                        }
-                    } catch (error) {
-                        addDebug(`Erro TonAPI: ${error.message}`);
-                    }
-                }
-                
-                // Método 3: TON Center (método tradicional)
-                if (!saldoEncontrado) {
-                    try {
-                        addDebug('Método 3: TON Center');
-                        
-                        // Consultar o jetton master para obter o endereço da wallet do usuário
-                        const jettonWalletResponse = await fetch(`https://toncenter.com/api/v2/runGetMethod?address=${TOKEN_MAEOKA}&method=get_wallet_address&stack=[["tvm.Slice","${endereco}"]]`);
-                        const jettonWalletData = await jettonWalletResponse.json();
-                        
-                        if (jettonWalletData.ok && jettonWalletData.result && jettonWalletData.result.length > 0) {
-                            const walletAddress = jettonWalletData.result[0];
-                            addDebug(`Jetton wallet address: ${walletAddress}`);
-                            
-                            // Buscar dados da wallet do jetton
-                            const walletDataResponse = await fetch(`https://toncenter.com/api/v2/runGetMethod?address=${walletAddress}&method=get_wallet_data`);
-                            const walletData = await walletDataResponse.json();
-                            
-                            if (walletData.ok && walletData.result && walletData.result.length > 0) {
-                                saldoTotal = parseInt(walletData.result[0]) / 1000000000; // 9 decimais
-                                saldoEncontrado = true;
-                                addDebug(`✅ Saldo encontrado via TON Center: ${saldoTotal} MAEOKA`);
-                            }
-                        }
-                    } catch (error) {
-                        addDebug(`Erro TON Center: ${error.message}`);
-                    }
-                }
-                
-                // Método 4: Verificação pelo endereço conhecido (fallback temporário)
-                if (!saldoEncontrado) {
-                    addDebug('Método 4: Verificação por endereço conhecido');
-                    
-                    // Converter endereços para comparação
-                    const enderecoComparacao = endereco.toLowerCase().replace(/[^a-f0-9]/g, '');
-                    const enderecoConhecido = '88f34ff33552f24877f50d96f17d5c39d8330f423f0400e31c0e7f5396fb230b';
-                    
-                    if (enderecoComparacao.includes(enderecoConhecido) || enderecoConhecido.includes(enderecoComparacao.slice(-40))) {
-                        saldoTotal = 7800; // Seu saldo conhecido
-                        saldoEncontrado = true;
-                        addDebug('✅ Endereço reconhecido - aplicando saldo conhecido: 7800 MAEOKA');
-                    } else {
-                        addDebug(`Endereço não reconhecido. Comparando: ${enderecoComparacao.slice(-40)} vs ${enderecoConhecido}`);
-                    }
-                }
-                
-                // Atualizar interface
-                statusCarteira.textContent = '✅ Carteira Conectada';
-                statusCarteira.className = 'status-box conectado';
-                saldoTokens.className = 'saldo';
-                
-                if (saldoEncontrado && saldoTotal > 0) {
-                    // Saldo encontrado
-                    saldoTokens.textContent = `${saldoTotal.toLocaleString('pt-BR', {maximumFractionDigits: 2})} MAEOKA`;
-                    valorReais.textContent = saldoTotal.toLocaleString('pt-BR', {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2
-                    });
-                    
-                    if (saldoTotal === 7800) {
-                        statusConsulta.innerHTML = '<div class="sucesso-aviso">✅ Saldo conhecido aplicado - APIs em desenvolvimento</div>';
-                    } else {
-                        statusConsulta.innerHTML = '<div class="sucesso-aviso">✅ Saldo consultado na blockchain TON</div>';
+                    if (data.claimed === 'TRUE') {
+                        resultado.innerHTML = '<div class="erro">⚠️ Esta recompensa já foi resgatada!</div>';
+                        return;
                     }
                     
-                    addDebug(`🎉 Consulta finalizada: ${saldoTotal} MAEOKA exibidos`);
+                    // Preencher informações
+                    document.getElementById('infoObra').textContent = obra;
+                    document.getElementById('infoCliente').textContent = data.cliente;
+                    document.getElementById('infoIndicador').textContent = data.indicador;
+                    document.getElementById('infoValor').textContent = data.valor.toLocaleString('pt-BR');
+                    document.getElementById('infoTokens').textContent = `${data.tokens.toLocaleString('pt-BR')} MAEOKA`;
+                    document.getElementById('infoValorTokens').textContent = data.tokens.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+                    
+                    resultado.style.display = 'none';
+                    document.getElementById('recompensaInfo').style.display = 'block';
                     
                 } else {
-                    // Nenhum token encontrado
-                    saldoTokens.textContent = '0 MAEOKA';
-                    valorReais.textContent = '0,00';
-                    
-                    statusConsulta.innerHTML = '<div class="info-aviso">ℹ️ Nenhum token Maeoka encontrado nesta carteira</div>';
-                    addDebug('❌ Nenhum token encontrado em nenhum método');
+                    resultado.innerHTML = '<div class="erro">❌ Recompensa não encontrada! Verifique os dados.</div>';
                 }
-                
-                infoTokens.style.display = 'block';
                 
             } catch (error) {
-                console.error('Erro na consulta mainnet:', error);
-                addDebug(`❌ Erro geral: ${error.message}`);
-                
-                // Fallback final
-                statusCarteira.textContent = '✅ Carteira Conectada';
-                statusCarteira.className = 'status-box conectado';
-                
-                // Tentar aplicar saldo conhecido mesmo com erro
-                const enderecoComparacao = endereco.toLowerCase().replace(/[^a-f0-9]/g, '');
-                const enderecoConhecido = '88f34ff33552f24877f50d96f17d5c39d8330f423f0400e31c0e7f5396fb230b';
-                
-                if (enderecoComparacao.includes(enderecoConhecido) || enderecoConhecido.includes(enderecoComparacao.slice(-40))) {
-                    saldoTokens.textContent = '7.800 MAEOKA';
-                    valorReais.textContent = '7.800,00';
-                    statusConsulta.innerHTML = '<div class="sucesso-aviso">✅ Saldo conhecido (erro nas APIs de consulta)</div>';
-                    addDebug('Fallback: saldo conhecido aplicado devido a erro');
-                } else {
-                    saldoTokens.textContent = 'Erro na consulta';
-                    valorReais.textContent = '0,00';
-                    statusConsulta.innerHTML = '<div class="erro-aviso">❌ Erro ao consultar blockchain. Verifique conexão.</div>';
-                }
-                
-                saldoTokens.className = 'saldo';
-                infoTokens.style.display = 'block';
+                console.error('Erro ao verificar recompensa:', error);
+                resultado.innerHTML = '<div class="erro">❌ Erro ao conectar com o sistema. Tente novamente.</div>';
             }
         }
 
-        // Função para desconectar carteira
-        function desconectarCarteira() {
-            tonConnectUI.disconnect();
-            debugInfo.style.display = 'none';
-            debugText.innerHTML = 'Aguardando conexão...';
+        async function claimAutomatico() {
+            if (!dadosRecompensa || !enderecoUsuario) {
+                alert('Conecte sua carteira primeiro!');
+                return;
+            }
+            
+            const btnAuto = document.getElementById('btnClaimAuto');
+            btnAuto.disabled = true;
+            btnAuto.innerHTML = '⚡ Processando automático...';
+            
+            try {
+                const quantidade = dadosRecompensa.tokens;
+                
+                // Usar TonWeb para transferência automática
+                const jettonMinter = new TonWeb.token.jetton.JettonMinter(tonweb.provider, {
+                    address: TOKEN_MAEOKA
+                });
+                
+                const userJettonWalletAddress = await jettonMinter.getJettonWalletAddress(
+                    new TonWeb.utils.Address(enderecoUsuario)
+                );
+                
+                const jettonWallet = new TonWeb.token.jetton.JettonWallet(tonweb.provider, {
+                    address: userJettonWalletAddress
+                });
+                
+                const transferBody = await jettonWallet.createTransferBody({
+                    jettonAmount: TonWeb.utils.toNano(quantidade.toString()),
+                    toAddress: new TonWeb.utils.Address(enderecoUsuario),
+                    forwardAmount: TonWeb.utils.toNano('0.01'),
+                    forwardPayload: new TextEncoder().encode(`Cashback automático obra ${document.getElementById('obraNumero').value}`),
+                    responseAddress: new TonWeb.utils.Address(enderecoUsuario)
+                });
+                
+                const transaction = {
+                    validUntil: Date.now() + 5 * 60 * 1000,
+                    messages: [
+                        {
+                            address: userJettonWalletAddress.toString(),
+                            amount: TonWeb.utils.toNano('0.05').toString(),
+                            payload: TonWeb.utils.bytesToBase64(await transferBody.toBoc())
+                        }
+                    ]
+                };
+                
+                const result = await tonConnectUI.sendTransaction(transaction);
+                
+                // Marcar como claimed
+                const obra = document.getElementById('obraNumero').value;
+                const senha = document.getElementById('senhaRecompensa').value;
+                await fetch(`${API_URL}?action=claim&obra=${obra}&senha=${senha}`);
+                
+                // Sucesso automático
+                document.getElementById('resultado').innerHTML = `
+                    <div class="sucesso">
+                        <h3>⚡ CLAIM AUTOMÁTICO REALIZADO!</h3>
+                        <p><strong>Método:</strong> Transferência automática</p>
+                        <p><strong>Tokens recebidos:</strong> ${quantidade.toLocaleString('pt-BR')} MAEOKA</p>
+                        <p><strong>Valor:</strong> R$ ${quantidade.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p>
+                        <p><strong>Taxa paga:</strong> ~0.05 TON</p>
+                        <p><strong>Hash:</strong> ${result.boc.slice(0, 20)}...</p>
+                        <p style="margin-top: 15px;">✅ Tokens enviados instantaneamente para sua carteira!</p>
+                    </div>
+                `;
+                document.getElementById('resultado').style.display = 'block';
+                document.getElementById('recompensaInfo').style.display = 'none';
+                
+            } catch (error) {
+                console.error('Erro no claim automático:', error);
+                btnAuto.disabled = false;
+                btnAuto.innerHTML = '⚡ CLAIM AUTOMÁTICO (Pago ~0.05 TON)';
+                
+                if (error.message.includes('User declined')) {
+                    alert('Transação cancelada.');
+                } else {
+                    alert('Erro na transferência automática: ' + error.message + '\nTente o método manual.');
+                }
+            }
         }
 
-        // Log inicial
-        console.log('Widget Maeoka Tokens MAINNET carregado');
-        console.log('Token address:', TOKEN_MAEOKA);
-        addDebug('Sistema iniciado - aguardando conexão de carteira');
+        async function claimManual() {
+            if (!dadosRecompensa || !enderecoUsuario) {
+                alert('Conecte sua carteira primeiro!');
+                return;
+            }
+            
+            const btnManual = document.getElementById('btnClaimManual');
+            btnManual.disabled = true;
+            btnManual.innerHTML = '📝 Registrando solicitação...';
+            
+            try {
+                const quantidade = dadosRecompensa.tokens;
+                
+                // Marcar como claimed na planilha
+                const obra = document.getElementById('obraNumero').value;
+                const senha = document.getElementById('senhaRecompensa').value;
+                const response = await fetch(`${API_URL}?action=claim&obra=${obra}&senha=${senha}`);
+                const result = await response.json();
+                
+                if (result.sucesso) {
+                    // Sucesso manual
+                    document.getElementById('resultado').innerHTML = `
+                        <div class="sucesso">
+                            <h3>📝 SOLICITAÇÃO MANUAL REGISTRADA!</h3>
+                            <p><strong>Método:</strong> Envio manual pela Maeoka</p>
+                            <p><strong>Indicador:</strong> ${dadosRecompensa.indicador}</p>
+                            <p><strong>Tokens solicitados:</strong> ${quantidade.toLocaleString('pt-BR')} MAEOKA</p>
+                            <p><strong>Valor:</strong> R$ ${quantidade.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p>
+                            <p><strong>Carteira destino:</strong></p>
+                            <div style="background: #fff; padding: 8px; border-radius: 4px; word-break: break-all; font-family: monospace; font-size: 11px; color: #1a3a52; margin: 10px 0;">
+                                ${enderecoUsuario}
+                            </div>
+                            
+                            <div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin: 15px 0; color: #856404;">
+                                <h4 style="margin: 0 0 10px 0;">📧 NOTIFICAÇÃO PARA KIOMA:</h4>
+                                <p style="margin: 0; font-size: 13px;">
+                                    <strong>Nova solicitação manual:</strong><br>
+                                    Obra: ${obra}<br>
+                                    Indicador: ${dadosRecompensa.indicador}<br>
+                                    Enviar: ${quantidade} MAEOKA<br>
+                                    Para: ${enderecoUsuario.slice(0, 15)}...
+                                </p>
+                            </div>
+                            
+                            <div style="background: #e6fffa; padding: 15px; border-radius: 8px; margin: 15px 0; color: #38b2ac;">
+                                <p style="margin: 0; font-size: 14px;">
+                                    ✅ <strong>Solicitação registrada!</strong><br>
+                                    Kioma enviará seus tokens em até 24 horas.<br>
+                                    Sem taxas para você! 🎉
+                                </p>
+                            </div>
+                        </div>
+                    `;
+                    document.getElementById('resultado').style.display = 'block';
+                    document.getElementById('recompensaInfo').style.display = 'none';
+                    
+                } else {
+                    throw new Error('Erro ao registrar solicitação');
+                }
+                
+            } catch (error) {
+                console.error('Erro no claim manual:', error);
+                btnManual.disabled = false;
+                btnManual.innerHTML = '📝 SOLICITAR ENVIO MANUAL (Grátis)';
+                alert('Erro ao registrar solicitação: ' + error.message);
+            }
+        }
+
+        // Inicializar sistema
+        window.addEventListener('load', () => {
+            inicializarTonWeb();
+        });
     </script>
 </body>
 </html>
