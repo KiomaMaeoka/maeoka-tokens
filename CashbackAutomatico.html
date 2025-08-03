@@ -11,6 +11,7 @@
         button { background: #fff; color: #1a3a52; border: none; cursor: pointer; }
         #resultado { margin-top: 10px; }
     </style>
+    <script src="https://unpkg.com/@tonconnect/ui@2.0.9/dist/tonconnect-ui.min.js"></script>
 </head>
 <body>
     <div class="container">
@@ -18,14 +19,27 @@
         <div>Dados da Indicação</div>
         <input id="numeroObra" placeholder="Número da Obra">
         <input id="senhaRecompensa" type="password" placeholder="Senha da Recompensa">
+        <ton-connect-ui id="tonConnect" ui-options="{ uiPreferences: { theme: 'LIGHT' } }"></ton-connect-ui>
         <button onclick="solicitarCashback()">Solicitar (Grátis)</button>
         <div id="resultado"></div>
     </div>
     <script src="https://unpkg.com/tonweb/dist/tonweb.js"></script>
     <script>
+        const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
+            manifestUrl: 'https://maeoka-tokens.vercel.app/tonconnect-manifest.json', // Crie esse arquivo no próximo passo
+            uiOptions: { uiPreferences: { theme: 'LIGHT' } }
+        });
+
         async function solicitarCashback() {
             const numeroObra = document.querySelector('#numeroObra').value;
             const senha = document.querySelector('#senhaRecompensa').value;
+
+            const connectedWallet = tonConnectUI.wallet;
+            if (!connectedWallet) {
+                document.getElementById('resultado').innerText = "Conecte sua carteira TON primeiro!";
+                return;
+            }
+            const clienteAddress = connectedWallet.account.address;
 
             const valorObra = await verificarGoogleSheets(numeroObra, senha);
             if (valorObra === 0) {
@@ -34,13 +48,13 @@
             }
 
             const cashback = valorObra * 0.03;
-            const saldoSimulado = 5000; // Substitua depois por saldo real da wallet
+            const saldoSimulado = 5000; // Ainda simulação
 
             if (cashback > saldoSimulado) {
                 document.getElementById('resultado').innerText = "O numero que você está solicitando é maior do que temos na nossa wallet semente, um email foi enviado para o Engenheiro Kioma que já tem acesso ao saldo solicitado e ao numero da sua wallet e ele enviará em até 24h o saldo solicitado";
                 enviarEmail("O cashback que o cliente está solicitando no modo manual é maior que o que tem na wallet, reponha os tokens da wallet");
             } else {
-                document.getElementById('resultado').innerText = "Cashback de " + cashback + " MAEOKA enviado! (Simulação)";
+                document.getElementById('resultado').innerText = "Cashback de " + cashback + " MAEOKA enviado para " + clienteAddress + " (Simulação)";
             }
         }
 
@@ -52,7 +66,7 @@
         }
 
         function enviarEmail(mensagem) {
-            console.log("Email enviado: " + mensagem); // Simulação, substitua por real depois
+            console.log("Email enviado: " + mensagem);
         }
     </script>
 </body>
