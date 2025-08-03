@@ -236,7 +236,7 @@
       
         function inicializarTonWeb() {
             try {
-                tonweb = new TonWeb(new TonWeb.HttpProvider('https://toncenter.com/api/v2/jsonRPC', { apiKey: 'be7785badc93b8b0ffcb1329d2d50fe724e2714d6de26f941fcb4f06860a6d4b' }));
+                tonweb = new TonWeb(new TonWeb.HttpProvider('https://ton.api.onfinality.io/public'));
                 console.log('TonWeb inicializado com sucesso');
                 return true;
             } catch (error) {
@@ -295,7 +295,8 @@
       
         async function buscarDadosCompletos(obra, senha) {
             try {
-                const response = await fetch(`${API_URL}?action=buscarCompleto&obra=${obra}&senha=${senha}`);
+                const response = await fetch(`${API_URL}?action=buscarCompleto&obra=${encodeURIComponent(obra)}&senha=${encodeURIComponent(senha)}`);
+                if (!response.ok) throw new Error(`Erro HTTP: ${response.status}`);
                 const data = await response.json();
                 if (data.encontrado && data.claimed) {
                     mostrarClaimJaEmitido(data.carteira);
@@ -404,37 +405,43 @@
                 console.log('Transação criada, enviando...');
                 
                 let attempts = 0, maxAttempts = 3;
+                let result = null;
                 while (attempts < maxAttempts) {
                     try {
-                        const result = await transfer.send();
+                        result = await transfer.send();
                         console.log('Transação enviada:', result);
-                        const response = await fetch(`${API_URL}?action=claim&obra=${dadosRecompensa.obra}&senha=${document.getElementById('senhaRecompensa').value}&carteira=${enderecoUsuario}`);
-                        const claimResult = await response.json();
-                        if (claimResult.sucesso) {
-                            document.getElementById('resultado').innerHTML = `
-                                <div class="sucesso">
-                                    ✅ Cashback de ${dadosRecompensa.tokens} MAEOKA enviado com sucesso!
-                                    <br><small>Hash da transação: ${result.hash || 'Processando...'}</small>
-                                </div>
-                            `;
-                            document.getElementById('resultado').style.display = 'block';
-                            document.getElementById('recompensaInfo').style.display = 'none';
-                            return;
-                        } else throw new Error('Falha ao registrar o claim na planilha');
+                        break;
                     } catch (error) {
                         console.error('Erro na tentativa', attempts + 1, ':', error);
-                        if (error.message.includes('429') && attempts < maxAttempts - 1) {
+                        if (error && error.message && error.message.includes('429') && attempts < maxAttempts - 1) {
                             await new Promise(resolve => setTimeout(resolve, 2000 * (attempts + 1))); // Espera 2s, 4s, 6s
                             attempts++;
-                        } else throw error;
+                        } else {
+                            throw error;
+                        }
                     }
                 }
-                throw new Error('Limite de tentativas atingido');
+                if (!result) throw new Error('Limite de tentativas atingido');
+                
+                const response = await fetch(`${API_URL}?action=claim&obra=${dadosRecompensa.obra}&senha=${document.getElementById('senhaRecompensa').value}&carteira=${enderecoUsuario}`);
+                const claimResult = await response.json();
+                if (claimResult.sucesso) {
+                    document.getElementById('resultado').innerHTML = `
+                        <div class="sucesso">
+                            ✅ Cashback de ${dadosRecompensa.tokens} MAEOKA enviado com sucesso!
+                            <br><small>Hash da transação: ${result.hash || 'Processando...'}</small>
+                        </div>
+                    `;
+                    document.getElementById('resultado').style.display = 'block';
+                    document.getElementById('recompensaInfo').style.display = 'none';
+                } else throw new Error('Falha ao registrar o claim na planilha');
+               
             } catch (error) {
                 console.error('Erro detalhado no claim auto:', error);
+                const errorMsg = error && error.message ? error.message : 'Erro desconhecido';
                 document.getElementById('resultado').innerHTML = `
                     <div class="erro">
-                        ❌ Erro no envio automático: ${error.message}
+                        ❌ Erro no envio automático: ${errorMsg}
                         <br><small>Verifique o console para mais detalhes</small>
                     </div>
                 `;
