@@ -9,6 +9,7 @@
         .container { max-width: 400px; margin: 0 auto; background: #2c5282; padding: 20px; border-radius: 10px; }
         input, button { width: 100%; padding: 10px; margin: 10px 0; }
         button { background: #fff; color: #1a3a52; border: none; cursor: pointer; }
+        #resultado { margin-top: 10px; }
     </style>
 </head>
 <body>
@@ -22,26 +23,40 @@
     </div>
     <script src="https://unpkg.com/tonweb/dist/tonweb.js"></script>
     <script>
-      async function solicitarCashback() {
-        const numeroObra = document.querySelector('#numeroObra').value;
-        const senha = document.querySelector('#senhaRecompensa').value;
-        const valorObra = await verificarGoogleSheets(numeroObra, senha); // Placeholder
-        const cashback = valorObra * 0.03;
-        const wallet5000 = new TonWeb(new TonWeb.HttpProvider('https://toncenter.com/api/v2/jsonRPC'), { seed: process.env.WALLET5000_SEED });
-        const saldo = await wallet5000.getBalance();
+        async function solicitarCashback() {
+            const numeroObra = document.querySelector('#numeroObra').value;
+            const senha = document.querySelector('#senhaRecompensa').value;
 
-        if (cashback > saldo / 1e9) {
-          document.getElementById('resultado').innerText = "O numero que você está solicitando é maior do que temos na nossa wallet semente, um email foi enviado para o Engenheiro Kioma que já tem acesso ao saldo solicitado e ao numero da sua wallet e ele enviará em até 24h o saldo solicitado";
-          enviarEmail("O cashback que o cliente está solicitando no modo manual é maior que o que tem na wallet, reponha os tokens da wallet");
-        } else {
-          await wallet5000.sendTransaction({ to: 'endereço_do_cliente', amount: cashback * 1e9 }); // Substitua 'endereço_do_cliente'
-          document.getElementById('resultado').innerText = "Cashback de " + cashback + " MAEOKA enviado!";
+            // Simulação de verificação no Google Sheets
+            const valorObra = await verificarGoogleSheets(numeroObra, senha);
+            if (!valorObra) {
+                document.getElementById('resultado').innerText = "Número da Obra ou Senha inválidos!";
+                return;
+            }
+
+            const cashback = valorObra * 0.03; // 3% de cashback
+            const saldoSimulado = 5000; // Simulação de saldo da wallet5000
+
+            if (cashback > saldoSimulado) {
+                document.getElementById('resultado').innerText = "O numero que você está solicitando é maior do que temos na nossa wallet semente, um email foi enviado para o Engenheiro Kioma que já tem acesso ao saldo solicitado e ao numero da sua wallet e ele enviará em até 24h o saldo solicitado";
+                enviarEmail("O cashback que o cliente está solicitando no modo manual é maior que o que tem na wallet, reponha os tokens da wallet");
+            } else {
+                document.getElementById('resultado').innerText = "Cashback de " + cashback + " MAEOKA enviado! (Simulação)";
+            }
         }
-      }
 
-      // Funções placeholder (implementar depois)
-      async function verificarGoogleSheets(numero, senha) { return 1000; } // Exemplo
-      function enviarEmail(mensagem) { /* Lógica de email */ }
+        // Função simulada para verificar Google Sheets
+        async function verificarGoogleSheets(numero, senha) {
+            // Simulação: retorna 1000 se número for "123" e senha "456", senão 0
+            if (numero === "123" && senha === "456") return 1000;
+            return 0;
+        }
+
+        // Função simulada para enviar email
+        function enviarEmail(mensagem) {
+            console.log("Email enviado às 08:38 PM de 03/08/2025: " + mensagem);
+            // Para funcionar de verdade, precisará de Google Apps Script
+        }
     </script>
 </body>
 </html>
