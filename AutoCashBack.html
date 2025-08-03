@@ -370,24 +370,42 @@
                 const seedWords = HOT_WALLET_SEED.split(' ');
                 console.log('Seed convertida para array, palavras:', seedWords.length);
                 
-                // Gerar keypair usando método simplificado
+                // Gerar keypair usando método PBKDF2 (compatível com TON)
                 let keyPair;
                 try {
-                    // Método direto sem mnemonicToSeed
+                    console.log('Gerando keypair com método PBKDF2...');
+                    
+                    // Implementação compatível com TON usando PBKDF2
                     const seedString = HOT_WALLET_SEED;
-                    
-                    // Criar hash da seed phrase para usar como seed
                     const encoder = new TextEncoder();
-                    const data = encoder.encode(seedString);
-                    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-                    const hashArray = new Uint8Array(hashBuffer);
                     
-                    // Usar os primeiros 32 bytes como seed para keypair
-                    keyPair = TonWeb.utils.nacl.sign.keyPair.fromSeed(hashArray.slice(0, 32));
-                    console.log('KeyPair gerado com método alternativo');
+                    // Importar a seed phrase como key material
+                    const keyMaterial = await crypto.subtle.importKey(
+                        'raw',
+                        encoder.encode(seedString),
+                        { name: 'PBKDF2' },
+                        false,
+                        ['deriveBits']
+                    );
+                    
+                    // Derivar seed usando PBKDF2 (método padrão TON)
+                    const salt = encoder.encode('TON default seed');
+                    const derivedBits = await crypto.subtle.deriveBits({
+                        name: 'PBKDF2',
+                        salt: salt,
+                        iterations: 100000,
+                        hash: 'SHA-512'
+                    }, keyMaterial, 256);
+                    
+                    // Usar os primeiros 32 bytes como seed
+                    const seedBytes = new Uint8Array(derivedBits).slice(0, 32);
+                    
+                    // Gerar keypair usando TonWeb
+                    keyPair = TonWeb.utils.nacl.sign.keyPair.fromSeed(seedBytes);
+                    console.log('KeyPair gerado com sucesso usando PBKDF2');
                 } catch (seedError) {
                     console.error('Erro ao gerar keypair:', seedError);
-                    throw new Error('Falha ao processar chaves da hot wallet');
+                    throw new Error('Falha ao processar chaves da hot wallet: ' + seedError.message);
                 }
                 
                 // Endereços
