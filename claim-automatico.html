@@ -80,8 +80,64 @@
     </div>
 
     <script>
-        // Próximo passo: vamos adicionar o JavaScript aqui
-        console.log('Sistema iniciado');
+        // Configurações do sistema
+        const API_URL = 'https://script.google.com/macros/s/AKfycbxWiKqFxvCaPqKgZM7sjNBrimnXOoiGOgCgXzX_UjtUV95EMotoJAzO-yzgtVl-WkyG/exec';
+        const TOKEN_MAEOKA = 'EQCUgsVus4fW5TY2bxBQWSyiwLETOr2iNlVied-szVuJ1t4W';
+
+        // Inicializar sistema
+        window.addEventListener('load', async () => {
+            document.getElementById('status').innerHTML = `
+                <p>✅ Sistema carregado!</p>
+                <p>🔍 Verificando claims pendentes...</p>
+                <button class="botao" onclick="verificarClaims()">🚀 INICIAR VERIFICAÇÃO</button>
+            `;
+        });
+
+        async function verificarClaims() {
+            const resultado = document.getElementById('resultado');
+            resultado.innerHTML = '<div style="background: #e8f4f8; color: #1a3a52; padding: 15px; border-radius: 8px;">🔄 Verificando claims pendentes...</div>';
+            resultado.style.display = 'block';
+            
+            try {
+                // Buscar claims pendentes na planilha
+                const response = await fetch(API_URL + '?action=buscarPendentes');
+                const data = await response.json();
+                
+                if (data.claims && data.claims.length > 0) {
+                    resultado.innerHTML = `
+                        <div class="sucesso">
+                            <h3>📋 CLAIMS ENCONTRADOS!</h3>
+                            <p>Encontrados: ${data.claims.length} claims pendentes</p>
+                            <button class="botao" onclick="processarClaims()">⚡ PROCESSAR AUTOMATICAMENTE</button>
+                        </div>
+                    `;
+                } else {
+                    resultado.innerHTML = `
+                        <div style="background: #fff3cd; color: #856404; padding: 15px; border-radius: 8px;">
+                            <h3>✅ NENHUM CLAIM PENDENTE</h3>
+                            <p>Sistema verificado! Todos os claims estão em dia.</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultado.innerHTML = `
+                    <div class="erro">
+                        <h3>❌ ERRO NA VERIFICAÇÃO</h3>
+                        <p>Erro: ${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        function processarClaims() {
+            const resultado = document.getElementById('resultado');
+            resultado.innerHTML = `
+                <div style="background: #fef3e7; color: #f6ad55; padding: 15px; border-radius: 8px;">
+                    <h3>🚧 EM DESENVOLVIMENTO</h3>
+                    <p>Próxima etapa: Conexão com WALLET5000</p>
+                </div>
+            `;
+        }
     </script>
 </body>
 </html>
