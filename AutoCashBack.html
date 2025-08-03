@@ -1,129 +1,36 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AutoCashBack - Maeoka Tokens</title>
-    <script src="https://unpkg.com/@tonconnect/ui@2.0.9/dist/tonconnect-ui.min.js"></script>
-    <script src="https://unpkg.com/tonweb/dist/tonweb.js"></script>
-    <style>
-        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f5f5f5; margin: 0; padding: 10px; color: #1a3a52; }
-        .container { max-width: 100%; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .header { background: #1a3a52; color: white; padding: 20px; margin: -20px -20px 20px -20px; border-radius: 8px 8px 0 0; text-align: center; }
-        .section { padding: 15px; margin: 20px 0; background: #f8f9fa; border-left: 4px solid #1a3a52; border-radius: 5px; }
-        .input-group { margin: 15px 0; }
-        .input-group label { display: block; margin-bottom: 8px; font-weight: bold; }
-        .input-group input { width: 100%; padding: 12px; border: 2px solid #e8f4f8; border-radius: 8px; font-size: 16px; }
-        .botao { background: #1a3a52; color: white; border: none; padding: 15px; border-radius: 8px; font-size: 16px; cursor: pointer; width: 100%; margin: 10px 0; }
-        .botao:hover { background: #2c5282; }
-        .botao:disabled { background: #ccc; cursor: not-allowed; }
-        .resultado { padding: 20px; border-radius: 10px; margin: 20px 0; display: none; }
-        .sucesso { background: #e6fffa; color: #38b2ac; border: 2px solid #38b2ac; }
-        .erro { background: #fef2f2; color: #dc2626; border: 2px solid #dc2626; }
-        @media (max-width: 768px) { .container { padding: 10px; margin: 2px; } .header { padding: 12px; margin: -10px -10px 10px -10px; } }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h2>🎁 AutoCashBack Maeoka</h2>
-        </div>
-        <div class="section">
-            <h3>📝 Verificar Recompensa</h3>
-            <div class="input-group">
-                <label>Número da Obra:</label>
-                <input type="text" id="obraNumero" placeholder="Ex: 2025-123">
-            </div>
-            <div class="input-group">
-                <label>Senha:</label>
-                <input type="password" id="senha" placeholder="Senha da recompensa">
-            </div>
-            <button class="botao" onclick="verificarRecompensa()">🔍 Verificar</button>
-        </div>
-        <div class="resultado" id="resultado"></div>
-        <div class="section" id="claimSection" style="display: none;">
-            <h3>✅ Solicitar Cashback</h3>
-            <div id="tonConnectButton"></div>
-            <button class="botao" id="btnClaim" onclick="solicitarCashback()" disabled>Solicitar</button>
-        </div>
-    </div>
-    <script>
-        const API_URL = 'https://script.google.com/macros/s/AKfycbxWiKqFxvCaPqKgZM7sjNBrimnXOoiGOgCgXzX_UjtUV95EMotoJAzO-yzgtVl-WkyG/exec';
-        const TOKEN_MAEOKA = 'EQCUgsVus4fW5TY2bxBQWSyiwLETOr2iNlVied-szVuJ1t4W';
-        const HOT_WALLET = 'UQBCBgQ4Q_WlpNo7AdlyRUqk96A_gG-iSCITFnwi7u74p6my';
-        let tonConnectUI, tonweb, enderecoUsuario, recompensa;
-
-        tonConnectUI = new TON_CONNECT_UI.TonConnectUI({ manifestUrl: 'https://ton-connect.github.io/demo-dapp-with-wallet/tonconnect-manifest.json', buttonRootId: 'tonConnectButton' });
-        tonConnectUI.onStatusChange(wallet => { enderecoUsuario = wallet?.account.address; document.getElementById('btnClaim').disabled = !enderecoUsuario || !recompensa; });
-
-        function inicializarTonWeb() {
-            tonweb = new TonWeb(new TonWeb.HttpProvider('https://toncenter.com/api/v2/jsonRPC'));
+async function solicitarCashback() {
+    const btnClaim = document.getElementById('btnClaim');
+    btnClaim.disabled = true;
+    btnClaim.innerHTML = '📝 Enviando...';
+    try {
+        const jettonMinter = new TonWeb.token.jetton.JettonMinter(tonweb.provider, { address: TOKEN_MAEOKA });
+        const hotWallet = new TonWeb.utils.Address('UQBCBgQ4Q_WlpNo7AdlyRUqk96A_gG-iSCITFnwi7u74p6my');
+        const userWallet = new TonWeb.utils.Address(enderecoUsuario);
+        const hotJettonWalletAddress = await jettonMinter.getJettonWalletAddress(hotWallet);
+        const hotJettonWallet = new TonWeb.token.jetton.JettonWallet(tonweb.provider, { address: hotJettonWalletAddress });
+        const jettonAmount = TonWeb.utils.toNano(recompensa.tokens.toString());
+        const transferBody = await hotJettonWallet.createTransferBody({
+            jettonAmount, toAddress: userWallet, forwardAmount: TonWeb.utils.toNano('0.01'),
+            forwardPayload: new TextEncoder().encode(`AutoCashBack ${recompensa.obra}`), responseAddress: hotWallet
+        });
+        const transaction = {
+            validUntil: Date.now() + 5 * 60 * 1000,
+            messages: [{ address: hotJettonWalletAddress.toString(), amount: TonWeb.utils.toNano('0.05').toString(), payload: TonWeb.utils.bytesToBase64(await transferBody.toBoc()) }]
+        };
+        await tonConnectUI.sendTransaction(transaction); // Simula envio, mas precisa de chave privada
+        const response = await fetch(`${API_URL}?action=claim&obra=${recompensa.obra}&senha=${document.getElementById('senha').value}&carteira=${enderecoUsuario}`);
+        const result = await response.json();
+        if (result.sucesso) {
+            document.getElementById('resultado').innerHTML = `<div class="sucesso">✅ Cashback de ${recompensa.tokens} MAEOKA enviado!</div>`;
+            document.getElementById('resultado').style.display = 'block';
+            document.getElementById('claimSection').style.display = 'none';
+        } else {
+            throw new Error('Falha no registro');
         }
-
-        async function verificarRecompensa() {
-            const obra = document.getElementById('obraNumero').value.trim();
-            const senha = document.getElementById('senha').value.trim();
-            const resultado = document.getElementById('resultado');
-            if (!obra || !senha) {
-                resultado.innerHTML = '<div class="erro">❌ Preencha todos os campos!</div>';
-                resultado.style.display = 'block';
-                return;
-            }
-            resultado.innerHTML = '<div style="background: #e8f4f8; color: #1a3a52;">🔄 Verificando...</div>';
-            resultado.style.display = 'block';
-            try {
-                const response = await fetch(`${API_URL}?action=verificar&obra=${obra}&senha=${senha}`);
-                const data = await response.json();
-                if (data.encontrado) {
-                    recompensa = data;
-                    resultado.style.display = 'none';
-                    document.getElementById('claimSection').style.display = 'block';
-                } else {
-                    resultado.innerHTML = '<div class="erro">❌ Recompensa não encontrada!</div>';
-                }
-            } catch (error) {
-                resultado.innerHTML = '<div class="erro">❌ Erro: ' + error.message + '</div>';
-            }
-        }
-
-        async function solicitarCashback() {
-            const btnClaim = document.getElementById('btnClaim');
-            btnClaim.disabled = true;
-            btnClaim.innerHTML = '📝 Enviando...';
-            try {
-                const jettonMinter = new TonWeb.token.jetton.JettonMinter(tonweb.provider, { address: TOKEN_MAEOKA });
-                const hotWallet = new TonWeb.utils.Address(HOT_WALLET);
-                const userWallet = new TonWeb.utils.Address(enderecoUsuario);
-                const hotJettonWalletAddress = await jettonMinter.getJettonWalletAddress(hotWallet);
-                const hotJettonWallet = new TonWeb.token.jetton.JettonWallet(tonweb.provider, { address: hotJettonWalletAddress });
-                const jettonAmount = TonWeb.utils.toNano(recompensa.tokens.toString());
-                const transferBody = await hotJettonWallet.createTransferBody({
-                    jettonAmount, toAddress: userWallet, forwardAmount: TonWeb.utils.toNano('0.01'),
-                    forwardPayload: new TextEncoder().encode(`AutoCashBack ${recompensa.obra}`), responseAddress: hotWallet
-                });
-                const transaction = {
-                    validUntil: Date.now() + 5 * 60 * 1000,
-                    messages: [{ address: hotJettonWalletAddress.toString(), amount: TonWeb.utils.toNano('0.05').toString(), payload: TonWeb.utils.bytesToBase64(await transferBody.toBoc()) }]
-                };
-                await tonConnectUI.sendTransaction(transaction);
-                const response = await fetch(`${API_URL}?action=claim&obra=${recompensa.obra}&senha=${document.getElementById('senha').value}&carteira=${enderecoUsuario}`);
-                const result = await response.json();
-                if (result.sucesso) {
-                    document.getElementById('resultado').innerHTML = `<div class="sucesso">✅ Cashback de ${recompensa.tokens} MAEOKA enviado!</div>`;
-                    document.getElementById('resultado').style.display = 'block';
-                    document.getElementById('claimSection').style.display = 'none';
-                } else {
-                    throw new Error('Falha no registro');
-                }
-            } catch (error) {
-                document.getElementById('resultado').innerHTML = `<div class="erro">❌ Erro: ${error.message}</div>`;
-                document.getElementById('resultado').style.display = 'block';
-                btnClaim.disabled = false;
-                btnClaim.innerHTML = 'Solicitar';
-            }
-        }
-
-        window.addEventListener('load', inicializarTonWeb);
-    </script>
-</body>
-</html>
+    } catch (error) {
+        document.getElementById('resultado').innerHTML = `<div class="erro">❌ Erro: ${error.message}</div>`;
+        document.getElementById('resultado').style.display = 'block';
+        btnClaim.disabled = false;
+        btnClaim.innerHTML = 'Solicitar';
+    }
+}
