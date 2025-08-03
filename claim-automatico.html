@@ -1,1 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claims Automáticos - Maeoka Tokens</title>
+    <script src="https://unpkg.com/tonweb/dist/tonweb.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #1a3a52 0%, #2c5282 100%);
+            margin: 0;
+            padding: 20px;
+            color: white;
+            min-height: 100vh;
+        }
+        
+        .container {
+            background: white;
+            color: #1a3a52;
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #1a3a52 0%, #2c5282 100%);
+            color: white;
+            padding: 20px;
+            margin: -20px -20px 20px -20px;
+            border-radius: 8px 8px 0 0;
+            text-align: center;
+        }
+        
+        .botao {
+            background: linear-gradient(135deg, #1a3a52 0%, #2c5282 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            margin: 10px 0;
+        }
+        
+        .resultado {
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            display: none;
+        }
+        
+        .sucesso {
+            background: #e6fffa;
+            color: #38b2ac;
+            border: 2px solid #38b2ac;
+        }
+        
+        .erro {
+            background: #fef2f2;
+            color: #dc2626;
+            border: 2px solid #dc2626;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 CLAIMS AUTOMÁTICOS</h1>
+            <p>Sistema Automatizado Maeoka Tokens</p>
+        </div>
+        
+        <div id="status">
+            <p>Sistema carregando...</p>
+        </div>
+        
+        <div class="resultado" id="resultado"></div>
+    </div>
 
+    <script>
+        // Próximo passo: vamos adicionar o JavaScript aqui
+        console.log('Sistema iniciado');
+    </script>
+</body>
+</html>
