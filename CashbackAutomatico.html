@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cashback Automático - Maeoka Engenharia</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #1a3a52; color: #fff; padding: 20px; }
+        .container { max-width: 400px; margin: 0 auto; background: #2c5282; padding: 20px; border-radius: 10px; }
+        input, button { width: 100%; padding: 10px; margin: 10px 0; }
+        button { background: #fff; color: #1a3a52; border: none; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>🎁 Cashback Automático</h2>
+        <div>Dados da Indicação</div>
+        <input id="numeroObra" placeholder="Número da Obra">
+        <input id="senhaRecompensa" type="password" placeholder="Senha da Recompensa">
+        <button onclick="solicitarCashback()">Solicitar (Grátis)</button>
+        <div id="resultado"></div>
+    </div>
+    <script src="https://unpkg.com/tonweb/dist/tonweb.js"></script>
+    <script>
+      async function solicitarCashback() {
+        const numeroObra = document.querySelector('#numeroObra').value;
+        const senha = document.querySelector('#senhaRecompensa').value;
+        const valorObra = await verificarGoogleSheets(numeroObra, senha); // Placeholder
+        const cashback = valorObra * 0.03;
+        const wallet5000 = new TonWeb(new TonWeb.HttpProvider('https://toncenter.com/api/v2/jsonRPC'), { seed: process.env.WALLET5000_SEED });
+        const saldo = await wallet5000.getBalance();
+
+        if (cashback > saldo / 1e9) {
+          document.getElementById('resultado').innerText = "O numero que você está solicitando é maior do que temos na nossa wallet semente, um email foi enviado para o Engenheiro Kioma que já tem acesso ao saldo solicitado e ao numero da sua wallet e ele enviará em até 24h o saldo solicitado";
+          enviarEmail("O cashback que o cliente está solicitando no modo manual é maior que o que tem na wallet, reponha os tokens da wallet");
+        } else {
+          await wallet5000.sendTransaction({ to: 'endereço_do_cliente', amount: cashback * 1e9 }); // Substitua 'endereço_do_cliente'
+          document.getElementById('resultado').innerText = "Cashback de " + cashback + " MAEOKA enviado!";
+        }
+      }
+
+      // Funções placeholder (implementar depois)
+      async function verificarGoogleSheets(numero, senha) { return 1000; } // Exemplo
+      function enviarEmail(mensagem) { /* Lógica de email */ }
+    </script>
+</body>
+</html>
