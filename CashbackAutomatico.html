@@ -48,26 +48,38 @@
             }
 
             const cashback = valorObra * 0.03;
-            const saldoSimulado = 5000; // Ainda simulação
+            const wallet5000Seed = process.env.WALLET5000_SEED;
+            const provider = new TonWeb.HttpProvider('https://toncenter.com/api/v2/jsonRPC');
+            const wallet5000 = TonWeb.WalletProvider.fromSeed(wallet5000Seed.split(''), provider);
 
-            if (cashback > saldoSimulado) {
+            const saldoNano = await wallet5000.getBalance();
+            const saldo = TonWeb.utils.fromNano(saldoNano);
+
+            if (cashback > saldo) {
                 document.getElementById('resultado').innerText = "O numero que você está solicitando é maior do que temos na nossa wallet semente, um email foi enviado para o Engenheiro Kioma que já tem acesso ao saldo solicitado e ao numero da sua wallet e ele enviará em até 24h o saldo solicitado";
                 enviarEmail("O cashback que o cliente está solicitando no modo manual é maior que o que tem na wallet, reponha os tokens da wallet");
             } else {
-                document.getElementById('resultado').innerText = "Cashback de " + cashback + " MAEOKA enviado para " + clienteAddress + " (Simulação)";
-            }
-        }
+                // Envio real de tokens MAEOKA
+                const tokenAddress = 'EQCUgsVus4fW5TY2bxBQWSyiwLETOr2iNlVied-szVuJ1t4W';
+                const jettonMinter = new TonWeb.token.jetton.JettonMinter(provider, { address: tokenAddress });
+                const wallet5000JettonAddress = await jettonMinter.getJettonWalletAddress(wallet5000.address);
+                const jettonWallet = new TonWeb.token.jetton.JettonWallet(provider, { address: wallet5000JettonAddress });
 
-        async function verificarGoogleSheets(numero, senha) {
-            const url = "https://script.google.com/macros/s/AKfycbwjWo5GQcanL20HnDuEkS3gqMedVIRNDaWPtSqP7AOZgkrZLdtEMuiEWALgWCcFa4D5wQ/exec?numero=" + encodeURIComponent(numero) + "&senha=" + encodeURIComponent(senha);
-            const response = await fetch(url);
-            const valor = await response.text();
-            return parseFloat(valor) || 0;
-        }
+                const jettonAmount = TonWeb.utils.toNano(cashback.toString());
+                const forwardAmount = TonWeb.utils.toNano('0.01');
 
-        function enviarEmail(mensagem) {
-            console.log("Email enviado: " + mensagem);
-        }
-    </script>
-</body>
-</html>
+                const transferBody = await jettonWallet.createTransferBody({
+                    jettonAmount: jettonAmount,
+                    toAddress: new TonWeb.utils.Address(clienteAddress),
+                    forwardAmount: forwardAmount,
+                    forwardPayload: new TextEncoder().encode(`Cashback obra ${numeroObra}`),
+                    responseAddress: wallet5000.address
+                });
+
+                const transaction = {
+                    validUntil: Date.now() + 5 * 60 * 1000,
+                    messages: [{
+                        address: wallet5000JettonAddress.toString(true, true, true),
+                        amount: TonWeb.utils.toNano('0.05').toString(),
+                        payload: TonWeb.utils.bytesToBase64(await transferBody.toBoc())
+                    }]
