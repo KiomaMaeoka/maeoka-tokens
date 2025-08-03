@@ -333,16 +333,14 @@
             document.getElementById('areaConexao').style.display = 'none';
         }
 
-        // Função para gerar chaves da seed phrase (método corrigido)
-        function seedToKeyPair(seedPhrase) {
+        // Função para gerar chaves da seed phrase (método alternativo)
+        async function seedToKeyPair(seedWords) {
             try {
-                const words = seedPhrase.split(' ');
-                if (words.length !== 24) {
-                    throw new Error('Seed phrase deve ter 24 palavras');
-                }
+                // Método alternativo usando crypto-js para hash
+                const seedPhrase = seedWords.join(' ');
                 
-                // Usar a função do TonWeb para converter mnemônico em keypair
-                const keyPair = TonWeb.mnemonic.mnemonicToSeed(words);
+                // Usar método simplificado do TonWeb
+                const keyPair = await TonWeb.utils.keyPairFromSeed(seedPhrase);
                 return keyPair;
             } catch (error) {
                 console.error('Erro ao gerar keypair da seed:', error);
@@ -372,12 +370,21 @@
                 const seedWords = HOT_WALLET_SEED.split(' ');
                 console.log('Seed convertida para array, palavras:', seedWords.length);
                 
-                // Gerar keypair usando método nativo do TonWeb
+                // Gerar keypair usando método simplificado
                 let keyPair;
                 try {
-                    const seed = await TonWeb.mnemonic.mnemonicToSeed(seedWords);
-                    keyPair = TonWeb.utils.nacl.sign.keyPair.fromSeed(seed.slice(0, 32));
-                    console.log('KeyPair gerado com sucesso');
+                    // Método direto sem mnemonicToSeed
+                    const seedString = HOT_WALLET_SEED;
+                    
+                    // Criar hash da seed phrase para usar como seed
+                    const encoder = new TextEncoder();
+                    const data = encoder.encode(seedString);
+                    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+                    const hashArray = new Uint8Array(hashBuffer);
+                    
+                    // Usar os primeiros 32 bytes como seed para keypair
+                    keyPair = TonWeb.utils.nacl.sign.keyPair.fromSeed(hashArray.slice(0, 32));
+                    console.log('KeyPair gerado com método alternativo');
                 } catch (seedError) {
                     console.error('Erro ao gerar keypair:', seedError);
                     throw new Error('Falha ao processar chaves da hot wallet');
