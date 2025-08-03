@@ -70,6 +70,7 @@
         <div class="header">
             <h1>🤖 CLAIMS AUTOMÁTICOS</h1>
             <p>Sistema Automatizado Maeoka Tokens</p>
+            <p><small>WALLET5000: UQAVXuoe9adhDSWHQ3xwhoP6hnU39DqwLGxW-wVwbiz1QXJR</small></p>
         </div>
         
         <div id="status">
@@ -80,22 +81,24 @@
     </div>
 
     <script>
-        // Configurações do sistema
-        const API_URL = 'https://script.google.com/macros/s/AKfycbxWiKqFxvCaPqKgZM7sjNBrimnXOoiGOgCgXzX_UjtUV95EMotoJAzO-yzgtVl-WkyG/exec';
+        // Configurações do sistema - USANDO SUA PLANILHA NOVA
+        const API_URL = 'https://script.google.com/macros/s/AKfycbxbX-xe5XkZpH1HJydB23l3r9wHEMAIKd8pl-6kEpdvpNMIqQH4qFn4QDe2BmHbSUdLnw/exec';
         const TOKEN_MAEOKA = 'EQCUgsVus4fW5TY2bxBQWSyiwLETOr2iNlVied-szVuJ1t4W';
+        const WALLET5000 = 'UQAVXuoe9adhDSWHQ3xwhoP6hnU39DqwLGxW-wVwbiz1QXJR';
 
         // Inicializar sistema
         window.addEventListener('load', async () => {
             document.getElementById('status').innerHTML = `
                 <p>✅ Sistema carregado!</p>
+                <p>📊 Conectado à planilha ClaimAutomatico</p>
                 <p>🔍 Verificando claims pendentes...</p>
-                <button class="botao" onclick="verificarClaims()">🚀 INICIAR VERIFICAÇÃO</button>
+                <button class="botao" onclick="verificarClaims()">🚀 VERIFICAR CLAIMS PENDENTES</button>
             `;
         });
 
         async function verificarClaims() {
             const resultado = document.getElementById('resultado');
-            resultado.innerHTML = '<div style="background: #e8f4f8; color: #1a3a52; padding: 15px; border-radius: 8px;">🔄 Verificando claims pendentes...</div>';
+            resultado.innerHTML = '<div style="background: #e8f4f8; color: #1a3a52; padding: 15px; border-radius: 8px;">🔄 Buscando claims na planilha ClaimAutomatico...</div>';
             resultado.style.display = 'block';
             
             try {
@@ -103,40 +106,95 @@
                 const response = await fetch(API_URL + '?action=buscarPendentes');
                 const data = await response.json();
                 
+                console.log('Resposta da planilha:', data);
+                
                 if (data.claims && data.claims.length > 0) {
-                    resultado.innerHTML = `
-                        <div class="sucesso">
-                            <h3>📋 CLAIMS ENCONTRADOS!</h3>
-                            <p>Encontrados: ${data.claims.length} claims pendentes</p>
-                            <button class="botao" onclick="processarClaims()">⚡ PROCESSAR AUTOMATICAMENTE</button>
-                        </div>
-                    `;
+                    let listaHtml = '<h3>📋 CLAIMS ENCONTRADOS!</h3>';
+                    listaHtml += `<p><strong>Total: ${data.claims.length} claims pendentes</strong></p>`;
+                    
+                    data.claims.forEach(claim => {
+                        listaHtml += `
+                            <div style="background: #f0f8ff; padding: 10px; margin: 10px 0; border-radius: 5px; border-left: 4px solid #1a3a52;">
+                                <strong>Obra:</strong> ${claim.obra}<br>
+                                <strong>Cliente:</strong> ${claim.cliente}<br>
+                                <strong>Indicador:</strong> ${claim.indicador}<br>
+                                <strong>Tokens:</strong> ${claim.tokens} MAEOKA<br>
+                                <strong>Status:</strong> Pendente
+                            </div>
+                        `;
+                    });
+                    
+                    listaHtml += '<button class="botao" onclick="testarClaimManual()">🧪 TESTAR CLAIM (Obra: 2025-001)</button>';
+                    
+                    resultado.innerHTML = `<div class="sucesso">${listaHtml}</div>`;
                 } else {
                     resultado.innerHTML = `
                         <div style="background: #fff3cd; color: #856404; padding: 15px; border-radius: 8px;">
                             <h3>✅ NENHUM CLAIM PENDENTE</h3>
-                            <p>Sistema verificado! Todos os claims estão em dia.</p>
+                            <p>Planilha ClaimAutomatico verificada!</p>
+                            <p>Todos os claims estão processados.</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Erro completo:', error);
+                resultado.innerHTML = `
+                    <div class="erro">
+                        <h3>❌ ERRO NA VERIFICAÇÃO</h3>
+                        <p>Erro: ${error.message}</p>
+                        <p><small>Verifique se a planilha ClaimAutomatico está acessível</small></p>
+                    </div>
+                `;
+            }
+        }
+
+        async function testarClaimManual() {
+            const resultado = document.getElementById('resultado');
+            resultado.innerHTML = `
+                <div style="background: #e8f4f8; color: #1a3a52; padding: 15px; border-radius: 8px;">
+                    <h3>🧪 TESTANDO CLAIM MANUAL</h3>
+                    <p>Processando obra: 2025-001</p>
+                    <p>Senha: teste123</p>
+                    <p>Simulando envio para carteira teste...</p>
+                </div>
+            `;
+            
+            try {
+                // Simular claim (sem enviar tokens reais ainda)
+                const response = await fetch(API_URL + '?action=claimAutomatico&obra=2025-001&senha=teste123&carteira=TESTE_CARTEIRA_USUARIO');
+                const data = await response.json();
+                
+                if (data.sucesso) {
+                    resultado.innerHTML = `
+                        <div class="sucesso">
+                            <h3>✅ TESTE CONCLUÍDO!</h3>
+                            <p><strong>Obra:</strong> 2025-001</p>
+                            <p><strong>Tokens:</strong> ${data.tokens} MAEOKA</p>
+                            <p><strong>Status:</strong> Marcado como processado na planilha</p>
+                            <p><strong>Email:</strong> Enviado para kmaeoka@gmail.com</p>
+                            
+                            <div style="background: #fef3e7; color: #f6ad55; padding: 15px; border-radius: 8px; margin: 15px 0;">
+                                <h4>🚧 PRÓXIMA ETAPA</h4>
+                                <p>Agora vamos conectar a WALLET5000 para envios automáticos reais!</p>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    resultado.innerHTML = `
+                        <div class="erro">
+                            <h3>❌ ERRO NO TESTE</h3>
+                            <p>Erro: ${data.erro || 'Erro desconhecido'}</p>
                         </div>
                     `;
                 }
             } catch (error) {
                 resultado.innerHTML = `
                     <div class="erro">
-                        <h3>❌ ERRO NA VERIFICAÇÃO</h3>
+                        <h3>❌ ERRO NO TESTE</h3>
                         <p>Erro: ${error.message}</p>
                     </div>
                 `;
             }
-        }
-
-        function processarClaims() {
-            const resultado = document.getElementById('resultado');
-            resultado.innerHTML = `
-                <div style="background: #fef3e7; color: #f6ad55; padding: 15px; border-radius: 8px;">
-                    <h3>🚧 EM DESENVOLVIMENTO</h3>
-                    <p>Próxima etapa: Conexão com WALLET5000</p>
-                </div>
-            `;
         }
     </script>
 </body>
