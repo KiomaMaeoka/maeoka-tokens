@@ -441,14 +441,16 @@
                 
                 console.log('Transfer body criado com sucesso');
                 
-                // Obter seqno da hot wallet
-                const seqno = await tonweb.provider.getSeqno(hotWallet.toString());
+                // Obter seqno da hot wallet (método corrigido)
+                const hotWalletContract = tonweb.wallet.create({
+                    publicKey: keyPair.publicKey,
+                    wc: 0
+                });
+                const seqno = await hotWalletContract.methods.seqno().call() || 0;
                 console.log('Seqno obtido:', seqno);
                 
-                // Criar transação
-                const transfer = tonweb.wallet.create({
-                    publicKey: keyPair.publicKey
-                }).methods.transfer({
+                // Criar transação (método corrigido)
+                const transfer = hotWalletContract.methods.transfer({
                     secretKey: keyPair.secretKey,
                     toAddress: hotJettonWalletAddress.toString(),
                     amount: TonWeb.utils.toNano('0.05'), // Taxa para a transação
