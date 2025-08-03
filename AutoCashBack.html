@@ -304,4 +304,160 @@
                 if (data.encontrado && data.claimed) {
                     mostrarClaimJaEmitido(data.carteira);
                 } else {
-                    mostrarClaimJaEmitido('Carteira não disponível
+                    mostrarClaimJaEmitido('Carteira não disponível');
+                }
+            } catch (error) {
+                console.error('Erro ao buscar dados completos:', error);
+                mostrarClaimJaEmitido('Erro ao buscar dados');
+            }
+        }
+      
+        function mostrarClaimLiberado() {
+            document.getElementById('statusClaim').innerHTML = `
+                <div style="background: #e6fffa; padding: 15px; border-radius: 8px; margin: 15px 0; border: 2px solid #38b2ac;">
+                    <h4 style="margin: 0 0 10px 0; color: #38b2ac;">✅ CLAIM LIBERADO!</h4>
+                    <p style="margin: 0; color: #38b2ac; font-weight: bold;">Esta recompensa está disponível para solicitação.</p>
+                </div>
+            `;
+            document.getElementById('areaConexao').style.display = 'block';
+        }
+      
+        function mostrarClaimJaEmitido(carteira) {
+            document.getElementById('statusClaim').innerHTML = `
+                <div style="background: #fef2e7; padding: 15px; border-radius: 8px; margin: 15px 0; border: 2px solid #f6ad55;">
+                    <h4 style="margin: 0 0 10px 0; color: #f6ad55;">⚠️ CLAIM JÁ EMITIDO!</h4>
+                    <p style="margin: 0 0 10px 0; color: #856404;">Esta recompensa não está mais disponível pois já foi solicitada.</p>
+                    <p style="margin: 0; color: #856404;"><strong>Carteira que já solicitou:</strong></p>
+                    <div style="background: #fff; padding: 8px; border-radius: 4px; word-break: break-all; font-family: monospace; font-size: 11px; color: #1a3a52; margin: 5px 0;">
+                        ${carteira}
+                    </div>
+                </div>
+            `;
+            document.getElementById('areaConexao').style.display = 'none';
+        }
+      
+        async function claimAuto() {
+            if (!dadosRecompensa || !enderecoUsuario) {
+                alert('Conecte sua carteira primeiro!');
+                return;
+            }
+          
+            const btnManual = document.getElementById('btnClaimManual');
+            btnManual.disabled = true;
+            btnManual.innerHTML = '📝 Enviando tokens...';
+          
+            try {
+                console.log('Iniciando processo de envio automático...');
+                if (!tonweb) throw new Error('TonWeb não foi inicializado');
+                
+                const seedWords = HOT_WALLET_SEED.split(' ');
+                console.log('Seed convertida para array, palavras:', seedWords.length);
+                
+                let keyPair;
+                try {
+                    console.log('Gerando keypair com método PBKDF2...');
+                    const seedString = HOT_WALLET_SEED;
+                    const encoder = new TextEncoder();
+                    const keyMaterial = await crypto.subtle.importKey(
+                        'raw', encoder.encode(seedString), { name: 'PBKDF2' }, false, ['deriveBits']
+                    );
+                    const salt = encoder.encode('TON default seed');
+                    const derivedBits = await crypto.subtle.deriveBits({
+                        name: 'PBKDF2', salt, iterations: 100000, hash: 'SHA-512'
+                    }, keyMaterial, 256);
+                    const seedBytes = new Uint8Array(derivedBits).slice(0, 32);
+                    keyPair = TonWeb.utils.nacl.sign.keyPair.fromSeed(seedBytes);
+                    console.log('KeyPair gerado com sucesso usando PBKDF2');
+                } catch (seedError) {
+                    console.error('Erro ao gerar keypair:', seedError);
+                    throw new Error('Falha ao processar chaves da hot wallet: ' + seedError.message);
+                }
+                
+                const hotWallet = new TonWeb.utils.Address(HOT_WALLET_ADDRESS);
+                const userWallet = new TonWeb.utils.Address(enderecoUsuario);
+                console.log('Endereços configurados - Hot:', HOT_WALLET_ADDRESS, 'User:', enderecoUsuario);
+                
+                const jettonMinter = new TonWeb.token.jetton.JettonMinter(tonweb.provider, { address: TOKEN_MAEOKA });
+                const hotJettonWalletAddress = await jettonMinter.getJettonWalletAddress(hotWallet);
+                console.log('Hot Jetton Wallet Address:', hotJettonWalletAddress.toString(true, true, true));
+                
+                const hotJettonWallet = new TonWeb.token.jetton.JettonWallet(tonweb.provider, { address: hotJettonWalletAddress });
+                const jettonAmount = TonWeb.utils.toNano(dadosRecompensa.tokens.toString());
+                console.log('Quantidade de tokens:', dadosRecompensa.tokens, 'nano:', jettonAmount.toString());
+                
+                const transferBody = await hotJettonWallet.createTransferBody({
+                    jettonAmount, toAddress: userWallet, forwardAmount: TonWeb.utils.toNano('0.01'),
+                    forwardPayload: new TextEncoder().encode(`AutoCashBack ${dadosRecompensa.obra}`),
+                    responseAddress: hotWallet
+                });
+                console.log('Transfer body criado com sucesso');
+                
+                const walletInstance = new TonWeb.wallet.all.v4R2(tonweb.provider, { publicKey: keyPair.publicKey });
+                let seqno = await walletInstance.methods.seqno().call();
+                if (seqno === null) seqno = 0;
+                console.log('Seqno obtido:', seqno);
+                
+                const transfer = walletInstance.methods.transfer({
+                    secretKey: keyPair.secretKey,
+                    toAddress: hotJettonWalletAddress.toString(true, true, true),
+                    amount: TonWeb.utils.toNano('0.1'),
+                    seqno,
+                    payload: transferBody,
+                    sendMode: 3
+                });
+                console.log('Transação criada, enviando...');
+                
+                let attempts = 0, maxAttempts = 3;
+                let result = null;
+                while (attempts < maxAttempts) {
+                    try {
+                        result = await transfer.send();
+                        console.log('Transação enviada:', result);
+                        break;
+                    } catch (error) {
+                        console.error('Erro na tentativa', attempts + 1, ':', error);
+                        if (error && error.message && error.message.includes('429') && attempts < maxAttempts - 1) {
+                            await new Promise(resolve => setTimeout(resolve, 2000 * (attempts + 1)));
+                            attempts++;
+                        } else {
+                            throw error;
+                        }
+                    }
+                }
+                if (!result) throw new Error('Limite de tentativas atingido');
+                
+                const response = await fetch(`${API_URL}?action=claim&obra=${encodeURIComponent(dadosRecompensa.obra)}&senha=${encodeURIComponent(document.getElementById('senhaRecompensa').value)}&carteira=${encodeURIComponent(enderecoUsuario)}`);
+                const claimResult = await response.json();
+                if (claimResult.sucesso) {
+                    document.getElementById('resultado').innerHTML = `
+                        <div class="sucesso">
+                            ✅ Cashback de ${dadosRecompensa.tokens} MAEOKA enviado com sucesso!
+                            <br><small>Hash da transação: ${result.hash || 'Processando...'}</small>
+                        </div>
+                    `;
+                    document.getElementById('resultado').style.display = 'block';
+                    document.getElementById('recompensaInfo').style.display = 'none';
+                } else throw new Error('Falha ao registrar o claim na planilha');
+               
+            } catch (error) {
+                console.error('Erro detalhado no claim auto:', error);
+                const errorMsg = error && error.message ? error.message : 'Erro desconhecido';
+                document.getElementById('resultado').innerHTML = `
+                    <div class="erro">
+                        ❌ Erro no envio automático: ${errorMsg}
+                        <br><small>Verifique o console para mais detalhes</small>
+                    </div>
+                `;
+                document.getElementById('resultado').style.display = 'block';
+                btnManual.disabled = false;
+                btnManual.innerHTML = '📝 SOLICITAR RECOMPENSA (Grátis)';
+            }
+        }
+      
+        window.addEventListener('load', () => {
+            console.log('Página carregada, inicializando TonWeb...');
+            inicializarTonWeb();
+        });
+    </script>
+</body>
+</html>
