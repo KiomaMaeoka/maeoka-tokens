@@ -331,13 +331,10 @@
             `;
             document.getElementById('areaConexao').style.display = 'none';
         }
-        // Função para gerar chaves da seed phrase (método alternativo)
+      
         async function seedToKeyPair(seedWords) {
             try {
-                // Método alternativo usando crypto-js para hash
                 const seedPhrase = seedWords.join(' ');
-               
-                // Usar método simplificado do TonWeb
                 const keyPair = await TonWeb.utils.keyPairFromSeed(seedPhrase);
                 return keyPair;
             } catch (error) {
@@ -358,125 +355,92 @@
           
             try {
                 console.log('Iniciando processo de envio automático...');
-               
-                // Verificar se TonWeb está carregado
-                if (!tonweb) {
-                    throw new Error('TonWeb não foi inicializado');
-                }
-               
-                // Converter seed phrase em array de palavras
+                if (!tonweb) throw new Error('TonWeb não foi inicializado');
+                
                 const seedWords = HOT_WALLET_SEED.split(' ');
                 console.log('Seed convertida para array, palavras:', seedWords.length);
-               
-                // Gerar keypair usando método PBKDF2 (compatível com TON)
+                
                 let keyPair;
                 try {
                     console.log('Gerando keypair com método PBKDF2...');
-                   
-                    // Implementação compatível com TON usando PBKDF2
                     const seedString = HOT_WALLET_SEED;
                     const encoder = new TextEncoder();
-                   
-                    // Importar a seed phrase como key material
                     const keyMaterial = await crypto.subtle.importKey(
-                        'raw',
-                        encoder.encode(seedString),
-                        { name: 'PBKDF2' },
-                        false,
-                        ['deriveBits']
+                        'raw', encoder.encode(seedString), { name: 'PBKDF2' }, false, ['deriveBits']
                     );
-                   
-                    // Derivar seed usando PBKDF2 (método padrão TON)
                     const salt = encoder.encode('TON default seed');
                     const derivedBits = await crypto.subtle.deriveBits({
-                        name: 'PBKDF2',
-                        salt: salt,
-                        iterations: 100000,
-                        hash: 'SHA-512'
+                        name: 'PBKDF2', salt, iterations: 100000, hash: 'SHA-512'
                     }, keyMaterial, 256);
-                   
-                    // Usar os primeiros 32 bytes como seed
                     const seedBytes = new Uint8Array(derivedBits).slice(0, 32);
-                   
-                    // Gerar keypair usando TonWeb
                     keyPair = TonWeb.utils.nacl.sign.keyPair.fromSeed(seedBytes);
                     console.log('KeyPair gerado com sucesso usando PBKDF2');
                 } catch (seedError) {
                     console.error('Erro ao gerar keypair:', seedError);
                     throw new Error('Falha ao processar chaves da hot wallet: ' + seedError.message);
                 }
-               
-                // Endereços
+                
                 const hotWallet = new TonWeb.utils.Address(HOT_WALLET_ADDRESS);
                 const userWallet = new TonWeb.utils.Address(enderecoUsuario);
                 console.log('Endereços configurados - Hot:', HOT_WALLET_ADDRESS, 'User:', enderecoUsuario);
-               
-                // Configurar jetton
-                const jettonMinter = new TonWeb.token.jetton.JettonMinter(tonweb.provider, {
-                    address: TOKEN_MAEOKA
-                });
-               
-                // Obter endereço da jetton wallet da hot wallet
+                
+                const jettonMinter = new TonWeb.token.jetton.JettonMinter(tonweb.provider, { address: TOKEN_MAEOKA });
                 const hotJettonWalletAddress = await jettonMinter.getJettonWalletAddress(hotWallet);
                 console.log('Hot Jetton Wallet Address:', hotJettonWalletAddress.toString(true, true, true));
-               
-                const hotJettonWallet = new TonWeb.token.jetton.JettonWallet(tonweb.provider, {
-                    address: hotJettonWalletAddress
-                });
-               
-                // Quantidade de tokens
+                
+                const hotJettonWallet = new TonWeb.token.jetton.JettonWallet(tonweb.provider, { address: hotJettonWalletAddress });
                 const jettonAmount = TonWeb.utils.toNano(dadosRecompensa.tokens.toString());
                 console.log('Quantidade de tokens:', dadosRecompensa.tokens, 'nano:', jettonAmount.toString());
-               
-                // Criar corpo da transferência
+                
                 const transferBody = await hotJettonWallet.createTransferBody({
-                    jettonAmount: jettonAmount,
-                    toAddress: userWallet,
-                    forwardAmount: TonWeb.utils.toNano('0.01'),
+                    jettonAmount, toAddress: userWallet, forwardAmount: TonWeb.utils.toNano('0.01'),
                     forwardPayload: new TextEncoder().encode(`AutoCashBack ${dadosRecompensa.obra}`),
                     responseAddress: hotWallet
                 });
-               
                 console.log('Transfer body criado com sucesso');
-               
-                // Criar instância da wallet para obter seqno
+                
                 const walletInstance = tonweb.wallet.create({ publicKey: keyPair.publicKey });
-                const seqno = await walletInstance.methods.seqno().call();
+                let seqno = await walletInstance.methods.seqno().call();
+                if (seqno === null) seqno = 0; // Usa 0 para wallets novas
                 console.log('Seqno obtido:', seqno);
-               
-                // Criar transação
+                
                 const transfer = walletInstance.methods.transfer({
                     secretKey: keyPair.secretKey,
                     toAddress: hotJettonWalletAddress.toString(true, true, true),
-                    amount: TonWeb.utils.toNano('0.05'), // Taxa para a transação
-                    seqno: seqno || 0, // Usa 0 se seqno for null (para wallets novas)
+                    amount: TonWeb.utils.toNano('0.05'),
+                    seqno,
                     payload: transferBody,
                     sendMode: 3
                 });
-               
                 console.log('Transação criada, enviando...');
-               
-                // Enviar transação
-                const result = await transfer.send();
-                console.log('Transação enviada:', result);
-               
-                // Marcar como claimed na planilha
-                const response = await fetch(`${API_URL}?action=claim&obra=${dadosRecompensa.obra}&senha=${document.getElementById('senhaRecompensa').value}&carteira=${enderecoUsuario}`);
-                const claimResult = await response.json();
-               
-                if (claimResult.sucesso) {
-                    document.getElementById('resultado').innerHTML = `
-                        <div class="sucesso">
-                            ✅ Cashback de ${dadosRecompensa.tokens} MAEOKA enviado com sucesso!
-                            <br><small>Hash da transação: ${result.hash || 'Processando...'}</small>
-                        </div>
-                    `;
-                    document.getElementById('resultado').style.display = 'block';
-                    document.getElementById('recompensaInfo').style.display = 'none';
-                } else {
-                    throw new Error('Falha ao registrar o claim na planilha');
+                
+                let attempts = 0, maxAttempts = 3;
+                while (attempts < maxAttempts) {
+                    try {
+                        const result = await transfer.send();
+                        console.log('Transação enviada:', result);
+                        const response = await fetch(`${API_URL}?action=claim&obra=${dadosRecompensa.obra}&senha=${document.getElementById('senhaRecompensa').value}&carteira=${enderecoUsuario}`);
+                        const claimResult = await response.json();
+                        if (claimResult.sucesso) {
+                            document.getElementById('resultado').innerHTML = `
+                                <div class="sucesso">
+                                    ✅ Cashback de ${dadosRecompensa.tokens} MAEOKA enviado com sucesso!
+                                    <br><small>Hash da transação: ${result.hash || 'Processando...'}</small>
+                                </div>
+                            `;
+                            document.getElementById('resultado').style.display = 'block';
+                            document.getElementById('recompensaInfo').style.display = 'none';
+                            return;
+                        } else throw new Error('Falha ao registrar o claim na planilha');
+                    } catch (error) {
+                        console.error('Erro na tentativa', attempts + 1, ':', error);
+                        if (error.message.includes('429') && attempts < maxAttempts - 1) {
+                            await new Promise(resolve => setTimeout(resolve, 2000 * (attempts + 1))); // Espera 2s, 4s, 6s
+                            attempts++;
+                        } else throw error;
+                    }
                 }
-               
+                throw new Error('Limite de tentativas atingido');
             } catch (error) {
                 console.error('Erro detalhado no claim auto:', error);
                 document.getElementById('resultado').innerHTML = `
@@ -486,13 +450,11 @@
                     </div>
                 `;
                 document.getElementById('resultado').style.display = 'block';
-               
                 btnManual.disabled = false;
                 btnManual.innerHTML = '📝 SOLICITAR RECOMPENSA (Grátis)';
             }
         }
       
-        // Inicializar quando a página carregar
         window.addEventListener('load', () => {
             console.log('Página carregada, inicializando TonWeb...');
             inicializarTonWeb();
