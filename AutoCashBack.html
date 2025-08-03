@@ -201,7 +201,7 @@
         // Configuração do TON
         const TOKEN_MAEOKA = 'EQCUgsVus4fW5TY2bxBQWSyiwLETOr2iNlVied-szVuJ1t4W';
         const HOT_WALLET_ADDRESS = 'UQBCBgQ4Q_WlpNo7AdlyRUqk96A_gG-iSCITFnwi7u74p6my';
-        const HOT_WALLET_SEED = 'favorite squeeze tenant pyramid uniform fit salad margin burger enlist pledge symbol push ill spring shy rookie ramp owner taxi convince barely coyote egg';
+        const HOT_WALLET_SEED = 'affair noise author snow health tray visual make rally again funny shiver boat best click story sand decrease wagon boring snake crater year solar';
       
         let dadosRecompensa = null;
         let enderecoUsuario = '';
@@ -236,11 +236,10 @@
       
         function inicializarTonWeb() {
             try {
-                const provider = new TonWeb.HttpProvider('https://toncenter.com/api/v2/jsonRPC', {
+                tonweb = new TonWeb(new TonWeb.HttpProvider('https://toncenter.com/api/v2/jsonRPC', {
                     apiKey: 'be7785badc93b8b0ffcb1329d2d50fe724e2714d6de26f941fcb4f06860a6d4b'
-                });
-                tonweb = new TonWeb(provider);
-                console.log('TonWeb inicializado com sucesso e API key');
+                }));
+                console.log('TonWeb inicializado com sucesso');
                 return true;
             } catch (error) {
                 console.error('Erro ao inicializar TonWeb:', error);
