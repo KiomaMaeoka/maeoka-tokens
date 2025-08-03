@@ -19,15 +19,15 @@
         <div>Dados da Indicação</div>
         <input id="numeroObra" placeholder="Número da Obra">
         <input id="senhaRecompensa" type="password" placeholder="Senha da Recompensa">
-        <ton-connect-ui id="tonConnect" ui-options="{ uiPreferences: { theme: 'LIGHT' } }"></ton-connect-ui>
+        <div id="tonConnectButton"></div>
         <button onclick="solicitarCashback()">Solicitar (Grátis)</button>
         <div id="resultado"></div>
     </div>
     <script src="https://unpkg.com/tonweb/dist/tonweb.js"></script>
     <script>
         const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
-            manifestUrl: 'https://maeoka-tokens.vercel.app/tonconnect-manifest.json', // Crie esse arquivo no próximo passo
-            uiOptions: { uiPreferences: { theme: 'LIGHT' } }
+            manifestUrl: 'https://ton-connect.github.io/demo-dapp-with-wallet/tonconnect-manifest.json',
+            buttonRootId: 'tonConnectButton'
         });
 
         async function solicitarCashback() {
