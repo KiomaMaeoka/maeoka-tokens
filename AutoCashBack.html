@@ -236,11 +236,8 @@
       
         function inicializarTonWeb() {
             try {
-                const provider = new TonWeb.HttpProvider('https://toncenter.com/api/v2/jsonRPC', {
-                    apiKey: 'be7785badc93b8b0ffcb1329d2d50fe724e2714d6de26f941fcb4f06860a6d4b'
-                });
-                tonweb = new TonWeb(provider);
-                console.log('TonWeb inicializado com sucesso e API key');
+                tonweb = new TonWeb(new TonWeb.HttpProvider('https://toncenter.com/api/v2/jsonRPC', { apiKey: 'be7785badc93b8b0ffcb1329d2d50fe724e2714d6de26f941fcb4f06860a6d4b' }));
+                console.log('TonWeb inicializado com sucesso');
                 return true;
             } catch (error) {
                 console.error('Erro ao inicializar TonWeb:', error);
@@ -298,8 +295,7 @@
       
         async function buscarDadosCompletos(obra, senha) {
             try {
-                const response = await fetch(`${API_URL}?action=buscarCompleto&obra=${encodeURIComponent(obra)}&senha=${encodeURIComponent(senha)}`);
-                if (!response.ok) throw new Error(`Erro HTTP: ${response.status}`);
+                const response = await fetch(`${API_URL}?action=buscarCompleto&obra=${obra}&senha=${senha}`);
                 const data = await response.json();
                 if (data.encontrado && data.claimed) {
                     mostrarClaimJaEmitido(data.carteira);
