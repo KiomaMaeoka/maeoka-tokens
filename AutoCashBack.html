@@ -8,92 +8,92 @@
     <script src="https://unpkg.com/tonweb/dist/tonweb.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            font-family: 'Segoe UI', Arial, sans-serif; 
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); 
-            color: #1a3a52; 
-            line-height: 1.6; 
-            min-height: 100vh; 
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #1a3a52;
+            line-height: 1.6;
+            min-height: 100vh;
             padding: 10px;
         }
-        .container { 
-            max-width: 900px; 
-            margin: 0 auto; 
-            background: white; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
-            border-radius: 12px; 
-            overflow: hidden; 
-            margin-top: 20px; 
-            margin-bottom: 20px; 
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border-radius: 12px;
+            overflow: hidden;
+            margin-top: 20px;
+            margin-bottom: 20px;
         }
-        .header { 
-            background: linear-gradient(135deg, #1a3a52 0%, #2c5282 100%); 
-            color: white; 
-            padding: 30px; 
-            text-align: center; 
-            position: relative; 
+        .header {
+            background: linear-gradient(135deg, #1a3a52 0%, #2c5282 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
         }
         .logo { font-size: 28px; font-weight: bold; margin-bottom: 8px; }
         .subtitle { font-size: 14px; opacity: 0.9; }
-        .section { 
-            padding: 15px; 
-            margin: 20px 0; 
-            background: #f8f9fa; 
-            border-left: 4px solid #1a3a52; 
-            border-radius: 5px; 
+        .section {
+            padding: 15px;
+            margin: 20px 0;
+            background: #f8f9fa;
+            border-left: 4px solid #1a3a52;
+            border-radius: 5px;
         }
         .input-group { margin: 15px 0; }
-        .input-group label { 
-            display: block; 
-            margin-bottom: 8px; 
-            font-weight: bold; 
-            color: #1a3a52; 
-            font-size: 14px; 
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #1a3a52;
+            font-size: 14px;
         }
-        .input-group input { 
-            width: 100%; 
-            padding: 12px; 
-            border: 2px solid #e8f4f8; 
-            border-radius: 8px; 
-            font-size: 16px; 
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e8f4f8;
+            border-radius: 8px;
+            font-size: 16px;
         }
-        .botao { 
-            background: linear-gradient(135deg, #1a3a52 0%, #2c5282 100%); 
-            color: white; 
-            border: none; 
-            padding: 15px 30px; 
-            border-radius: 8px; 
-            font-size: 16px; 
-            cursor: pointer; 
-            width: 100%; 
-            margin: 10px 0; 
-            transition: all 0.3s ease; 
+        .botao {
+            background: linear-gradient(135deg, #1a3a52 0%, #2c5282 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            margin: 10px 0;
+            transition: all 0.3s ease;
         }
-        .botao:hover { 
-            transform: translateY(-2px); 
-            box-shadow: 0 5px 15px rgba(26, 58, 82, 0.3); 
+        .botao:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(26, 58, 82, 0.3);
         }
-        .botao:disabled { 
-            background: #ccc; 
-            cursor: not-allowed; 
-            transform: none; 
+        .botao:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
         }
-        .resultado { 
-            padding: 20px; 
-            border-radius: 10px; 
-            margin: 20px 0; 
-            display: none; 
-            text-align: center; 
+        .resultado {
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            display: none;
+            text-align: center;
         }
-        .sucesso { 
-            background: #e6fffa; 
-            color: #38b2ac; 
-            border: 2px solid #38b2ac; 
+        .sucesso {
+            background: #e6fffa;
+            color: #38b2ac;
+            border: 2px solid #38b2ac;
         }
-        .erro { 
-            background: #fef2f2; 
-            color: #dc2626; 
-            border: 2px solid #dc2626; 
+        .erro {
+            background: #fef2f2;
+            color: #dc2626;
+            border: 2px solid #dc2626;
         }
         .valor-destaque {
             font-size: 32px;
@@ -107,16 +107,16 @@
             border: 2px solid #1a3a52;
         }
         #tonConnectButton { margin: 20px 0; text-align: center; }
-        @media (max-width: 768px) { 
-            body { padding: 5px; font-size: 14px; } 
-            .container { margin: 5px auto; } 
-            .header { padding: 15px 10px; } 
-            .logo { font-size: 18px; } 
-            .subtitle { font-size: 10px; } 
-            .section { padding: 10px; margin: 10px 0; } 
-            .input-group label { font-size: 13px; } 
-            .input-group input { padding: 10px; font-size: 14px; } 
-            .botao { padding: 12px 20px; font-size: 14px; } 
+        @media (max-width: 768px) {
+            body { padding: 5px; font-size: 14px; }
+            .container { margin: 5px auto; }
+            .header { padding: 15px 10px; }
+            .logo { font-size: 18px; }
+            .subtitle { font-size: 10px; }
+            .section { padding: 10px; margin: 10px 0; }
+            .input-group label { font-size: 13px; }
+            .input-group input { padding: 10px; font-size: 14px; }
+            .botao { padding: 12px 20px; font-size: 14px; }
             .valor-destaque { font-size: 24px; padding: 15px; }
         }
         @media (max-width: 480px) {
@@ -134,47 +134,47 @@
             <div class="logo">🎁 AutoCashBack Maeoka</div>
             <div class="subtitle">Receba seus MAEOKA tokens automaticamente</div>
         </div>
-       
+      
         <div class="section">
             <h3 style="margin-top: 0;">📝 Dados da Recompensa</h3>
-           
+          
             <div class="input-group">
                 <label>Número da Obra:</label>
                 <input type="text" id="obraNumero" placeholder="Ex: 2025-123">
             </div>
-           
+          
             <div class="input-group">
                 <label>Senha da Recompensa:</label>
                 <input type="password" id="senhaRecompensa" placeholder="Senha fornecida pela Maeoka">
             </div>
-           
+          
             <button class="botao" onclick="verificarRecompensa()">
                 🔍 VERIFICAR RECOMPENSA
             </button>
         </div>
-       
+      
         <div class="resultado" id="resultado"></div>
-       
+      
         <div class="section" id="recompensaInfo" style="display: none;">
             <h3 style="text-align: center; margin-top: 0;">✅ RECOMPENSA ENCONTRADA!</h3>
-           
+          
             <div style="text-align: center;">
                 <p><strong>Obra:</strong> <span id="infoObra"></span></p>
                 <p><strong>Cliente:</strong> <span id="infoCliente"></span></p>
                 <p><strong>Indicador:</strong> <span id="infoIndicador"></span></p>
                 <p><strong>Valor da Obra:</strong> R$ <span id="infoValor"></span></p>
             </div>
-           
+          
             <div class="valor-destaque" id="infoTokens">0 MAEOKA</div>
             <p style="text-align: center; color: #666;">
                 Equivale a: R$ <span id="infoValorTokens">0,00</span>
             </p>
-           
+          
             <div id="statusClaim"></div>
-           
+          
             <div id="areaConexao" style="display: none;">
                 <div id="tonConnectButton"></div>
-               
+              
                 <div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin: 15px 0; color: #856404;">
                     <h4 style="margin: 0 0 10px 0;">📝 COMO FUNCIONA:</h4>
                     <p style="margin: 0 0 10px 0; font-size: 13px;">
@@ -187,34 +187,33 @@
                         💡 <strong>Seguro:</strong> Automatizado com verificação.
                     </p>
                 </div>
-               
+              
                 <button class="botao" id="btnClaimManual" onclick="claimAuto()" disabled>
                     📝 SOLICITAR RECOMPENSA (Grátis)
                 </button>
             </div>
         </div>
     </div>
-
     <script>
         // URL da API do Google Sheets
         const API_URL = 'https://script.google.com/macros/s/AKfycbw6pmkaZb899Fqrcd1jwT5sryk4ibtx8sINGTLVmIZ_Q1PCE6_LrXw9iY2dbHaGDl0g/exec';
-       
+      
         // Configuração do TON
         const TOKEN_MAEOKA = 'EQCUgsVus4fW5TY2bxBQWSyiwLETOr2iNlVied-szVuJ1t4W';
         const HOT_WALLET_ADDRESS = 'UQBCBgQ4Q_WlpNo7AdlyRUqk96A_gG-iSCITFnwi7u74p6my';
         const HOT_WALLET_SEED = 'favorite squeeze tenant pyramid uniform fit salad margin burger enlist pledge symbol push ill spring shy rookie ramp owner taxi convince barely coyote egg';
-       
+      
         let dadosRecompensa = null;
         let enderecoUsuario = '';
         let tonweb = null;
         let tonConnectUI = null;
-       
+      
         // Inicializar TON Connect
         tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
             manifestUrl: 'https://ton-connect.github.io/demo-dapp-with-wallet/tonconnect-manifest.json',
             buttonRootId: 'tonConnectButton'
         });
-       
+      
         tonConnectUI.onStatusChange(walletInfo => {
             if (walletInfo) {
                 const endereco = walletInfo.account.address;
@@ -225,7 +224,7 @@
                     console.error('Erro ao processar endereço:', error);
                     enderecoUsuario = endereco;
                 }
-               
+              
                 if (dadosRecompensa && !dadosRecompensa.claimed) {
                     document.getElementById('btnClaimManual').disabled = false;
                 }
@@ -234,7 +233,7 @@
                 document.getElementById('btnClaimManual').disabled = true;
             }
         });
-       
+      
         function inicializarTonWeb() {
             try {
                 tonweb = new TonWeb(new TonWeb.HttpProvider('https://toncenter.com/api/v2/jsonRPC'));
@@ -245,29 +244,29 @@
                 return false;
             }
         }
-       
+      
         async function verificarRecompensa() {
             const obra = document.getElementById('obraNumero').value.trim();
             const senha = document.getElementById('senhaRecompensa').value.trim();
             const resultado = document.getElementById('resultado');
-           
+          
             if (!obra || !senha) {
                 resultado.innerHTML = '<div class="erro">❌ Preencha todos os campos!</div>';
                 resultado.style.display = 'block';
                 return;
             }
-           
+          
             resultado.innerHTML = '<div style="background: #e8f4f8; padding: 15px; border-radius: 8px;">🔄 Verificando recompensa...</div>';
             resultado.style.display = 'block';
             document.getElementById('recompensaInfo').style.display = 'none';
-           
+          
             try {
                 const response = await fetch(`${API_URL}?action=verificar&obra=${encodeURIComponent(obra)}&senha=${encodeURIComponent(senha)}`);
                 if (!response.ok) throw new Error(`Erro HTTP: ${response.status}`);
-                
+               
                 const text = await response.text();
                 const data = text ? JSON.parse(text) : {};
-                
+               
                 if (data.encontrado) {
                     dadosRecompensa = data;
                     document.getElementById('infoObra').textContent = obra;
@@ -276,10 +275,10 @@
                     document.getElementById('infoValor').textContent = data.valor.toLocaleString('pt-BR');
                     document.getElementById('infoTokens').textContent = `${data.tokens.toLocaleString('pt-BR')} MAEOKA`;
                     document.getElementById('infoValorTokens').textContent = data.tokens.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
-                    
+                   
                     resultado.style.display = 'none';
                     document.getElementById('recompensaInfo').style.display = 'block';
-                    
+                   
                     if (data.claimed === 'TRUE' || data.claimed === true) {
                         buscarDadosCompletos(obra, senha);
                     } else {
@@ -293,7 +292,7 @@
                 resultado.innerHTML = '<div class="erro">❌ Erro: ' + error.message + '</div>';
             }
         }
-       
+      
         async function buscarDadosCompletos(obra, senha) {
             try {
                 const response = await fetch(`${API_URL}?action=buscarCompleto&obra=${obra}&senha=${senha}`);
@@ -308,7 +307,7 @@
                 mostrarClaimJaEmitido('Erro ao buscar dados');
             }
         }
-       
+      
         function mostrarClaimLiberado() {
             document.getElementById('statusClaim').innerHTML = `
                 <div style="background: #e6fffa; padding: 15px; border-radius: 8px; margin: 15px 0; border: 2px solid #38b2ac;">
@@ -318,7 +317,7 @@
             `;
             document.getElementById('areaConexao').style.display = 'block';
         }
-       
+      
         function mostrarClaimJaEmitido(carteira) {
             document.getElementById('statusClaim').innerHTML = `
                 <div style="background: #fef2e7; padding: 15px; border-radius: 8px; margin: 15px 0; border: 2px solid #f6ad55;">
@@ -332,13 +331,12 @@
             `;
             document.getElementById('areaConexao').style.display = 'none';
         }
-
         // Função para gerar chaves da seed phrase (método alternativo)
         async function seedToKeyPair(seedWords) {
             try {
                 // Método alternativo usando crypto-js para hash
                 const seedPhrase = seedWords.join(' ');
-                
+               
                 // Usar método simplificado do TonWeb
                 const keyPair = await TonWeb.utils.keyPairFromSeed(seedPhrase);
                 return keyPair;
@@ -347,38 +345,38 @@
                 throw error;
             }
         }
-       
+      
         async function claimAuto() {
             if (!dadosRecompensa || !enderecoUsuario) {
                 alert('Conecte sua carteira primeiro!');
                 return;
             }
-           
+          
             const btnManual = document.getElementById('btnClaimManual');
             btnManual.disabled = true;
             btnManual.innerHTML = '📝 Enviando tokens...';
-           
+          
             try {
                 console.log('Iniciando processo de envio automático...');
-                
+               
                 // Verificar se TonWeb está carregado
                 if (!tonweb) {
                     throw new Error('TonWeb não foi inicializado');
                 }
-                
+               
                 // Converter seed phrase em array de palavras
                 const seedWords = HOT_WALLET_SEED.split(' ');
                 console.log('Seed convertida para array, palavras:', seedWords.length);
-                
+               
                 // Gerar keypair usando método PBKDF2 (compatível com TON)
                 let keyPair;
                 try {
                     console.log('Gerando keypair com método PBKDF2...');
-                    
+                   
                     // Implementação compatível com TON usando PBKDF2
                     const seedString = HOT_WALLET_SEED;
                     const encoder = new TextEncoder();
-                    
+                   
                     // Importar a seed phrase como key material
                     const keyMaterial = await crypto.subtle.importKey(
                         'raw',
@@ -387,7 +385,7 @@
                         false,
                         ['deriveBits']
                     );
-                    
+                   
                     // Derivar seed usando PBKDF2 (método padrão TON)
                     const salt = encoder.encode('TON default seed');
                     const derivedBits = await crypto.subtle.deriveBits({
@@ -396,10 +394,10 @@
                         iterations: 100000,
                         hash: 'SHA-512'
                     }, keyMaterial, 256);
-                    
+                   
                     // Usar os primeiros 32 bytes como seed
                     const seedBytes = new Uint8Array(derivedBits).slice(0, 32);
-                    
+                   
                     // Gerar keypair usando TonWeb
                     keyPair = TonWeb.utils.nacl.sign.keyPair.fromSeed(seedBytes);
                     console.log('KeyPair gerado com sucesso usando PBKDF2');
@@ -407,29 +405,29 @@
                     console.error('Erro ao gerar keypair:', seedError);
                     throw new Error('Falha ao processar chaves da hot wallet: ' + seedError.message);
                 }
-                
+               
                 // Endereços
                 const hotWallet = new TonWeb.utils.Address(HOT_WALLET_ADDRESS);
                 const userWallet = new TonWeb.utils.Address(enderecoUsuario);
                 console.log('Endereços configurados - Hot:', HOT_WALLET_ADDRESS, 'User:', enderecoUsuario);
-                
+               
                 // Configurar jetton
-                const jettonMinter = new TonWeb.token.jetton.JettonMinter(tonweb.provider, { 
-                    address: TOKEN_MAEOKA 
+                const jettonMinter = new TonWeb.token.jetton.JettonMinter(tonweb.provider, {
+                    address: TOKEN_MAEOKA
                 });
-                
+               
                 // Obter endereço da jetton wallet da hot wallet
                 const hotJettonWalletAddress = await jettonMinter.getJettonWalletAddress(hotWallet);
-                console.log('Hot Jetton Wallet Address:', hotJettonWalletAddress.toString());
-                
-                const hotJettonWallet = new TonWeb.token.jetton.JettonWallet(tonweb.provider, { 
-                    address: hotJettonWalletAddress 
+                console.log('Hot Jetton Wallet Address:', hotJettonWalletAddress.toString(true, true, true));
+               
+                const hotJettonWallet = new TonWeb.token.jetton.JettonWallet(tonweb.provider, {
+                    address: hotJettonWalletAddress
                 });
-                
+               
                 // Quantidade de tokens
                 const jettonAmount = TonWeb.utils.toNano(dadosRecompensa.tokens.toString());
                 console.log('Quantidade de tokens:', dadosRecompensa.tokens, 'nano:', jettonAmount.toString());
-                
+               
                 // Criar corpo da transferência
                 const transferBody = await hotJettonWallet.createTransferBody({
                     jettonAmount: jettonAmount,
@@ -438,37 +436,34 @@
                     forwardPayload: new TextEncoder().encode(`AutoCashBack ${dadosRecompensa.obra}`),
                     responseAddress: hotWallet
                 });
-                
+               
                 console.log('Transfer body criado com sucesso');
-                
-                // Obter seqno da hot wallet (método corrigido)
-                const hotWalletContract = tonweb.wallet.create({
-                    publicKey: keyPair.publicKey,
-                    wc: 0
-                });
-                const seqno = await hotWalletContract.methods.seqno().call() || 0;
+               
+                // Criar instância da wallet para obter seqno
+                const walletInstance = tonweb.wallet.create({ publicKey: keyPair.publicKey });
+                const seqno = await walletInstance.methods.seqno().call();
                 console.log('Seqno obtido:', seqno);
-                
-                // Criar transação (método corrigido)
-                const transfer = hotWalletContract.methods.transfer({
+               
+                // Criar transação
+                const transfer = walletInstance.methods.transfer({
                     secretKey: keyPair.secretKey,
-                    toAddress: hotJettonWalletAddress.toString(),
+                    toAddress: hotJettonWalletAddress.toString(true, true, true),
                     amount: TonWeb.utils.toNano('0.05'), // Taxa para a transação
-                    seqno: seqno,
-                    payload: await transferBody.toBoc(),
+                    seqno: seqno || 0, // Usa 0 se seqno for null (para wallets novas)
+                    payload: transferBody,
                     sendMode: 3
                 });
-                
+               
                 console.log('Transação criada, enviando...');
-                
+               
                 // Enviar transação
                 const result = await transfer.send();
                 console.log('Transação enviada:', result);
-                
+               
                 // Marcar como claimed na planilha
                 const response = await fetch(`${API_URL}?action=claim&obra=${dadosRecompensa.obra}&senha=${document.getElementById('senhaRecompensa').value}&carteira=${enderecoUsuario}`);
                 const claimResult = await response.json();
-                
+               
                 if (claimResult.sucesso) {
                     document.getElementById('resultado').innerHTML = `
                         <div class="sucesso">
@@ -481,7 +476,7 @@
                 } else {
                     throw new Error('Falha ao registrar o claim na planilha');
                 }
-                
+               
             } catch (error) {
                 console.error('Erro detalhado no claim auto:', error);
                 document.getElementById('resultado').innerHTML = `
@@ -491,12 +486,12 @@
                     </div>
                 `;
                 document.getElementById('resultado').style.display = 'block';
-                
+               
                 btnManual.disabled = false;
                 btnManual.innerHTML = '📝 SOLICITAR RECOMPENSA (Grátis)';
             }
         }
-       
+      
         // Inicializar quando a página carregar
         window.addEventListener('load', () => {
             console.log('Página carregada, inicializando TonWeb...');
