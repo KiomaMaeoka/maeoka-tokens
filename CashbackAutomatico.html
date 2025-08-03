@@ -27,15 +27,14 @@
             const numeroObra = document.querySelector('#numeroObra').value;
             const senha = document.querySelector('#senhaRecompensa').value;
 
-            // Simulação de verificação no Google Sheets
             const valorObra = await verificarGoogleSheets(numeroObra, senha);
-            if (!valorObra) {
+            if (valorObra === 0) {
                 document.getElementById('resultado').innerText = "Número da Obra ou Senha inválidos!";
                 return;
             }
 
-            const cashback = valorObra * 0.03; // 3% de cashback
-            const saldoSimulado = 5000; // Simulação de saldo da wallet5000
+            const cashback = valorObra * 0.03;
+            const saldoSimulado = 5000; // Substitua depois por saldo real da wallet
 
             if (cashback > saldoSimulado) {
                 document.getElementById('resultado').innerText = "O numero que você está solicitando é maior do que temos na nossa wallet semente, um email foi enviado para o Engenheiro Kioma que já tem acesso ao saldo solicitado e ao numero da sua wallet e ele enviará em até 24h o saldo solicitado";
@@ -45,17 +44,15 @@
             }
         }
 
-        // Função simulada para verificar Google Sheets
         async function verificarGoogleSheets(numero, senha) {
-            // Simulação: retorna 1000 se número for "123" e senha "456", senão 0
-            if (numero === "123" && senha === "456") return 1000;
-            return 0;
+            const url = "https://script.google.com/macros/s/AKfycbwjWo5GQcanL20HnDuEkS3gqMedVIRNDaWPtSqP7AOZgkrZLdtEMuiEWALgWCcFa4D5wQ/exec?numero=" + encodeURIComponent(numero) + "&senha=" + encodeURIComponent(senha);
+            const response = await fetch(url);
+            const valor = await response.text();
+            return parseFloat(valor) || 0;
         }
 
-        // Função simulada para enviar email
         function enviarEmail(mensagem) {
-            console.log("Email enviado às 08:38 PM de 03/08/2025: " + mensagem);
-            // Para funcionar de verdade, precisará de Google Apps Script
+            console.log("Email enviado: " + mensagem); // Simulação, substitua por real depois
         }
     </script>
 </body>
