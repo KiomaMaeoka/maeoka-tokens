@@ -12,34 +12,43 @@
         #resultado { margin-top: 10px; }
     </style>
     <script src="https://unpkg.com/@tonconnect/ui@2.0.9/dist/tonconnect-ui.min.js"></script>
+    <script src="https://unpkg.com/tonweb/dist/tonweb.js"></script>
 </head>
 <body>
     <div class="container">
         <h2>🎁 Cashback Automático</h2>
-        <div>Dados da Indicação</div>
         <input id="numeroObra" placeholder="Número da Obra">
         <input id="senhaRecompensa" type="password" placeholder="Senha da Recompensa">
         <div id="tonConnectButton"></div>
-        <button onclick="solicitarCashback()">Solicitar (Grátis)</button>
+        <button id="solicitarBtn">Solicitar (Grátis)</button>
         <div id="resultado"></div>
     </div>
-    <script src="https://unpkg.com/tonweb/dist/tonweb.js"></script>
     <script>
         const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
             manifestUrl: 'https://ton-connect.github.io/demo-dapp-with-wallet/tonconnect-manifest.json',
             buttonRootId: 'tonConnectButton'
         });
 
-        async function solicitarCashback() {
-            const numeroObra = document.querySelector('#numeroObra').value;
-            const senha = document.querySelector('#senhaRecompensa').value;
+        async function verificarGoogleSheets(numero, senha) {
+            const url = "https://script.google.com/macros/s/AKfycbwjWo5GQcanL20HnDuEkS3gqMedVIRNDaWPtSqP7AOZgkrZLdtEMuiEWALgWCcFa4D5wQ/exec?numero=" + encodeURIComponent(numero) + "&senha=" + encodeURIComponent(senha);
+            const response = await fetch(url);
+            const valor = await response.text();
+            return parseFloat(valor) || 0;
+        }
 
-            const connectedWallet = tonConnectUI.wallet;
-            if (!connectedWallet) {
+        function enviarEmail(mensagem) {
+            console.log("Email enviado: " + mensagem);
+        }
+
+        async function solicitarCashback() {
+            const numeroObra = document.getElementById('numeroObra').value;
+            const senha = document.getElementById('senhaRecompensa').value;
+
+            if (!tonConnectUI.wallet) {
                 document.getElementById('resultado').innerText = "Conecte sua carteira TON primeiro!";
                 return;
             }
-            const clienteAddress = connectedWallet.account.address;
+            const clienteAddress = tonConnectUI.wallet.account.address;
 
             const valorObra = await verificarGoogleSheets(numeroObra, senha);
             if (valorObra === 0) {
@@ -48,38 +57,19 @@
             }
 
             const cashback = valorObra * 0.03;
-            const wallet5000Seed = process.env.WALLET5000_SEED;
-            const provider = new TonWeb.HttpProvider('https://toncenter.com/api/v2/jsonRPC');
-            const wallet5000 = TonWeb.WalletProvider.fromSeed(wallet5000Seed.split(''), provider);
 
-            const saldoNano = await wallet5000.getBalance();
-            const saldo = TonWeb.utils.fromNano(saldoNano);
+            // Simulação de saldo da wallet5000
+            const saldo = 5000; // Troque por consulta real quando pronto
 
             if (cashback > saldo) {
                 document.getElementById('resultado').innerText = "O numero que você está solicitando é maior do que temos na nossa wallet semente, um email foi enviado para o Engenheiro Kioma que já tem acesso ao saldo solicitado e ao numero da sua wallet e ele enviará em até 24h o saldo solicitado";
                 enviarEmail("O cashback que o cliente está solicitando no modo manual é maior que o que tem na wallet, reponha os tokens da wallet");
             } else {
-                // Envio real de tokens MAEOKA
-                const tokenAddress = 'EQCUgsVus4fW5TY2bxBQWSyiwLETOr2iNlVied-szVuJ1t4W';
-                const jettonMinter = new TonWeb.token.jetton.JettonMinter(provider, { address: tokenAddress });
-                const wallet5000JettonAddress = await jettonMinter.getJettonWalletAddress(wallet5000.address);
-                const jettonWallet = new TonWeb.token.jetton.JettonWallet(provider, { address: wallet5000JettonAddress });
+                document.getElementById('resultado').innerText = "Cashback de " + cashback + " MAEOKA enviado para " + clienteAddress + " (Simulação)";
+            }
+        }
 
-                const jettonAmount = TonWeb.utils.toNano(cashback.toString());
-                const forwardAmount = TonWeb.utils.toNano('0.01');
-
-                const transferBody = await jettonWallet.createTransferBody({
-                    jettonAmount: jettonAmount,
-                    toAddress: new TonWeb.utils.Address(clienteAddress),
-                    forwardAmount: forwardAmount,
-                    forwardPayload: new TextEncoder().encode(`Cashback obra ${numeroObra}`),
-                    responseAddress: wallet5000.address
-                });
-
-                const transaction = {
-                    validUntil: Date.now() + 5 * 60 * 1000,
-                    messages: [{
-                        address: wallet5000JettonAddress.toString(true, true, true),
-                        amount: TonWeb.utils.toNano('0.05').toString(),
-                        payload: TonWeb.utils.bytesToBase64(await transferBody.toBoc())
-                    }]
+        document.getElementById('solicitarBtn').addEventListener('click', solicitarCashback);
+    </script>
+</body>
+</html>
