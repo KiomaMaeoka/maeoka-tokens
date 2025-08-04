@@ -538,17 +538,15 @@
                                 </div>
                             </div>
 
-                            <div class="text-xs text-gray-600 mt-4 space-y-1 bg-white p-3 rounded-lg border">
-                                <div class="flex justify-between items-center">
-                                    <span>Seu saldo atual:</span>
-                                    <strong class="text-gray-900" id="infoSaldoUsuario">0,00 MAEOKA</strong>
+                            <!-- Caixa de diálogo de saldo/limite responsiva -->
+                            <div class="text-xs text-gray-600 mt-4 space-y-2 bg-white p-3 rounded-lg border">
+                                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center">
+                                    <span class="font-medium">Seu saldo atual:</span>
+                                    <strong class="text-gray-900 text-left sm:text-right" id="infoSaldoUsuario">0,00 MAEOKA</strong>
                                 </div>
-                                <div class="flex justify-between items-center border-t pt-1 mt-1">
-                                    <span>Limite de uso na obra:</span>
-                                    <div>
-                                        <strong class="text-gray-900" id="infoSaldoMaximoObra">0,00 MAEOKA</strong>
-                                        <p class="text-right text-gray-500" id="infoSaldoPercentual">(40% de R$ 62.331,00)</p>
-                                    </div>
+                                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-t pt-2 mt-2">
+                                    <span class="font-medium">Limite de uso na obra:</span>
+                                    <strong class="text-gray-900 text-left sm:text-right" id="infoSaldoMaximoObra">0,00 MAEOKA</strong>
                                 </div>
                             </div>
                             
@@ -1072,8 +1070,7 @@
             
                 document.getElementById('infoSaldoUsuario').textContent = `${saldoUsuario.toLocaleString('pt-BR', {minimumFractionDigits: 2})} MAEOKA`;
                 document.getElementById('infoSaldoMaximoObra').textContent = `${maxTokensPorLimite.toLocaleString('pt-BR', {minimumFractionDigits: 2})} MAEOKA`;
-                document.getElementById('infoSaldoPercentual').textContent = `(40% de R$ ${VALOR_OBRA.toLocaleString('pt-BR', {minimumFractionDigits: 2})})`;
-
+                
                 const valorOriginalObra = document.getElementById('valorOriginalObra');
                 if (valorOriginalObra) {
                     valorOriginalObra.textContent = `R$ ${VALOR_OBRA.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
@@ -1397,8 +1394,37 @@
             `;
         
             // Enviar para Apps Script automaticamente
-            // await sendContractToAppsScript(contractData);
+            await sendContractToAppsScript(contractData);
         
+        }
+        // NOVO: Função de envio de e-mail re-adicionada
+        async function sendContractToAppsScript(contractData) {
+            const statusMessage = document.getElementById('statusMessage');
+            try {
+                statusMessage.innerHTML = '<span class="spinner mr-2"></span> Enviando contrato para Maeoka Engenharia...';
+                
+                const response = await fetch(APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        contractData: contractData
+                    })
+                });
+                
+                console.log('Requisição enviada com sucesso (no-cors mode)');
+                statusMessage.innerHTML = '✅ Contrato enviado com sucesso! Maeoka Engenharia foi notificada automaticamente.';
+                document.getElementById('systemStatus').classList.remove('bg-blue-50', 'border-blue-200');
+                document.getElementById('systemStatus').classList.add('bg-green-50', 'border-green-300');
+                
+            } catch (error) {
+                console.error('Erro ao enviar para Apps Script:', error);
+                statusMessage.innerHTML = '⚠️ Erro ao notificar a Maeoka Engenharia. Por favor, baixe o documento e envie manualmente.';
+                document.getElementById('systemStatus').classList.remove('bg-blue-50', 'border-blue-200');
+                document.getElementById('systemStatus').classList.add('bg-yellow-50', 'border-yellow-300');
+            }
         }
         function downloadContractHTML() {
             const contractData = JSON.parse(localStorage.getItem('currentContractDisplay'));
