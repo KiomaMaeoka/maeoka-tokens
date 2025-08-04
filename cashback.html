@@ -1,881 +1,477 @@
 <!DOCTYPE html>
-
 <html lang="pt-BR">
 
 <head>
-
-    <meta charset="UTF-8">
-
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Receber Recompensas - Maeoka Tokens</title>
-
-    <script src="https://unpkg.com/@tonconnect/ui@2.0.9/dist/tonconnect-ui.min.js"></script>
-
-    <script src="https://unpkg.com/tonweb/dist/tonweb.js"></script>
-
-    <style>
-
-        body {
-
-            font-family: 'Segoe UI', Arial, sans-serif;
-
-            background: linear-gradient(135deg, #1a3a52 0%, #2c5282 100%);
-
-            margin: 0;
-
-            padding: 10px;
-
-            color: white;
-
-            min-height: 100vh;
-
-            line-height: 1.6;
-
-        }
-
-        
-
-        .container {
-
-            background: white;
-
-            color: #1a3a52;
-
-            padding: 20px;
-
-            border-radius: 8px;
-
-            max-width: 100%;
-
-            margin: 0 auto;
-
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-
-        }
-
-        
-
-        .header {
-
-            background: linear-gradient(135deg, #1a3a52 0%, #2c5282 100%);
-
-            color: white;
-
-            padding: 20px;
-
-            margin: -20px -20px 20px -20px;
-
-            border-radius: 8px 8px 0 0;
-
-            text-align: center;
-
-        }
-
-        
-
-        .logo {
-
-            font-size: 18px;
-
-            font-weight: bold;
-
-            margin-bottom: 5px;
-
-        }
-
-        
-
-        .subtitle {
-
-            font-size: 11px;
-
-            opacity: 0.9;
-
-        }
-
-        
-
-        .section {
-
-            padding: 15px;
-
-            margin: 20px 0;
-
-            background: #f8f9fa;
-
-            border-left: 4px solid #1a3a52;
-
-            border-radius: 5px;
-
-        }
-
-        
-
-        .input-group {
-
-            margin: 15px 0;
-
-        }
-
-        
-
-        .input-group label {
-
-            display: block;
-
-            margin-bottom: 8px;
-
-            font-weight: bold;
-
-            color: #1a3a52;
-
-            font-size: 14px;
-
-        }
-
-        
-
-        .input-group input {
-
-            width: 100%;
-
-            padding: 12px;
-
-            border: 2px solid #e8f4f8;
-
-            border-radius: 8px;
-
-            font-size: 16px;
-
-            box-sizing: border-box;
-
-        }
-
-        
-
-        .botao {
-
-            background: linear-gradient(135deg, #1a3a52 0%, #2c5282 100%);
-
-            color: white;
-
-            border: none;
-
-            padding: 15px 30px;
-
-            border-radius: 8px;
-
-            font-size: 16px;
-
-            cursor: pointer;
-
-            width: 100%;
-
-            margin: 10px 0;
-
-            transition: all 0.3s ease;
-
-        }
-
-        
-
-        .botao:hover {
-
-            transform: translateY(-2px);
-
-            box-shadow: 0 5px 15px rgba(26, 58, 82, 0.3);
-
-        }
-
-        
-
-        .botao:disabled {
-
-            background: #ccc;
-
-            cursor: not-allowed;
-
-            transform: none;
-
-        }
-
-        
-
-        .resultado {
-
-            padding: 20px;
-
-            border-radius: 10px;
-
-            margin: 20px 0;
-
-            display: none;
-
-        }
-
-        
-
-        .sucesso {
-
-            background: #e6fffa;
-
-            color: #38b2ac;
-
-            border: 2px solid #38b2ac;
-
-        }
-
-        
-
-        .erro {
-
-            background: #fef2f2;
-
-            color: #dc2626;
-
-            border: 2px solid #dc2626;
-
-        }
-
-        
-
-        .recompensa-info {
-
-            background: #e6fffa;
-
-            padding: 20px;
-
-            border-radius: 10px;
-
-            margin: 20px 0;
-
-            border-left: 4px solid #38b2ac;
-
-            display: none;
-
-        }
-
-        
-
-        .valor-destaque {
-
-            font-size: 32px;
-
-            font-weight: bold;
-
-            color: #1a3a52;
-
-            text-align: center;
-
-            margin: 15px 0;
-
-        }
-
-        
-
-        #tonConnectButton {
-
-            margin: 20px 0;
-
-            text-align: center;
-
-        }
-
-        
-
-        @media (max-width: 768px) {
-
-            .container { padding: 10px; margin: 2px; }
-
-            .header { padding: 12px; margin: -10px -10px 10px -10px; }
-
-            .logo { font-size: 16px; }
-
-            .subtitle { font-size: 10px; }
-
-            .section { padding: 10px; margin: 10px 0; }
-
-            .input-group label { font-size: 13px; }
-
-            .input-group input { padding: 10px; font-size: 14px; }
-
-            .botao { padding: 12px 20px; font-size: 14px; }
-
-            .valor-destaque { font-size: 24px; }
-
-        }
-
-    </style>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Receber Recompensas - Maeoka Tokens</title>
+    <script src="https://unpkg.com/@tonconnect/ui@2.0.9/dist/tonconnect-ui.min.js"></script>
+    <script src="https://unpkg.com/tonweb/dist/tonweb.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #1a3a52 0%, #2c5282 100%);
+            margin: 0;
+            padding: 10px;
+            color: white;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            background: white;
+            color: #1a3a52;
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 100%;
+            margin: 0 auto;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1a3a52 0%, #2c5282 100%);
+            color: white;
+            padding: 20px;
+            margin: -20px -20px 20px -20px;
+            border-radius: 8px 8px 0 0;
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            font-size: 11px;
+            opacity: 0.9;
+        }
+
+        .section {
+            padding: 15px;
+            margin: 20px 0;
+            background: #f8f9fa;
+            border-left: 4px solid #1a3a52;
+            border-radius: 5px;
+        }
+
+        .input-group {
+            margin: 15px 0;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #1a3a52;
+            font-size: 14px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e8f4f8;
+            border-radius: 8px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        .botao {
+            background: linear-gradient(135deg, #1a3a52 0%, #2c5282 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            margin: 10px 0;
+            transition: all 0.3s ease;
+        }
+
+        .botao:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(26, 58, 82, 0.3);
+        }
+
+        .botao:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .resultado {
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            display: none;
+        }
+
+        .sucesso {
+            background: #e6fffa;
+            color: #38b2ac;
+            border: 2px solid #38b2ac;
+        }
+
+        .erro {
+            background: #fef2f2;
+            color: #dc2626;
+            border: 2px solid #dc2626;
+        }
+
+        .recompensa-info {
+            background: #e6fffa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid #38b2ac;
+            display: none;
+        }
+
+        .valor-destaque {
+            font-size: 32px;
+            font-weight: bold;
+            color: #1a3a52;
+            text-align: center;
+            margin: 15px 0;
+        }
+
+        #tonConnectButton {
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+                margin: 2px;
+            }
+
+            .header {
+                padding: 12px;
+                margin: -10px -10px 10px -10px;
+            }
+
+            .logo {
+                font-size: 16px;
+            }
+
+            .subtitle {
+                font-size: 10px;
+            }
+
+            .section {
+                padding: 10px;
+                margin: 10px 0;
+            }
+
+            .input-group label {
+                font-size: 13px;
+            }
+
+            .input-group input {
+                padding: 10px;
+                font-size: 14px;
+            }
+
+            .botao {
+                padding: 12px 20px;
+                font-size: 14px;
+            }
+
+            .valor-destaque {
+                font-size: 24px;
+            }
+        }
+    </style>
 </head>
 
 <body>
-
-    <div class="container">
-
-        <div class="header">
-
-            <div class="logo">🎁 RECEBER RECOMPENSAS</div>
-
-            <div class="subtitle">Sistema de Cashback Maeoka Tokens</div>
-
-        </div>
-
-        
-
-        <div class="section">
-
-            <h3 style="margin-top: 0;">📝 Dados da Indicação</h3>
-
-            
-
-            <div class="input-group">
-
-                <label>Número da Obra:</label>
-
-                <input type="text" id="obraNumero" placeholder="Ex: 2025-123">
-
-            </div>
-
-            
-
-            <div class="input-group">
-
-                <label>Senha da Recompensa:</label>
-
-                <input type="password" id="senhaRecompensa" placeholder="Senha fornecida pela Maeoka">
-
-            </div>
-
-            
-
-            <button class="botao" onclick="verificarRecompensa()">
-
-                🔍 VERIFICAR RECOMPENSA
-
-            </button>
-
-        </div>
-
-        
-
-        <div class="resultado" id="resultado"></div>
-
-        
-
-        <div class="recompensa-info" id="recompensaInfo">
-
-            <h3 style="text-align: center; margin-top: 0;">✅ RECOMPENSA ENCONTRADA!</h3>
-
-            
-
-            <div style="text-align: center;">
-
-                <p><strong>Obra:</strong> <span id="infoObra"></span></p>
-
-                <p><strong>Cliente:</strong> <span id="infoCliente"></span></p>
-
-                <p><strong>Indicador:</strong> <span id="infoIndicador"></span></p>
-
-                <p><strong>Valor da Obra:</strong> R$ <span id="infoValor"></span></p>
-
-            </div>
-
-            
-
-            <div class="valor-destaque" id="infoTokens">0 MAEOKA</div>
-
-            <p style="text-align: center; color: #666;">
-
-                Equivale a: R$ <span id="infoValorTokens">0,00</span>
-
-            </p>
-
-            
-
-            <div id="statusClaim"></div>
-
-            
-
-            <div id="areaConexao" style="display: none;">
-
-                <div id="tonConnectButton"></div>
-
-                
-
-                <div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin: 15px 0; color: #856404;">
-
-                    <h4 style="margin: 0 0 10px 0;">📝 COMO FUNCIONA:</h4>
-
-                    <p style="margin: 0 0 10px 0; font-size: 13px;">
-
-                        1. Conecte sua carteira TON<br>
-
-                        2. Clique em "SOLICITAR RECOMPENSA"<br>
-
-                        3. Kioma enviará seus tokens em até 24 horas<br>
-
-                        4. Sem taxas para você!
-
-                    </p>
-
-                    <p style="margin: 0; font-size: 12px; color: #856404;">
-
-                        💡 <strong>Seguro:</strong> Envio manual garante máxima segurança dos tokens.
-
-                    </p>
-
-                </div>
-
-                
-
-                <button class="botao" id="btnClaimManual" onclick="claimManual()" disabled>
-
-                    📝 SOLICITAR RECOMPENSA (Grátis)
-
-                </button>
-
-            </div>
-
-        </div>
-
-    </div>
-
-
-
-    <script>
-
-        // URL da API do Google Sheets
-
-        const API_URL = 'https://script.google.com/macros/s/AKfycbxWiKqFxvCaPqKgZM7sjNBrimnXOoiGOgCgXzX_UjtUV95EMotoJAzO-yzgtVl-WkyG/exec';
-
-        
-
-        // Configuração do TON Connect
-
-        const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
-
-            manifestUrl: 'https://ton-connect.github.io/demo-dapp-with-wallet/tonconnect-manifest.json',
-
-            buttonRootId: 'tonConnectButton'
-
-        });
-
-
-
-        // Configurações
-
-        const TOKEN_MAEOKA = 'EQCUgsVus4fW5TY2bxBQWSyiwLETOr2iNlVied-szVuJ1t4W';
-
-        const CARTEIRA_MAEOKA_EMPRESA = 'UQCI80_zNVLySHf1DZbxfVw52DMPQj8EAOMcDn9TlvsjC341';
-
-        
-
-        let dadosRecompensa = null;
-
-        let enderecoUsuario = '';
-
-        let tonweb = null;
-
-
-
-        // Inicializar TonWeb
-
-        function inicializarTonWeb() {
-
-            try {
-
-                tonweb = new TonWeb(new TonWeb.HttpProvider('https://toncenter.com/api/v2/jsonRPC'));
-
-                return true;
-
-            } catch (error) {
-
-                console.error('Erro ao inicializar TonWeb:', error);
-
-                return false;
-
-            }
-
-        }
-
-
-
-        // Monitorar conexão da carteira
-
-        tonConnectUI.onStatusChange(walletInfo => {
-
-            if (walletInfo) {
-
-                // Converter para formato user-friendly
-
-                const endereco = walletInfo.account.address;
-
-                try {
-
-                    const address = new TonWeb.utils.Address(endereco);
-
-                    enderecoUsuario = address.toString(true, true, false); // user-friendly format
-
-                } catch (error) {
-
-                    enderecoUsuario = endereco; // fallback para raw se der erro
-
-                }
-
-                
-
-                if (dadosRecompensa && !dadosRecompensa.claimed) {
-
-                    document.getElementById('btnClaimManual').disabled = false;
-
-                }
-
-            } else {
-
-                enderecoUsuario = '';
-
-                document.getElementById('btnClaimManual').disabled = true;
-
-            }
-
-        });
-
-
-
-        async function verificarRecompensa() {
-
-            const obra = document.getElementById('obraNumero').value.trim();
-
-            const senha = document.getElementById('senhaRecompensa').value.trim();
-
-            const resultado = document.getElementById('resultado');
-
-            
-
-            if (!obra || !senha) {
-
-                resultado.innerHTML = '<div class="erro">❌ Preencha todos os campos!</div>';
-
-                resultado.style.display = 'block';
-
-                return;
-
-            }
-
-            
-
-            resultado.innerHTML = '<div style="background: #e8f4f8; color: #1a3a52; padding: 15px; border-radius: 8px;">🔄 Verificando recompensa...</div>';
-
-            resultado.style.display = 'block';
-
-            document.getElementById('recompensaInfo').style.display = 'none';
-
-            
-
-            try {
-
-                const response = await fetch(`${API_URL}?action=verificar&obra=${obra}&senha=${senha}`);
-
-                const data = await response.json();
-
-                
-
-                if (data.encontrado) {
-
-                    dadosRecompensa = data;
-
-                    
-
-                    // Preencher informações básicas
-
-                    document.getElementById('infoObra').textContent = obra;
-
-                    document.getElementById('infoCliente').textContent = data.cliente;
-
-                    document.getElementById('infoIndicador').textContent = data.indicador;
-
-                    document.getElementById('infoValor').textContent = data.valor.toLocaleString('pt-BR');
-
-                    document.getElementById('infoTokens').textContent = `${data.tokens.toLocaleString('pt-BR')} MAEOKA`;
-
-                    document.getElementById('infoValorTokens').textContent = data.tokens.toLocaleString('pt-BR', {minimumFractionDigits: 2});
-
-                    
-
-                    resultado.style.display = 'none';
-
-                    document.getElementById('recompensaInfo').style.display = 'block';
-
-                    
-
-                    // VERIFICAR STATUS DO CLAIM
-
-                    if (data.claimed === 'TRUE' || data.claimed === true) {
-
-                        // JÁ FOI RESGATADO - Buscar dados da carteira
-
-                        buscarDadosCompletos(obra, senha);
-
-                    } else {
-
-                        // LIBERADO PARA CLAIM
-
-                        mostrarClaimLiberado();
-
-                    }
-
-                    
-
-                } else {
-
-                    resultado.innerHTML = '<div class="erro">❌ Recompensa não encontrada! Verifique os dados.</div>';
-
-                }
-
-                
-
-            } catch (error) {
-
-                console.error('Erro ao verificar recompensa:', error);
-
-                resultado.innerHTML = '<div class="erro">❌ Erro ao conectar com o sistema. Tente novamente.</div>';
-
-            }
-
-        }
-
-
-
-        async function buscarDadosCompletos(obra, senha) {
-
-            try {
-
-                // Buscar dados completos incluindo carteira (precisamos acessar a planilha diretamente)
-
-                const response = await fetch(`${API_URL}?action=buscarCompleto&obra=${obra}&senha=${senha}`);
-
-                const data = await response.json();
-
-                
-
-                if (data.carteira) {
-
-                    mostrarClaimJaEmitido(data.carteira);
-
-                } else {
-
-                    mostrarClaimJaEmitido('Carteira não disponível');
-
-                }
-
-            } catch (error) {
-
-                mostrarClaimJaEmitido('Erro ao buscar dados');
-
-            }
-
-        }
-
-
-
-        function mostrarClaimLiberado() {
-
-            document.getElementById('statusClaim').innerHTML = `
-
-                <div style="background: #e6fffa; padding: 15px; border-radius: 8px; margin: 15px 0; border: 2px solid #38b2ac;">
-
-                    <h4 style="margin: 0 0 10px 0; color: #38b2ac;">✅ CLAIM LIBERADO!</h4>
-
-                    <p style="margin: 0; color: #38b2ac; font-weight: bold;">Esta recompensa está disponível para solicitação.</p>
-
-                </div>
-
-            `;
-
-            
-
-            document.getElementById('areaConexao').style.display = 'block';
-
-        }
-
-
-
-        function mostrarClaimJaEmitido(carteira) {
-
-            document.getElementById('statusClaim').innerHTML = `
-
-                <div style="background: #fef2e7; padding: 15px; border-radius: 8px; margin: 15px 0; border: 2px solid #f6ad55;">
-
-                    <h4 style="margin: 0 0 10px 0; color: #f6ad55;">⚠️ CLAIM JÁ EMITIDO!</h4>
-
-                    <p style="margin: 0 0 10px 0; color: #856404;">Esta recompensa não está mais disponível pois já foi solicitada.</p>
-
-                    <p style="margin: 0; color: #856404;"><strong>Carteira que já solicitou:</strong></p>
-
-                    <div style="background: #fff; padding: 8px; border-radius: 4px; word-break: break-all; font-family: monospace; font-size: 11px; color: #1a3a52; margin: 5px 0;">
-
-                        ${carteira}
-
-                    </div>
-
-                </div>
-
-            `;
-
-            
-
-            document.getElementById('areaConexao').style.display = 'none';
-
-        }
-
-
-
-        async function claimManual() {
-
-            if (!dadosRecompensa || !enderecoUsuario) {
-
-                alert('Conecte sua carteira primeiro!');
-
-                return;
-
-            }
-
-            
-
-            const btnManual = document.getElementById('btnClaimManual');
-
-            btnManual.disabled = true;
-
-            btnManual.innerHTML = '📝 Registrando solicitação...';
-
-            
-
-            try {
-
-                const quantidade = dadosRecompensa.tokens;
-
-                
-
-                // Marcar como claimed na planilha E salvar carteira
-
-                const obra = document.getElementById('obraNumero').value;
-
-                const senha = document.getElementById('senhaRecompensa').value;
-
-                const response = await fetch(`${API_URL}?action=claim&obra=${obra}&senha=${senha}&carteira=${enderecoUsuario}`);
-
-                const result = await response.json();
-
-                
-
-                if (result.sucesso) {
-
-                    // Sucesso manual
-
-                    document.getElementById('resultado').innerHTML = `
-
-                        <div class="sucesso">
-
-                            <h3>📝 SOLICITAÇÃO REGISTRADA!</h3>
-
-                            <p><strong>Indicador:</strong> ${dadosRecompensa.indicador}</p>
-
-                            <p><strong>Tokens solicitados:</strong> ${quantidade.toLocaleString('pt-BR')} MAEOKA</p>
-
-                            <p><strong>Valor:</strong> R$ ${quantidade.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p>
-
-                            <p><strong>Carteira destino:</strong></p>
-
-                            <div style="background: #fff; padding: 8px; border-radius: 4px; word-break: break-all; font-family: monospace; font-size: 11px; color: #1a3a52; margin: 10px 0;">
-
-                                ${enderecoUsuario}
-
-                            </div>
-
-                            
-
-                            <div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin: 15px 0; color: #856404;">
-
-                                <h4 style="margin: 0 0 10px 0;">📧 NOTIFICAÇÃO PARA KIOMA:</h4>
-
-                                <p style="margin: 0; font-size: 13px;">
-
-                                    <strong>Nova solicitação:</strong><br>
-
-                                    Obra: ${obra}<br>
-
-                                    Indicador: ${dadosRecompensa.indicador}<br>
-
-                                    Enviar: ${quantidade} MAEOKA<br>
-
-                                    Para: ${enderecoUsuario.slice(0, 15)}...
-
-                                </p>
-
-                            </div>
-
-                            
-
-                            <div style="background: #e6fffa; padding: 15px; border-radius: 8px; margin: 15px 0; color: #38b2ac;">
-
-                                <p style="margin: 0; font-size: 14px;">
-
-                                    ✅ <strong>Solicitação registrada!</strong><br>
-
-                                    Kioma enviará seus tokens em até 24 horas.<br>
-
-                                    Sem taxas! 🎉
-
-                                </p>
-
-                            </div>
-
-                        </div>
-
-                    `;
-
-                    document.getElementById('resultado').style.display = 'block';
-
-                    document.getElementById('recompensaInfo').style.display = 'none';
-
-                    
-
-                } else {
-
-                    throw new Error('Erro ao registrar solicitação');
-
-                }
-
-                
-
-            } catch (error) {
-
-                console.error('Erro no claim manual:', error);
-
-                btnManual.disabled = false;
-
-                btnManual.innerHTML = '📝 SOLICITAR RECOMPENSA (Grátis)';
-
-                alert('Erro ao registrar solicitação: ' + error.message);
-
-            }
-
-        }
-
-
-
-        // Inicializar sistema
-
-        window.addEventListener('load', () => {
-
-            inicializarTonWeb();
-
-        });
-
-    </script>
-
+    <div class="container">
+        <div class="header">
+            <div class="logo">🎁 RECEBER RECOMPENSAS</div>
+            <div class="subtitle">Sistema de Cashback Maeoka Tokens</div>
+        </div>
+
+        <div class="section">
+            <h3 style="margin-top: 0;">📝 Dados da Indicação</h3>
+
+            <div class="input-group">
+                <label>Número da Obra:</label>
+                <input type="text" id="obraNumero" placeholder="Ex: 2025-123">
+            </div>
+
+            <div class="input-group">
+                <label>Senha da Recompensa:</label>
+                <input type="password" id="senhaRecompensa" placeholder="Senha fornecida pela Maeoka">
+            </div>
+
+            <button class="botao" onclick="verificarRecompensa()">
+                🔍 VERIFICAR RECOMPENSA
+            </button>
+        </div>
+
+        <div class="resultado" id="resultado"></div>
+
+        <div class="recompensa-info" id="recompensaInfo">
+            <h3 style="text-align: center; margin-top: 0;">✅ RECOMPENSA ENCONTRADA!</h3>
+
+            <div style="text-align: center;">
+                <p><strong>Obra:</strong> <span id="infoObra"></span></p>
+                <p><strong>Cliente:</strong> <span id="infoCliente"></span></p>
+                <p><strong>Indicador:</strong> <span id="infoIndicador"></span></p>
+                <p><strong>Valor da Obra:</strong> R$ <span id="infoValor"></span></p>
+            </div>
+
+            <div class="valor-destaque" id="infoTokens">0 MAEOKA</div>
+            <p style="text-align: center; color: #666;">
+                Equivale a: R$ <span id="infoValorTokens">0,00</span>
+            </p>
+
+            <div id="statusClaim"></div>
+
+            <div id="areaConexao" style="display: none;">
+                <div id="tonConnectButton"></div>
+
+                <div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin: 15px 0; color: #856404;">
+                    <h4 style="margin: 0 0 10px 0;">📝 COMO FUNCIONA:</h4>
+                    <p style="margin: 0 0 10px 0; font-size: 13px;">
+                        1. Conecte sua carteira TON<br>
+                        2. Clique em "SOLICITAR RECOMPENSA"<br>
+                        3. Kioma enviará seus tokens em até 24 horas<br>
+                        4. Sem taxas para você!
+                    </p>
+                    <p style="margin: 0; font-size: 12px; color: #856404;">
+                        💡 <strong>Seguro:</strong> Envio manual garante máxima segurança dos tokens.
+                    </p>
+                </div>
+
+                <button class="botao" id="btnClaimManual" onclick="claimManual()" disabled>
+                    📝 SOLICITAR RECOMPENSA (Grátis)
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // URL da API do Google Sheets
+        const API_URL = 'https://script.google.com/macros/s/AKfycbxWiKqFxvCaPqKgZM7sjNBrimnXOoiGOgCgXzX_UjtUV95EMotoJAzO-yzgtVl-WkyG/exec';
+
+        // Configuração do TON Connect
+        const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
+            manifestUrl: 'https://ton-connect.github.io/demo-dapp-with-wallet/tonconnect-manifest.json',
+            buttonRootId: 'tonConnectButton'
+        });
+
+        // Configurações
+        const TOKEN_MAEOKA = 'EQCUgsVus4fW5TY2bxBQWSyiwLETOr2iNlVied-szVuJ1t4W';
+        const CARTEIRA_MAEOKA_EMPRESA = 'UQCI80_zNVLySHf1DZbxfVw52DMPQj8EAOMcDn9TlvsjC341';
+
+        let dadosRecompensa = null;
+        let enderecoUsuario = '';
+        let tonweb = null;
+
+        // Inicializar TonWeb
+        function inicializarTonWeb() {
+            try {
+                tonweb = new TonWeb(new TonWeb.HttpProvider('https://toncenter.com/api/v2/jsonRPC'));
+                return true;
+            } catch (error) {
+                console.error('Erro ao inicializar TonWeb:', error);
+                return false;
+            }
+        }
+
+        // Monitorar conexão da carteira
+        tonConnectUI.onStatusChange(walletInfo => {
+            if (walletInfo) {
+                // Converter para formato user-friendly
+                const endereco = walletInfo.account.address;
+                try {
+                    const address = new TonWeb.utils.Address(endereco);
+                    enderecoUsuario = address.toString(true, true, false); // user-friendly format
+                } catch (error) {
+                    enderecoUsuario = endereco; // fallback para raw se der erro
+                }
+
+                if (dadosRecompensa && !dadosRecompensa.claimed) {
+                    document.getElementById('btnClaimManual').disabled = false;
+                }
+            } else {
+                enderecoUsuario = '';
+                document.getElementById('btnClaimManual').disabled = true;
+            }
+        });
+
+        async function verificarRecompensa() {
+            const obra = document.getElementById('obraNumero').value.trim();
+            const senha = document.getElementById('senhaRecompensa').value.trim();
+            const resultado = document.getElementById('resultado');
+
+            if (!obra || !senha) {
+                resultado.innerHTML = '<div class="erro">❌ Preencha todos os campos!</div>';
+                resultado.style.display = 'block';
+                return;
+            }
+
+            resultado.innerHTML = '<div style="background: #e8f4f8; color: #1a3a52; padding: 15px; border-radius: 8px;">🔄 Verificando recompensa...</div>';
+            resultado.style.display = 'block';
+            document.getElementById('recompensaInfo').style.display = 'none';
+
+            try {
+                const response = await fetch(`${API_URL}?action=verificar&obra=${obra}&senha=${senha}`);
+                const data = await response.json();
+
+                if (data.encontrado) {
+                    dadosRecompensa = data;
+
+                    // Preencher informações básicas
+                    document.getElementById('infoObra').textContent = obra;
+                    document.getElementById('infoCliente').textContent = data.cliente;
+                    document.getElementById('infoIndicador').textContent = data.indicador;
+                    document.getElementById('infoValor').textContent = data.valor.toLocaleString('pt-BR');
+                    document.getElementById('infoTokens').textContent = `${data.tokens.toLocaleString('pt-BR')} MAEOKA`;
+                    document.getElementById('infoValorTokens').textContent = data.tokens.toLocaleString('pt-BR', {
+                        minimumFractionDigits: 2
+                    });
+
+                    resultado.style.display = 'none';
+                    document.getElementById('recompensaInfo').style.display = 'block';
+
+                    // VERIFICAR STATUS DO CLAIM
+                    if (data.claimed === 'TRUE' || data.claimed === true) {
+                        // JÁ FOI RESGATADO - Buscar dados da carteira
+                        buscarDadosCompletos(obra, senha);
+                    } else {
+                        // LIBERADO PARA CLAIM
+                        mostrarClaimLiberado();
+                    }
+
+                } else {
+                    resultado.innerHTML = '<div class="erro">❌ Recompensa não encontrada! Verifique os dados.</div>';
+                }
+
+            } catch (error) {
+                console.error('Erro ao verificar recompensa:', error);
+                resultado.innerHTML = '<div class="erro">❌ Erro ao conectar com o sistema. Tente novamente.</div>';
+            }
+        }
+
+        async function buscarDadosCompletos(obra, senha) {
+            try {
+                // Buscar dados completos incluindo carteira (precisamos acessar a planilha diretamente)
+                const response = await fetch(`${API_URL}?action=buscarCompleto&obra=${obra}&senha=${senha}`);
+                const data = await response.json();
+
+                if (data.carteira) {
+                    mostrarClaimJaEmitido(data.carteira);
+                } else {
+                    mostrarClaimJaEmitido('Carteira não disponível');
+                }
+            } catch (error) {
+                mostrarClaimJaEmitido('Erro ao buscar dados');
+            }
+        }
+
+        function mostrarClaimLiberado() {
+            document.getElementById('statusClaim').innerHTML = `
+                <div style="background: #e6fffa; padding: 15px; border-radius: 8px; margin: 15px 0; border: 2px solid #38b2ac;">
+                    <h4 style="margin: 0 0 10px 0; color: #38b2ac;">✅ CLAIM LIBERADO!</h4>
+                    <p style="margin: 0; color: #38b2ac; font-weight: bold;">Esta recompensa está disponível para solicitação.</p>
+                </div>
+            `;
+
+            document.getElementById('areaConexao').style.display = 'block';
+        }
+
+        function mostrarClaimJaEmitido(carteira) {
+            document.getElementById('statusClaim').innerHTML = `
+                <div style="background: #fef2e7; padding: 15px; border-radius: 8px; margin: 15px 0; border: 2px solid #f6ad55;">
+                    <h4 style="margin: 0 0 10px 0; color: #f6ad55;">⚠️ CLAIM JÁ EMITIDO!</h4>
+                    <p style="margin: 0 0 10px 0; color: #856404;">Esta recompensa não está mais disponível pois já foi solicitada.</p>
+                    <p style="margin: 0; color: #856404;"><strong>Carteira que já solicitou:</strong></p>
+                    <div style="background: #fff; padding: 8px; border-radius: 4px; word-break: break-all; font-family: monospace; font-size: 11px; color: #1a3a52; margin: 5px 0;">
+                        ${carteira}
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('areaConexao').style.display = 'none';
+        }
+
+        async function claimManual() {
+            if (!dadosRecompensa || !enderecoUsuario) {
+                alert('Conecte sua carteira primeiro!');
+                return;
+            }
+
+            const btnManual = document.getElementById('btnClaimManual');
+            btnManual.disabled = true;
+            btnManual.innerHTML = '📝 Registrando solicitação...';
+
+            try {
+                const quantidade = dadosRecompensa.tokens;
+
+                // Marcar como claimed na planilha E salvar carteira
+                const obra = document.getElementById('obraNumero').value;
+                const senha = document.getElementById('senhaRecompensa').value;
+                const response = await fetch(`${API_URL}?action=claim&obra=${obra}&senha=${senha}&carteira=${enderecoUsuario}`);
+                const result = await response.json();
+
+                if (result.sucesso) {
+                    // Sucesso manual
+                    document.getElementById('resultado').innerHTML = `
+                        <div class="sucesso">
+                            <h3>📝 SOLICITAÇÃO REGISTRADA!</h3>
+                            <p><strong>Indicador:</strong> ${dadosRecompensa.indicador}</p>
+                            <p><strong>Tokens solicitados:</strong> ${quantidade.toLocaleString('pt-BR')} MAEOKA</p>
+                            <p><strong>Valor:</strong> R$ ${quantidade.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p>
+                            <p><strong>Carteira destino:</strong></p>
+                            <div style="background: #fff; padding: 8px; border-radius: 4px; word-break: break-all; font-family: monospace; font-size: 11px; color: #1a3a52; margin: 10px 0;">
+                                ${enderecoUsuario}
+                            </div>
+                            
+                            <div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin: 15px 0; color: #856404;">
+                                <h4 style="margin: 0 0 10px 0;">📧 NOTIFICAÇÃO PARA KIOMA:</h4>
+                                <p style="margin: 0; font-size: 13px;">
+                                    <strong>Nova solicitação:</strong><br>
+                                    Obra: ${obra}<br>
+                                    Indicador: ${dadosRecompensa.indicador}<br>
+                                    Enviar: ${quantidade} MAEOKA<br>
+                                    Para: ${enderecoUsuario.slice(0, 15)}...
+                                </p>
+                            </div>
+                            
+                            <div style="background: #e6fffa; padding: 15px; border-radius: 8px; margin: 15px 0; color: #38b2ac;">
+                                <p style="margin: 0; font-size: 14px;">
+                                    ✅ <strong>Solicitação registrada!</strong><br>
+                                    Kioma enviará seus tokens em até 24 horas.<br>
+                                    Sem taxas! 🎉
+                                </p>
+                            </div>
+                        </div>
+                    `;
+                    document.getElementById('resultado').style.display = 'block';
+                    document.getElementById('recompensaInfo').style.display = 'none';
+
+                } else {
+                    throw new Error('Erro ao registrar solicitação');
+                }
+
+            } catch (error) {
+                console.error('Erro no claim manual:', error);
+                btnManual.disabled = false;
+                btnManual.innerHTML = '📝 SOLICITAR RECOMPENSA (Grátis)';
+                alert('Erro ao registrar solicitação: ' + error.message);
+            }
+        }
+
+        // Inicializar sistema
+        window.addEventListener('load', () => {
+            inicializarTonWeb();
+        });
+    </script>
 </body>
 
 </html>
