@@ -1,0 +1,2527 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Contratação - Maeoka Engenharia</title>
+    <meta name="description" content="Sistema de contratação online da Maeoka Engenharia - Seguro, rápido e transparente">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@tonconnect/ui@2.0.9/dist/tonconnect-ui.min.js"></script>
+    <script src="https://unpkg.com/tonweb/dist/tonweb.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #1a3a52;
+            --secondary-color: #2c5282;
+            --success-color: #38b2ac;
+            --warning-color: #f59e0b;
+            --error-color: #ef4444;
+            --min-touch-target: 48px;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f1f5f9;
+            color: #374151;
+            min-height: 100vh;
+        }
+        
+        /* Melhorias de acessibilidade */
+        *:focus {
+            outline: 3px solid var(--primary-color);
+            outline-offset: 2px;
+        }
+        
+        /* Páginas com transições suaves */
+        .page {
+            display: none;
+            opacity: 0;
+            transform: translateX(20px);
+            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+        }
+        
+        .page.active {
+            display: block;
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        /* Modal melhorado */
+        .modal {
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.2s ease-in-out;
+        }
+        
+        .modal-content {
+            animation: slideUp 0.3s ease-out;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        /* Spinner melhorado */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        /* Toast notifications */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #333;
+            color: white;
+            padding: 16px 24px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: slideInRight 0.3s ease-out;
+            z-index: 1000;
+        }
+        
+        @keyframes slideInRight {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+        
+        /* Botões com área de toque adequada */
+        button {
+            min-height: var(--min-touch-target);
+            min-width: 120px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        button::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+        
+        button:active::after {
+            width: 300px;
+            height: 300px;
+        }
+        
+        /* Stepper melhorado */
+        .stepper {
+            display: flex;
+            justify-content: space-between;
+            margin: 2rem 1rem;
+            position: relative;
+        }
+        
+        .stepper::before {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #e5e7eb;
+            z-index: -1;
+        }
+        
+        .step {
+            text-align: center;
+            cursor: pointer;
+            position: relative;
+            background: white;
+            padding: 0 8px;
+        }
+        
+        .step-number {
+            background: #ccc;
+            color: white;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            line-height: 30px;
+            display: inline-block;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .step.active .step-number {
+            background: var(--primary-color);
+            transform: scale(1.1);
+        }
+        
+        .step.completed .step-number {
+            background: var(--success-color);
+        }
+        
+        .step-label {
+            font-size: 0.75rem;
+            margin-top: 4px;
+            color: #6b7280;
+        }
+        
+        .step.active .step-label {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+        
+        /* Tooltip melhorado */
+        [data-tooltip] {
+            position: relative;
+        }
+        
+        [data-tooltip]:hover::after,
+        [data-tooltip]:focus::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #333;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            white-space: nowrap;
+            z-index: 10;
+            font-size: 0.875rem;
+            margin-bottom: 8px;
+            animation: fadeIn 0.2s ease-in-out;
+        }
+        
+        /* Valores monetários responsivos */
+        .money-value {
+            word-break: break-word;
+            hyphens: auto;
+        }
+        
+        /* Melhorias para mobile */
+        @media (max-width: 640px) {
+            .container {
+                padding: 0.5rem;
+            }
+            
+            .header {
+                padding: 1.5rem 1rem;
+            }
+            
+            .logo {
+                font-size: 1.75rem;
+            }
+            
+            .subtitle {
+                font-size: 0.7rem;
+            }
+            
+            /* Container de termos com scroll em mobile */
+            #termsContainer {
+                max-height: 300px;
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+                padding-right: 0.5rem;
+            }
+            
+            /* Stepper compacto mas visível */
+            .stepper {
+                margin: 1rem 0.5rem;
+            }
+            
+            .step-number {
+                width: 25px;
+                height: 25px;
+                line-height: 25px;
+                font-size: 0.75rem;
+            }
+            
+            .step-label {
+                display: none;
+            }
+            
+            .step.active .step-label {
+                display: block;
+                position: absolute;
+                top: 35px;
+                left: 50%;
+                transform: translateX(-50%);
+                white-space: nowrap;
+                font-size: 0.625rem;
+            }
+            
+            /* Botões com espaçamento adequado */
+            .btn-group {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .btn-group button {
+                width: 100%;
+            }
+            
+            /* Cards de serviço responsivos */
+            .service-item {
+                padding: 1rem;
+            }
+            
+            .service-details {
+                flex-direction: column;
+                align-items: flex-start !important;
+            }
+            
+            .price {
+                margin-top: 0.5rem;
+                font-size: 1.125rem !important;
+            }
+            
+            /* Textos grandes responsivos */
+            .text-6xl {
+                font-size: 2rem !important;
+            }
+            
+            .text-5xl {
+                font-size: 1.75rem !important;
+            }
+            
+            .text-4xl {
+                font-size: 1.5rem !important;
+            }
+            
+            .text-3xl {
+                font-size: 1.25rem !important;
+            }
+            
+            /* Modal responsivo */
+            .modal-content {
+                margin: 1rem;
+                max-width: calc(100vw - 2rem);
+            }
+            
+            /* Toast mobile */
+            .toast {
+                left: 10px;
+                right: 10px;
+                bottom: 10px;
+            }
+        }
+        
+        /* Modo paisagem mobile */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .modal-content {
+                max-height: 80vh;
+            }
+            
+            .header {
+                padding: 1rem;
+            }
+        }
+        
+        /* Animação de sucesso */
+        @keyframes successPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .success-animate {
+            animation: successPulse 1s ease-in-out;
+        }
+        
+        /* Indicador de campo obrigatório */
+        .required-field::after {
+            content: ' *';
+            color: var(--error-color);
+        }
+        
+        /* Estados de erro nos campos */
+        input:invalid:not(:focus):not(:placeholder-shown),
+        textarea:invalid:not(:focus):not(:placeholder-shown) {
+            border-color: var(--error-color);
+        }
+        
+        /* Scroll suave */
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        /* Melhor contraste para acessibilidade */
+        .text-gray-600 {
+            color: #4b5563;
+        }
+        
+        /* Loading overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+        }
+        
+        .loading-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        /* Progress indicator */
+        .progress-indicator {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: #e5e7eb;
+            z-index: 50;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: var(--primary-color);
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-gray-800">
+    <!-- Indicador de progresso fixo -->
+    <div class="progress-indicator" aria-hidden="true">
+        <div class="progress-bar" id="topProgressBar" style="width: 20%"></div>
+    </div>
+    
+    <!-- Container principal -->
+    <div class="container mx-auto p-4 md:p-8 lg:p-12">
+        <div class="bg-white rounded-xl shadow-2xl overflow-hidden">
+            <!-- Header com gradiente -->
+            <header class="bg-gradient-to-r from-blue-900 to-blue-500 text-white text-center p-8 md:p-12 shadow-lg">
+                <h1 class="logo text-3xl md:text-5xl font-extrabold tracking-wide mb-2">MAEOKA ENGENHARIA</h1>
+                <p class="subtitle text-xs md:text-sm opacity-90">CNPJ: 19.924.627/0001-67 • Eng. Kioma Maeoka (CREA 159.328/D-PR)</p>
+                <div class="w-full bg-white bg-opacity-20 rounded-full h-1 mt-6">
+                    <div class="bg-green-400 h-full rounded-full transition-all duration-500 ease-in-out" id="progressBar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="20" style="width: 20%"></div>
+                </div>
+                <p class="text-xs mt-2 opacity-80" id="currentStepText">Etapa 1 de 5 - Proposta</p>
+            </header>
+            
+            <!-- Stepper melhorado -->
+            <nav class="stepper" id="stepper" role="navigation" aria-label="Etapas do processo">
+                <div class="step active" data-step="1" onclick="navigateToPage(1)" role="button" tabindex="0" aria-label="Ir para proposta">
+                    <span class="step-number">1</span>
+                    <span class="step-label">Proposta</span>
+                </div>
+                <div class="step" data-step="2" onclick="navigateToPage(2)" role="button" tabindex="0" aria-label="Ir para termos">
+                    <span class="step-number">2</span>
+                    <span class="step-label">Termos</span>
+                </div>
+                <div class="step" data-step="3" onclick="navigateToPage(3)" role="button" tabindex="0" aria-label="Ir para pagamento">
+                    <span class="step-number">3</span>
+                    <span class="step-label">Pagamento</span>
+                </div>
+                <div class="step" data-step="4" onclick="navigateToPage(4)" role="button" tabindex="0" aria-label="Ir para dados">
+                    <span class="step-number">4</span>
+                    <span class="step-label">Dados</span>
+                </div>
+                <div class="step" data-step="5" onclick="navigateToPage(5)" role="button" tabindex="0" aria-label="Ir para finalização">
+                    <span class="step-number">5</span>
+                    <span class="step-label">Final</span>
+                </div>
+            </nav>
+            
+            <!-- Páginas de navegação -->
+            <main class="p-6 md:p-10">
+                <!-- PÁGINA 1: PROPOSTA -->
+                <div class="page active" id="page1" role="tabpanel" aria-label="Página de proposta">
+                    <h2 class="text-3xl md:text-4xl font-bold text-blue-900 text-center mb-8 pb-4 border-b-2">
+                        Contrato de Prestação de Serviço
+                    </h2>
+                    
+                    <!-- Informações do Cliente -->
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8 text-sm" role="region" aria-label="Informações do cliente">
+                        <p class="font-bold">Cliente: Thiago</p>
+                        <p class="mt-1">Endereço da Obra: R. Eponino Macuco, 185 - Curitiba/PR</p>
+                        <p class="mt-1">Data: <time id="currentDate"></time></p>
+                    </div>
+                    
+                    <!-- Serviços Contratados -->
+                    <section aria-label="Serviços contratados">
+                        <h3 class="text-2xl font-semibold text-blue-800 mb-6 border-b pb-2">Serviços Contratados:</h3>
+                        <div class="space-y-4">
+                            <article class="bg-gray-50 border-l-4 border-blue-500 rounded-lg p-5 shadow-sm service-item">
+                                <h4 class="font-semibold text-lg text-gray-900">Demolição - Remover Revestimento e Contra-Piso existente.</h4>
+                                <div class="flex flex-col md:flex-row justify-between items-start md:items-center text-sm mt-2 text-gray-600 service-details">
+                                    <div class="flex-1">Área: 100,93 m² • Com retirada de entulho até caçamba</div>
+                                    <div class="font-bold text-blue-700 text-base md:text-lg mt-2 md:mt-0 price money-value">R$ 6.333,33</div>
+                                </div>
+                            </article>
+                            
+                            <article class="bg-gray-50 border-l-4 border-blue-500 rounded-lg p-5 shadow-sm service-item">
+                                <h4 class="font-semibold text-lg text-gray-900">Regularização/nivelamento</h4>
+                                <div class="flex flex-col md:flex-row justify-between items-start md:items-center text-sm mt-2 text-gray-600 service-details">
+                                    <div class="flex-1">Argamassa de regularização e caimento para ralos (min. 1%)</div>
+                                    <div class="font-bold text-blue-700 text-base md:text-lg mt-2 md:mt-0 price money-value">R$ 7.125,00</div>
+                                </div>
+                            </article>
+                            
+                            <article class="bg-gray-50 border-l-4 border-blue-500 rounded-lg p-5 shadow-sm service-item">
+                                <h4 class="font-semibold text-lg text-gray-900">Aplicação de Primer e Manta asfáltica</h4>
+                                <div class="flex flex-col md:flex-row justify-between items-start md:items-center text-sm mt-2 text-gray-600 service-details">
+                                    <div class="flex-1">Nas áreas de recreação 1 e 2</div>
+                                    <div class="font-bold text-blue-700 text-base md:text-lg mt-2 md:mt-0 price money-value">R$ 5.541,67</div>
+                                </div>
+                            </article>
+                            
+                            <article class="bg-gray-50 border-l-4 border-blue-500 rounded-lg p-5 shadow-sm service-item">
+                                <h4 class="font-semibold text-lg text-gray-900">Executar Contrapiso</h4>
+                                <div class="flex flex-col md:flex-row justify-between items-start md:items-center text-sm mt-2 text-gray-600 service-details">
+                                    <div class="flex-1">Proteção mecânica - Argamassa de proteção de 3-5cm sobre a manta</div>
+                                    <div class="font-bold text-blue-700 text-base md:text-lg mt-2 md:mt-0 price money-value">R$ 11.875,00</div>
+                                </div>
+                            </article>
+                            
+                            <article class="bg-gray-50 border-l-4 border-blue-500 rounded-lg p-5 shadow-sm service-item">
+                                <h4 class="font-semibold text-lg text-gray-900">Instalar Revestimento Cerâmico/Porcelanato</h4>
+                                <div class="flex flex-col md:flex-row justify-between items-start md:items-center text-sm mt-2 text-gray-600 service-details">
+                                    <div class="flex-1">Nas áreas de recreação 1 e 2 (porcelanato até 90x90)</div>
+                                    <div class="font-bold text-blue-700 text-base md:text-lg mt-2 md:mt-0 price money-value">R$ 7.125,00</div>
+                                </div>
+                            </article>
+                        </div>
+                        
+                        <div class="bg-blue-100 text-blue-900 font-bold text-center py-4 mt-6 rounded-lg text-xl" role="status" aria-live="polite">
+                            Subtotal Serviços: <span class="money-value">R$ 38.000,00</span>
+                        </div>
+                    </section>
+                    
+                    <!-- Serviços e Materiais Inclusos -->
+                    <section class="bg-green-50 border-l-4 border-green-500 rounded-lg p-6 mt-8 shadow-sm" aria-label="Serviços inclusos">
+                        <h4 class="text-xl font-semibold text-gray-900 mb-4">Serviços Inclusos no Processo:</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                            <div class="bg-white p-4 rounded-lg shadow-md">
+                                <p class="font-bold">Anotação de Responsabilidade Técnica (ART)</p>
+                                <p class="text-gray-600">Registro junto ao CREA-PR</p>
+                            </div>
+                            <div class="bg-white p-4 rounded-lg shadow-md">
+                                <p class="font-bold">Gerenciamento de Obra</p>
+                                <p class="text-gray-600">Acompanhamento técnico completo</p>
+                            </div>
+                        </div>
+                        <p class="text-center text-xs text-gray-600 mt-4 italic">
+                            Estes serviços já estão inclusos no valor da proposta
+                        </p>
+                    </section>
+                    
+                    <section class="bg-gray-100 rounded-lg p-6 mt-8 shadow-sm" aria-label="Materiais inclusos">
+                        <h4 class="text-xl font-semibold text-gray-900 mb-4">Materiais Inclusos:</h4>
+                        <div class="space-y-3">
+                            <div class="bg-white border-l-4 border-blue-500 rounded-md p-3">
+                                <p class="font-medium text-sm">Areia, cimento e brita</p>
+                                <p class="text-xs text-gray-500">Para contrapiso e regularização</p>
+                            </div>
+                            <div class="bg-white border-l-4 border-blue-500 rounded-md p-3">
+                                <p class="font-medium text-sm">Manta asfáltica e primer</p>
+                                <p class="text-xs text-gray-500">Cola, pregos para impermeabilização</p>
+                            </div>
+                            <div class="bg-white border-l-4 border-blue-500 rounded-md p-3">
+                                <p class="font-medium text-sm">Argamassa e espaçadores</p>
+                                <p class="text-xs text-gray-500">Para assentamento de revestimento</p>
+                            </div>
+                        </div>
+                        <div class="bg-blue-100 text-blue-900 font-bold text-center py-4 mt-6 rounded-lg text-xl" role="status" aria-live="polite">
+                            Subtotal Materiais: <span class="money-value">R$ 28.031,00</span>
+                        </div>
+                    </section>
+                    
+                    <!-- Observações e Nota Fiscal -->
+                    <section class="bg-yellow-50 border border-yellow-200 rounded-lg p-6 mt-8 shadow-sm" aria-label="Observações importantes">
+                        <h4 class="text-xl font-semibold text-yellow-800 mb-4">Observações Importantes</h4>
+                        <ul id="importantObservations" class="list-disc list-inside text-sm text-gray-600 space-y-1">
+                            <li>Materiais inclusos no valor da proposta</li>
+                            <li>Não inclui taxas de condomínio para aprovação</li>
+                            <li>Proposta válida por 30 dias</li>
+                            <li>Garantia: 12 meses para vícios de execução</li>
+                            <li>Caçamba não inclusa (custo aprox. R$ 450,00)</li>
+                            <li>Local: 4º andar sem elevador</li>
+                        </ul>
+                    </section>
+                    
+                    <section class="bg-gray-100 border-l-4 border-blue-500 rounded-lg p-6 mt-8 shadow-sm" aria-label="Opções de nota fiscal">
+                        <h3 class="text-xl font-semibold text-blue-900 mb-5">Concordância de Nota Fiscal</h3>
+                        <fieldset>
+                            <legend class="sr-only">Escolha a opção de nota fiscal</legend>
+                            <div class="flex flex-col space-y-4 text-sm text-gray-700">
+                                <label class="flex items-center cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-all">
+                                    <input type="radio" name="invoiceOption" value="condominio" id="invoiceOptionCondominio" onchange="updateCalculations()" checked class="mr-3 transform scale-125 text-blue-600 focus:ring-blue-500">
+                                    <span>Não será necessário nota fiscal, o condomínio fica a cargo deste item</span>
+                                </label>
+                                <label class="flex items-center cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-all">
+                                    <input type="radio" name="invoiceOption" value="emitir" id="invoiceOptionEmitir" onchange="updateCalculations()" class="mr-3 transform scale-125 text-blue-600 focus:ring-blue-500">
+                                    <span>Será necessário emitir nota fiscal (acréscimo de 17% sobre o valor final)</span>
+                                </label>
+                            </div>
+                        </fieldset>
+                    </section>
+                    
+                    <!-- Preço Final -->
+                    <section class="bg-blue-900 text-white rounded-lg p-8 text-center shadow-2xl mt-8 total-section" aria-label="Valor total do investimento">
+                        <h3 class="text-2xl font-bold mb-2">Valor Total do Investimento</h3>
+                        <div class="bg-gray-100 bg-opacity-20 rounded-lg p-4 mb-4">
+                            <p class="text-gray-200 text-lg line-through" id="originalPriceDisplay">
+                                Total orçado: <span class="money-value">R$ 66.031,00</span>
+                            </p>
+                            <div class="text-5xl font-extrabold my-2 money-value" id="finalPriceDisplay" role="status" aria-live="polite">
+                                R$ 62.331,00
+                            </div>
+                            <p class="text-sm opacity-80 italic" id="discountExplanation">
+                                Desconto aplicado para mantermos o preço acordado no nosso orçamento inicial.
+                            </p>
+                        </div>
+                        <p class="text-sm opacity-80 mt-2">Prazo de Execução: 18-22 dias úteis</p>
+                    </section>
+                    
+                    <div class="mt-8">
+                        <button class="w-full bg-blue-600 text-white text-lg font-semibold py-4 rounded-lg shadow-xl hover:bg-blue-700 transition-colors duration-300 transform hover:scale-105" onclick="nextPage()" aria-label="Aceitar proposta e continuar para próxima etapa">
+                            Aceitar Proposta e Continuar
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- PÁGINA 2: TERMOS -->
+                <div class="page" id="page2" role="tabpanel" aria-label="Página de termos">
+                    <h2 class="text-3xl md:text-4xl font-bold text-blue-900 text-center mb-8 pb-4 border-b-2">
+                        Termo de Ciência e Responsabilidade
+                    </h2>
+                    
+                    <p class="text-center text-gray-600 italic mb-8 bg-blue-50 p-6 rounded-lg text-base border-l-4 border-blue-200">
+                        Para garantir transparência total no nosso trabalho, queremos esclarecer alguns pontos importantes sobre o processo de reforma:
+                    </p>
+                    
+                    <!-- Container de termos com scroll -->
+                    <div class="bg-gray-100 rounded-lg p-6 md:p-8 shadow-sm border-l-4 border-blue-500 space-y-6" id="termsContainer" role="region" aria-label="Termos do contrato">
+                        <section>
+                            <h3 class="text-xl font-semibold text-gray-900 mb-3">Proteção de Móveis e Objetos</h3>
+                            <p class="text-sm text-gray-700 mb-2">• Nossa equipe fará a proteção dos móveis conforme padrão do mercado</p>
+                            <div class="bg-red-100 border border-red-300 text-red-800 p-4 rounded-lg text-sm mb-2" role="alert">
+                                <strong class="font-semibold">Importante:</strong> Após a proteção ser instalada, o cliente deve verificar e aprovar se está adequada
+                            </div>
+                            <p class="text-sm text-gray-700 mb-2">• Uma vez aprovada a proteção pelo cliente, a responsabilidade por eventuais danos fica transferida</p>
+                            <p class="text-sm text-gray-700 font-bold">• Mesmo com toda proteção e cuidado, reformas envolvem movimentação constante de materiais, ferramentas e equipamentos, podendo ocorrer batidas acidentais, resbalos, respingos ou pequenos impactos nos móveis protegidos</p>
+                        </section>
+                        
+                        <section>
+                            <h3 class="text-xl font-semibold text-gray-900 mb-3">Objetos de Valor</h3>
+                            <div class="bg-yellow-100 border border-yellow-300 text-yellow-800 p-4 rounded-lg text-sm mb-2" role="alert">
+                                <strong class="font-semibold">Obrigatório:</strong> Itens de grande valor (financeiro ou sentimental) devem ser removidos do ambiente
+                            </div>
+                            <p class="text-sm text-gray-700 mb-2">• <strong class="font-semibold">Apenas quando for impossível remover:</strong> guardar em cômodo que não será reformado ou solicitar isolamento especial</p>
+                            <p class="text-sm text-gray-700">• A empresa não se responsabiliza por objetos de valor que permaneceram no local mesmo após orientação</p>
+                        </section>
+                        
+                        <section>
+                            <h3 class="text-xl font-semibold text-gray-900 mb-3">Durante a Execução</h3>
+                            <p class="text-sm text-gray-700 mb-2">• Reformar com móveis no ambiente sempre envolve riscos</p>
+                            <p class="text-sm text-gray-700 mb-2">• Geração de pó é inevitável (mesmo com proteção)</p>
+                            <p class="text-sm text-gray-700 mb-2">• <strong class="font-semibold">4º andar sem elevador:</strong> Transporte de materiais será feito pela escada</p>
+                            <p class="text-sm text-gray-700">• A reorganização final dos móveis não está incluída no serviço</p>
+                        </section>
+                        
+                        <section>
+                            <h3 class="text-xl font-semibold text-gray-900 mb-3">Especificidades da Obra</h3>
+                            <div class="bg-green-100 border border-green-300 text-green-800 p-4 rounded-lg text-sm mb-2">
+                                <strong class="font-semibold">Impermeabilização:</strong> Problemas de infiltração serão solucionados com manta asfáltica
+                            </div>
+                            <p class="text-sm text-gray-700 mb-2">• Contrapiso será refeito conforme necessário para correção de níveis</p>
+                            <p class="text-sm text-gray-700">• Porcelanato 70x70 será assentado conforme especificação técnica</p>
+                        </section>
+                    </div>
+                    
+                    <!-- Indicador de scroll -->
+                    <p class="text-center text-xs text-gray-500 mt-2" id="scrollIndicator">
+                        <i class="fas fa-arrow-down animate-bounce"></i> Role para ler todos os termos
+                    </p>
+                    
+                    <!-- Checkbox de aceite -->
+                    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-6 mt-8 shadow-sm flex items-start">
+                        <input type="checkbox" id="agreeTerms" onchange="checkTermsAgreement()" class="mt-1 mr-3 transform scale-125 text-yellow-600 focus:ring-yellow-500" disabled aria-describedby="termsAgreementHelp">
+                        <label for="agreeTerms" class="text-sm cursor-pointer text-gray-700">
+                            <strong class="font-semibold">Li e estou de acordo com os Termos de Ciência e Responsabilidade acima.</strong>
+                            <span id="termsAgreementHelp" class="block text-xs text-gray-500 mt-1">Você precisa ler todos os termos antes de aceitar</span>
+                        </label>
+                    </div>
+                    
+                    <!-- Botões de navegação -->
+                    <div class="flex flex-col md:flex-row gap-4 mt-8 btn-group">
+                        <button class="flex-1 bg-gray-500 text-white text-lg font-semibold py-4 rounded-lg shadow-md hover:bg-gray-600 transition-colors duration-300" aria-label="Voltar para página anterior" onclick="prevPage()">
+                            <i class="fa-solid fa-arrow-left mr-2" aria-hidden="true"></i>Voltar
+                        </button>
+                        <button class="flex-1 bg-blue-600 text-white text-lg font-semibold py-4 rounded-lg shadow-md hover:bg-blue-700 transition-colors duration-300 disabled:bg-gray-400 disabled:cursor-not-allowed" id="confirmTermsBtn" aria-label="Confirmar termos e avançar" onclick="nextPage()" disabled>
+                            Confirmar e Avançar<i class="fa-solid fa-arrow-right ml-2" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- PÁGINA 3: PAGAMENTO -->
+                <div class="page" id="page3" role="tabpanel" aria-label="Página de pagamento">
+                    <h2 class="text-3xl md:text-4xl font-bold text-blue-900 text-center mb-8 pb-4 border-b-2">
+                        Condições de Pagamento
+                    </h2>
+                    
+                    <section class="bg-blue-900 text-white rounded-lg p-8 text-center shadow-2xl mt-8 total-section" aria-label="Valor total">
+                        <h3 class="text-2xl font-bold mb-2">Valor Total do Investimento</h3>
+                        <div class="bg-gray-100 bg-opacity-20 rounded-lg p-4 mb-4">
+                            <p class="text-gray-200 text-lg line-through" id="paymentOriginalPrice">
+                                Total orçado: <span class="money-value">R$ 66.031,00</span>
+                            </p>
+                            <div class="text-5xl font-extrabold my-2 money-value" id="paymentFinalPrice" role="status" aria-live="polite">
+                                R$ 62.331,00
+                            </div>
+                            <p class="text-sm opacity-80 italic" id="paymentDiscountExplanation">
+                                Desconto aplicado para mantermos o preço acordado no nosso orçamento inicial.
+                            </p>
+                        </div>
+                        <p class="text-sm opacity-80 mt-2">Prazo de Execução: 18-22 dias úteis</p>
+                    </section>
+                    
+                    <div id="mainPaymentChoices" class="bg-gray-100 border-l-4 border-blue-500 rounded-lg p-6 mt-8 shadow-sm">
+                        <h3 class="text-2xl font-semibold text-blue-900 mb-5">Escolha sua Forma de Pagamento:</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-center">
+                            <button class="bg-white border border-gray-300 hover:border-blue-500 p-6 rounded-lg shadow-sm cursor-pointer transition-all duration-300 transform hover:scale-105" onclick="showCashPayment()" aria-label="Selecionar pagamento apenas em dinheiro">
+                                <h4 class="text-xl font-semibold text-blue-800 mb-2">Pagamento apenas em Dinheiro</h4>
+                                <p class="text-sm text-gray-600">Condições tradicionais de pagamento parcelado</p>
+                            </button>
+                            <button class="bg-white border border-gray-300 hover:border-blue-500 p-6 rounded-lg shadow-sm cursor-pointer transition-all duration-300 transform hover:scale-105" onclick="showTokenPayment()" aria-label="Selecionar pagamento com tokens e dinheiro">
+                                <h4 class="text-xl font-semibold text-blue-800 mb-2">Pagamento com Tokens MAEOKA + Dinheiro</h4>
+                                <p class="text-sm text-gray-600">Use até 40% em tokens e ganhe 10% de desconto</p>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Botão voltar principal -->
+                    <div id="mainBackBtnContainer" class="flex justify-center mt-8">
+                        <button class="bg-gray-500 text-white text-lg font-semibold py-4 px-10 rounded-lg shadow-md hover:bg-gray-600 transition-colors duration-300" aria-label="Voltar para página anterior" onclick="prevPage()">
+                            <i class="fa-solid fa-arrow-left mr-2" aria-hidden="true"></i>Voltar
+                        </button>
+                    </div>
+                    
+                    <!-- Seção Dinheiro -->
+                    <section class="bg-gray-50 border-l-4 border-green-500 rounded-lg p-6 mt-8 shadow-sm hidden" id="cashPaymentContent" aria-label="Pagamento em dinheiro">
+                        <h4 class="text-2xl font-semibold text-gray-900 mb-5">Condições de Pagamento</h4>
+                        <ul class="list-disc list-inside text-base text-gray-700 space-y-2">
+                            <li>Entrada: 20% na assinatura do contrato (<span class="money-value">R$ 12.466,20</span>)</li>
+                            <li>1ª Medição - Demolição: 25% (<span class="money-value">R$ 15.582,75</span>)</li>
+                            <li>2ª Medição - Impermeabilização e Contrapiso: 30% (<span class="money-value">R$ 18.699,30</span>)</li>
+                            <li>3ª Medição - Instalação de revestimentos e rejunte: 20% (<span class="money-value">R$ 12.466,20</span>)</li>
+                            <li>Final - Conclusão: 5% (<span class="money-value">R$ 3.116,55</span>)</li>
+                            <li class="font-bold">Pagamentos via PIX</li>
+                        </ul>
+                        <div class="flex flex-col md:flex-row gap-4 mt-8 btn-group">
+                            <button class="flex-1 bg-gray-500 text-white text-lg font-semibold py-4 rounded-lg shadow-md hover:bg-gray-600 transition-colors duration-300" aria-label="Voltar para escolhas de pagamento" onclick="hideAllPaymentSections()">
+                                <i class="fa-solid fa-arrow-left mr-2" aria-hidden="true"></i>Voltar
+                            </button>
+                            <button class="flex-1 bg-blue-600 text-white text-lg font-semibold py-4 rounded-lg shadow-md hover:bg-blue-700 transition-colors duration-300" aria-label="Continuar com pagamento em dinheiro" onclick="nextPage()">
+                                Continuar com Pagamento em Dinheiro<i class="fa-solid fa-arrow-right ml-2" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                    </section>
+                    
+                    <!-- Seção Tokens -->
+                    <section class="bg-gray-50 border-l-4 border-green-500 rounded-lg p-6 mt-8 shadow-sm hidden" id="tokenPaymentContent" aria-label="Pagamento com tokens">
+                        <h4 class="text-2xl font-semibold text-gray-900 mb-5">Pagamento com Tokens MAEOKA</h4>
+                        
+                        <div class="bg-yellow-100 text-yellow-800 font-semibold text-center py-3 rounded-lg border border-yellow-300 mb-5" id="statusCarteira" role="status" aria-live="polite">
+                            <i class="fa-solid fa-link mr-2" aria-hidden="true"></i>Conecte sua carteira para pagar com tokens
+                        </div>
+                        
+                        <div id="tonConnectButton" class="flex justify-center my-4"></div>
+                        
+                        <div class="bg-white p-5 rounded-lg shadow-inner border border-gray-200 mt-6 hidden" id="walletInfo">
+                            <h5 class="text-lg font-semibold text-gray-800">Sua Carteira</h5>
+                            <p class="text-sm mt-2"><strong>Endereço:</strong></p>
+                            <div class="bg-gray-100 text-xs font-mono p-2 rounded break-all border mt-1" id="enderecoCarteira"></div>
+                            <p class="text-sm mt-2"><strong>Saldo:</strong> <span id="saldoTokens" class="font-bold">0 MAEOKA</span></p>
+                        </div>
+                        
+                        <div class="bg-blue-50 p-6 rounded-lg border border-blue-200 mt-6 hidden" id="calculadoraTokens">
+                            <h5 class="text-xl font-semibold text-blue-900">Calculadora de Pagamento</h5>
+                            <p class="text-sm text-gray-600 mt-2">Use até <strong class="text-blue-700">40%</strong> do valor total em tokens (com 10% de desconto)</p>
+                            
+                            <div class="mt-6">
+                                <label for="sliderTokens" class="text-sm font-semibold text-gray-800 flex justify-between">
+                                    <span>Tokens a usar: <span id="tokensUsar">0</span> MAEOKA</span>
+                                    <span class="text-blue-700">R$ <span id="valorTokens">0,00</span></span>
+                                </label>
+                                <div class="flex items-center gap-4 mt-2">
+                                    <input type="range" min="0" max="24932" value="0" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer" id="sliderTokens" aria-label="Quantidade de tokens">
+                                    <input type="number" id="tokenInput" min="0" max="24932" value="0" class="w-32 p-2 border border-gray-300 rounded-lg text-sm text-center" aria-label="Digite a quantidade de tokens">
+                                </div>
+                                <p class="text-xs text-gray-500 mt-2" id="infoSaldo"></p>
+                            </div>
+                            
+                            <div class="bg-white p-5 rounded-lg mt-6 border-l-4 border-blue-500">
+                                <h6 class="font-bold text-lg text-blue-800 mb-3">Resumo do Pagamento</h6>
+                                <dl class="space-y-2 text-sm">
+                                    <div class="flex flex-col sm:flex-row justify-between pb-1 border-b border-gray-200">
+                                        <dt class="text-gray-600">Valor original da obra:</dt>
+                                        <dd id="valorOriginalObra" class="money-value"></dd>
+                                    </div>
+                                    <div class="flex flex-col sm:flex-row justify-between pb-1 border-b border-gray-200">
+                                        <dt class="text-gray-600">Tokens a usar:</dt>
+                                        <dd class="font-semibold" id="resumoTokens">0 MAEOKA (R$ 0,00)</dd>
+                                    </div>
+                                    <div class="flex flex-col sm:flex-row justify-between pb-1 border-b border-gray-200">
+                                        <dt class="text-gray-600">Desconto de 10%:</dt>
+                                        <dd class="text-green-600 font-semibold" id="resumoDesconto">- R$ 0,00</dd>
+                                    </div>
+                                    <div class="flex flex-col sm:flex-row justify-between pb-1 border-b border-gray-200">
+                                        <dt class="text-gray-600">Valor em dinheiro:</dt>
+                                        <dd class="font-semibold money-value" id="resumoDinheiro">R$ 62.331,00</dd>
+                                    </div>
+                                    <div class="flex flex-col sm:flex-row justify-between pt-3 border-t-2 border-blue-500 text-lg font-bold">
+                                        <dt>Total a Pagar:</dt>
+                                        <dd id="resumoTotal" class="money-value">R$ 62.331,00</dd>
+                                    </div>
+                                    <div class="flex flex-col sm:flex-row justify-between pt-2 text-green-600 font-bold text-lg">
+                                        <dt>Economia:</dt>
+                                        <dd id="resumoEconomia" class="money-value">R$ 0,00</dd>
+                                    </div>
+                                </dl>
+                            </div>
+                            
+                            <button class="w-full bg-blue-600 text-white text-lg font-semibold py-4 rounded-lg shadow-xl hover:bg-blue-700 transition-colors duration-300 disabled:bg-gray-400 disabled:cursor-not-allowed mt-6" id="btnEnviarTokens" aria-label="Pagar com tokens" onclick="enviarTokens()" disabled>
+                                <i class="fa-solid fa-credit-card mr-2" aria-hidden="true"></i>PAGAR COM TOKENS + DINHEIRO
+                            </button>
+                        </div>
+                        
+                        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-5 mt-6 shadow-sm hidden" id="adjustedPaymentConditions">
+                            <h4 class="text-xl font-semibold text-yellow-800 mb-4">Condições de Pagamento (Valor Restante em Dinheiro)</h4>
+                            <ul class="list-disc list-inside text-sm text-gray-700 space-y-2">
+                                <li>Entrada: 20% na assinatura do contrato (<span class="font-bold money-value" id="tokenEntry">R$ 12.466,20</span>)</li>
+                                <li>1ª Medição - Demolição: 25% (<span class="font-bold money-value" id="tokenMeasurement1">R$ 15.582,75</span>)</li>
+                                <li>2ª Medição - Impermeabilização e Contrapiso: 30% (<span class="font-bold money-value" id="tokenMeasurement2">R$ 18.699,30</span>)</li>
+                                <li>3ª Medição - Instalação de revestimentos e rejunte: 20% (<span class="font-bold money-value" id="tokenMeasurement3">R$ 12.466,20</span>)</li>
+                                <li>Final - Conclusão: 5% (<span class="font-bold money-value" id="tokenFinal">R$ 3.116,55</span>)</li>
+                                <li class="font-bold">Pagamentos via PIX</li>
+                            </ul>
+                            <div class="bg-green-100 text-green-800 p-3 rounded-lg mt-4 text-sm font-semibold border border-green-300">
+                                <i class="fa-solid fa-gift mr-2" aria-hidden="true"></i><strong>Cashback:</strong> Você receberá <span id="cashbackInfo">0</span> MAEOKA de volta após a conclusão da obra (3% sobre o total)!
+                            </div>
+                        </div>
+                        
+                        <div class="flex flex-col md:flex-row gap-4 mt-8 btn-group">
+                            <button class="flex-1 bg-gray-500 text-white text-lg font-semibold py-4 rounded-lg shadow-md hover:bg-gray-600 transition-colors duration-300" aria-label="Voltar para escolhas de pagamento" onclick="hideAllPaymentSections()">
+                                <i class="fa-solid fa-arrow-left mr-2" aria-hidden="true"></i>Voltar
+                            </button>
+                            <button class="flex-1 bg-blue-600 text-white text-lg font-semibold py-4 rounded-lg shadow-md hover:bg-blue-700 transition-colors duration-300 disabled:bg-gray-400 disabled:cursor-not-allowed" id="continueTokenBtn" aria-label="Continuar com pagamento em tokens" disabled onclick="nextPage()">
+                                Continuar<i class="fa-solid fa-arrow-right ml-2" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                    </section>
+                </div>
+                
+                <!-- PÁGINA 4: DADOS -->
+                <div class="page" id="page4" role="tabpanel" aria-label="Página de dados pessoais">
+                    <h2 class="text-3xl md:text-4xl font-bold text-blue-900 text-center mb-8 pb-4 border-b-2">
+                        Dados do Contratante
+                    </h2>
+                    
+                    <form id="clientForm" class="space-y-6" novalidate>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="form-group">
+                                <label for="fullName" class="block text-sm font-medium text-gray-700 mb-1">
+                                    <span class="required-field">Nome Completo</span>
+                                    <i class="fas fa-info-circle text-gray-400 ml-1" data-tooltip="Seu nome completo para o contrato"></i>
+                                </label>
+                                <input type="text" id="fullName" name="fullName" autocomplete="name" required 
+                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors" 
+                                       oninput="validateFormWithDebounce()" 
+                                       aria-required="true" 
+                                       aria-describedby="fullNameError">
+                                <p class="text-red-500 text-xs mt-1 hidden" id="fullNameError" role="alert">Campo obrigatório</p>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="cpf" class="block text-sm font-medium text-gray-700 mb-1">
+                                    <span class="required-field">CPF</span>
+                                    <i class="fas fa-info-circle text-gray-400 ml-1" data-tooltip="Formato: 000.000.000-00"></i>
+                                </label>
+                                <input type="text" id="cpf" name="cpf" autocomplete="off" required 
+                                       placeholder="000.000.000-00" 
+                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors" 
+                                       oninput="validateFormWithDebounce()" 
+                                       aria-required="true" 
+                                       aria-describedby="cpfError">
+                                <p class="text-red-500 text-xs mt-1 hidden" id="cpfError" role="alert">CPF inválido</p>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="form-group">
+                                <label for="email" class="block text-sm font-medium text-gray-700 mb-1">
+                                    <span class="required-field">E-mail</span>
+                                    <i class="fas fa-info-circle text-gray-400 ml-1" data-tooltip="Usado para confirmações"></i>
+                                </label>
+                                <input type="email" id="email" name="email" autocomplete="email" required 
+                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors" 
+                                       oninput="validateFormWithDebounce()" 
+                                       aria-required="true" 
+                                       aria-describedby="emailError">
+                                <p class="text-red-500 text-xs mt-1 hidden" id="emailError" role="alert">E-mail inválido</p>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">
+                                    <span class="required-field">Telefone/WhatsApp</span>
+                                    <i class="fas fa-info-circle text-gray-400 ml-1" data-tooltip="Para contato rápido"></i>
+                                </label>
+                                <input type="tel" id="phone" name="phone" autocomplete="tel" required 
+                                       placeholder="(41) 99999-9999" 
+                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors" 
+                                       oninput="validateFormWithDebounce()" 
+                                       aria-required="true" 
+                                       aria-describedby="phoneError">
+                                <p class="text-red-500 text-xs mt-1 hidden" id="phoneError" role="alert">Telefone inválido</p>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="address" class="block text-sm font-medium text-gray-700 mb-1">
+                                <span class="required-field">Endereço de Domicílio</span>
+                                <i class="fas fa-info-circle text-gray-400 ml-1" data-tooltip="Endereço completo"></i>
+                            </label>
+                            <textarea id="address" name="address" rows="3" autocomplete="street-address" required 
+                                      placeholder="Rua, número, bairro, cidade" 
+                                      class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors" 
+                                      oninput="validateFormWithDebounce()" 
+                                      aria-required="true" 
+                                      aria-describedby="addressError"></textarea>
+                            <p class="text-red-500 text-xs mt-1 hidden" id="addressError" role="alert">Campo obrigatório</p>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="observations" class="block text-sm font-medium text-gray-700 mb-1">
+                                Observações Adicionais
+                                <i class="fas fa-info-circle text-gray-400 ml-1" data-tooltip="Qualquer nota extra"></i>
+                            </label>
+                            <textarea id="observations" name="observations" rows="3" 
+                                      placeholder="Alguma informação adicional importante..." 
+                                      class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"></textarea>
+                        </div>
+                        
+                        <!-- LGPD -->
+                        <section class="bg-gray-100 border border-gray-200 rounded-lg p-6 text-sm text-gray-700" aria-label="Proteção de dados">
+                            <h4 class="text-lg font-semibold text-gray-900 mb-3">Proteção de Dados Pessoais (LGPD)</h4>
+                            <p class="leading-relaxed">
+                                <strong class="font-semibold">Como utilizamos seus dados:</strong><br>
+                                • Seus dados serão utilizados exclusivamente para execução do contrato<br>
+                                • Comunicação sobre o andamento da obra e serviços<br>
+                                • Cumprimento de obrigações legais e fiscais<br>
+                                • Não compartilhamos dados com terceiros sem autorização<br>
+                                • Você pode solicitar exclusão dos dados a qualquer momento
+                            </p>
+                        </section>
+                        
+                        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-6 flex items-start text-sm text-gray-700">
+                            <input type="checkbox" id="lgpdAccepted" required 
+                                   class="mt-1 mr-3 transform scale-125 text-yellow-600 focus:ring-yellow-500" 
+                                   oninput="validateFormWithDebounce()" 
+                                   aria-required="true">
+                            <label for="lgpdAccepted" class="cursor-pointer">
+                                <strong class="font-semibold">Autorizo o tratamento dos meus dados pessoais pela Maeoka Engenharia conforme descrito acima, de acordo com a Lei Geral de Proteção de Dados (LGPD - Lei 13.709/2018).</strong>
+                            </label>
+                        </div>
+                        
+                        <!-- Confirmação Final -->
+                        <section class="bg-yellow-50 border border-yellow-200 rounded-lg p-6 text-sm text-gray-700">
+                            <h4 class="text-lg font-semibold text-yellow-800 mb-3">Confirmação Final</h4>
+                            <p>Ao finalizar, você estará formalizando a contratação dos serviços da Maeoka Engenharia conforme proposta apresentada e termos aceitos.</p>
+                        </section>
+                        
+                        <!-- Botões de navegação -->
+                        <div class="flex flex-col md:flex-row gap-4 mt-8 btn-group">
+                            <button type="button" class="flex-1 bg-gray-500 text-white text-lg font-semibold py-4 rounded-lg shadow-md hover:bg-gray-600 transition-colors duration-300" aria-label="Voltar para página anterior" onclick="prevPage()">
+                                <i class="fa-solid fa-arrow-left mr-2" aria-hidden="true"></i>Voltar
+                            </button>
+                            <button type="submit" class="flex-1 bg-blue-600 text-white text-lg font-semibold py-4 rounded-lg shadow-md hover:bg-blue-700 transition-colors duration-300 disabled:bg-gray-400 disabled:cursor-not-allowed" id="submitBtn" aria-label="Finalizar contratação" disabled>
+                                Finalizar Contratação<i class="fa-solid fa-arrow-right ml-2" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- PÁGINA 5: FINALIZAÇÃO -->
+                <div class="page" id="page5" role="tabpanel" aria-label="Página de finalização">
+                    <!-- Status do Sistema -->
+                    <div id="systemStatus" class="bg-blue-50 border border-blue-200 p-5 rounded-lg mt-6 text-sm text-gray-700" role="status" aria-live="polite">
+                        <h4 class="text-lg font-semibold text-gray-900 mb-2">Status do Sistema</h4>
+                        <p id="statusMessage" class="font-medium text-blue-800">
+                            <span class="spinner mr-2"></span> Enviando contrato automaticamente para Maeoka Engenharia...
+                        </p>
+                    </div>
+                    
+                    <div class="bg-green-50 border border-green-300 rounded-lg p-8 text-center shadow-lg mt-8 success-animate">
+                        <h2 class="text-4xl font-bold text-green-700 mb-4">Contratação Realizada com Sucesso!</h2>
+                        <p class="text-lg text-gray-700 mb-6">Obrigado por escolher a Maeoka Engenharia!</p>
+                        
+                        <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 space-y-4">
+                            <h3 class="text-2xl font-semibold text-gray-900 mb-2">Próximos Passos:</h3>
+                            <ul class="list-none text-base text-gray-700 space-y-2">
+                                <li class="flex items-center justify-center text-left">
+                                    <i class="fa-solid fa-download mr-3 text-blue-500" aria-hidden="true"></i>
+                                    <span>Baixar documento no celular/computador/tablet</span>
+                                </li>
+                                <li class="flex items-center justify-center text-left">
+                                    <i class="fa-brands fa-whatsapp mr-3 text-green-500" aria-hidden="true"></i>
+                                    <span>Enviar para nossa equipe via WhatsApp</span>
+                                </li>
+                                <li class="flex items-center justify-center text-left">
+                                    <i class="fa-solid fa-calendar-check mr-3 text-purple-500" aria-hidden="true"></i>
+                                    <span>Agendaremos a vistoria técnica</span>
+                                </li>
+                                <li class="flex items-center justify-center text-left">
+                                    <i class="fa-solid fa-chart-line mr-3 text-red-500" aria-hidden="true"></i>
+                                    <span>Definiremos o cronograma detalhado</span>
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <div class="bg-gray-100 p-6 rounded-lg mt-6 text-sm text-gray-700 border border-gray-200">
+                            <p class="font-bold">Número do Protocolo: <span id="protocolNumber" class="font-normal text-gray-900"></span></p>
+                            <p class="font-bold">Data/Hora: <time id="contractDateTime" class="font-normal text-gray-900"></time></p>
+                        </div>
+                        
+                        <!-- Resumo Final -->
+                        <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 mt-6">
+                            <h3 class="text-2xl font-semibold text-gray-900 mb-2">Resumo Final da Contratação</h3>
+                            <div id="finalSummary" class="text-base text-gray-700"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gradient-to-r from-green-600 to-green-400 text-white p-8 rounded-lg text-center shadow-2xl mt-8">
+                        <h3 class="text-2xl font-bold mb-4">Finalização do Processo</h3>
+                        <p class="text-sm md:text-base mb-4">
+                            <strong class="font-semibold">Para finalizar o processo, é necessário baixar o documento para assinatura e compartilhar com a Maeoka Engenharia.</strong>
+                        </p>
+                        <p class="text-xs md:text-sm opacity-90 mb-6">
+                            O documento será baixado em formato HTML (pode ser convertido para PDF). Recomendamos envio via WhatsApp para maior agilidade.
+                        </p>
+                        
+                        <button class="bg-red-600 text-white font-semibold py-4 px-10 rounded-full shadow-lg hover:bg-red-700 transition-colors duration-300 transform hover:scale-105" 
+                                aria-label="Baixar documento para assinatura" 
+                                onclick="downloadContractHTML()">
+                            <i class="fa-solid fa-file-arrow-down mr-2" aria-hidden="true"></i>Baixar Documento para Assinatura
+                        </button>
+                        
+                        <button class="bg-blue-600 text-white font-semibold py-3 px-8 rounded-full shadow-lg hover:bg-blue-700 transition-colors duration-300 transform hover:scale-105 ml-4 mt-4 md:mt-0" 
+                                aria-label="Enviar contrato via WhatsApp" 
+                                onclick="sendViaWhatsApp()">
+                            <i class="fa-brands fa-whatsapp mr-2" aria-hidden="true"></i>Enviar via WhatsApp
+                        </button>
+                        
+                        <p class="text-xs opacity-80 mt-4">
+                            * Após compartilhar o documento, nossa equipe confirmará o recebimento e dará início ao processo.
+                        </p>
+                    </div>
+                    
+                    <div class="mt-8 text-center">
+                        <button class="bg-gray-500 text-white text-lg font-semibold py-4 px-10 rounded-lg shadow-md hover:bg-gray-600 transition-colors duration-300" 
+                                aria-label="Iniciar nova contratação" 
+                                onclick="restartProcess()">
+                            <i class="fa-solid fa-redo mr-2" aria-hidden="true"></i>Nova Contratação
+                        </button>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    
+    <!-- Modal melhorado -->
+    <div id="llmModal" class="modal hidden" tabindex="-1" aria-modal="true" role="dialog">
+        <div class="modal-content bg-white rounded-xl shadow-lg p-6 md:p-8 w-11/12 max-w-2xl relative">
+            <button class="absolute top-4 right-6 text-gray-400 text-3xl font-bold cursor-pointer hover:text-gray-800 transition-colors" 
+                    aria-label="Fechar modal" 
+                    onclick="closeModal()">
+                &times;
+            </button>
+            <h3 id="modalTitle" class="text-2xl font-bold text-blue-900 text-center mb-4"></h3>
+            <div id="modalBody" class="text-sm text-gray-700 leading-relaxed max-h-96 overflow-y-auto"></div>
+            <div id="modalButtons" class="mt-6 flex justify-end gap-4"></div>
+        </div>
+    </div>
+    
+    <!-- Toast Container -->
+    <div id="toastContainer" class="fixed bottom-0 right-0 p-4 z-50" aria-live="polite" aria-atomic="true"></div>
+    
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay hidden">
+        <div class="loading-content">
+            <div class="spinner mb-4"></div>
+            <p class="text-gray-700 font-semibold">Processando...</p>
+        </div>
+    </div>
+    
+    <script>
+        // --- CONFIGURAÇÕES GLOBAIS ---
+        const TOKEN_MAEOKA = 'EQCUgsVus4fW5TY2bxBQWSyiwLETOr2iNlVied-szVuJ1t4W';
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwovnJtN76EfqzykncamVAvszSve0JMzrw7gU7kAPIF6MJBmkf9-XSmP1z2KjBwsWBN8Q/exec';
+        const WHATSAPP_NUMBER = '5541988391153'; // Número da Maeoka
+        
+        let VALOR_OBRA = 62331;
+        const LIMITE_PERCENTUAL = 0.40;
+        let currentPage = 1;
+        let currentTotalWithTax = 62331;
+        let totalPages = 5;
+        let contracts = JSON.parse(localStorage.getItem('maeokaContracts')) || [];
+        
+        // Variáveis do sistema de tokens
+        let saldoUsuario = 0;
+        let enderecoUsuario = '';
+        let tonweb = null;
+        let tonConnectUI = null;
+        let metodoPagamentoSelecionado = null;
+        let tokensSelecionados = 0;
+        
+        // Cache de elementos DOM
+        const elements = {
+            statusCarteira: document.getElementById('statusCarteira'),
+            walletInfo: document.getElementById('walletInfo'),
+            enderecoCarteira: document.getElementById('enderecoCarteira'),
+            saldoTokens: document.getElementById('saldoTokens'),
+            calculadoraTokens: document.getElementById('calculadoraTokens'),
+            sliderTokens: document.getElementById('sliderTokens'),
+            tokenInput: document.getElementById('tokenInput'),
+            tokensUsar: document.getElementById('tokensUsar'),
+            btnEnviarTokens: document.getElementById('btnEnviarTokens'),
+            continueTokenBtn: document.getElementById('continueTokenBtn'),
+            modal: document.getElementById('llmModal'),
+            modalTitle: document.getElementById('modalTitle'),
+            modalBody: document.getElementById('modalBody'),
+            modalButtons: document.getElementById('modalButtons'),
+            termsContainer: document.getElementById('termsContainer'),
+            stepper: document.getElementById('stepper').querySelectorAll('.step'),
+            submitBtn: document.getElementById('submitBtn'),
+            progressBar: document.getElementById('progressBar'),
+            topProgressBar: document.getElementById('topProgressBar'),
+            currentStepText: document.getElementById('currentStepText'),
+            scrollIndicator: document.getElementById('scrollIndicator'),
+            loadingOverlay: document.getElementById('loadingOverlay')
+        };
+        
+        // --- FUNÇÕES UTILITÁRIAS ---
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+        
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+                <span>${message}</span>
+            `;
+            
+            document.getElementById('toastContainer').appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = 'slideInRight 0.3s ease-out reverse';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+        
+        function showLoading() {
+            elements.loadingOverlay.classList.remove('hidden');
+        }
+        
+        function hideLoading() {
+            elements.loadingOverlay.classList.add('hidden');
+        }
+        
+        // --- FUNÇÕES DE NAVEGAÇÃO ---
+        function updateProgressBar() {
+            const progress = (currentPage / totalPages) * 100;
+            elements.progressBar.style.width = progress + '%';
+            elements.progressBar.setAttribute('aria-valuenow', progress);
+            elements.topProgressBar.style.width = progress + '%';
+            
+            // Atualizar stepper
+            elements.stepper.forEach((step, index) => {
+                step.classList.remove('active', 'completed');
+                if (index < currentPage - 1) {
+                    step.classList.add('completed');
+                } else if (index === currentPage - 1) {
+                    step.classList.add('active');
+                }
+            });
+            
+            // Atualizar texto da etapa
+            const stepNames = ['Proposta', 'Termos', 'Pagamento', 'Dados', 'Final'];
+            elements.currentStepText.textContent = `Etapa ${currentPage} de ${totalPages} - ${stepNames[currentPage - 1]}`;
+        }
+        
+        function showPage(pageNumber) {
+            // Validar antes de navegar
+            if (pageNumber > currentPage && !canNavigateForward()) {
+                return;
+            }
+            
+            const pages = document.querySelectorAll('.page');
+            pages.forEach(page => page.classList.remove('active'));
+            
+            const pageToShow = document.getElementById(`page${pageNumber}`);
+            if (pageToShow) {
+                pageToShow.classList.add('active');
+                currentPage = pageNumber;
+                updateProgressBar();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                
+                // Ações específicas por página
+                if (pageNumber === 2) {
+                    setupTermsScroll();
+                } else if (pageNumber === 3) {
+                    updatePaymentPageValues();
+                }
+            }
+        }
+        
+        function canNavigateForward() {
+            if (currentPage === 2) {
+                const termsAccepted = document.getElementById('agreeTerms').checked;
+                if (!termsAccepted) {
+                    showModal('Aviso', '<i class="fas fa-exclamation-triangle text-yellow-500 mr-2"></i>Por favor, aceite os Termos de Ciência e Responsabilidade para continuar.');
+                    return false;
+                }
+            }
+            return true;
+        }
+        
+        function navigateToPage(pageNumber) {
+            if (pageNumber < currentPage || canNavigateForward()) {
+                showPage(pageNumber);
+            }
+        }
+        
+        function nextPage() {
+            if (currentPage === 4) {
+                const clientForm = document.getElementById('clientForm');
+                if (!validateForm()) {
+                    showToast('Por favor, preencha todos os campos obrigatórios corretamente.', 'error');
+                    return;
+                }
+                if (!document.getElementById('lgpdAccepted').checked) {
+                    showModal('Aviso', '<i class="fas fa-exclamation-triangle text-yellow-500 mr-2"></i>É necessário autorizar o tratamento de dados pessoais (LGPD) para continuar.');
+                    return;
+                }
+                finalizeContract();
+                return;
+            }
+            
+            if (currentPage < totalPages) {
+                showPage(currentPage + 1);
+            }
+        }
+        
+        function prevPage() {
+            if (currentPage > 1) {
+                showPage(currentPage - 1);
+            }
+        }
+        
+        // --- FUNÇÕES DE CÁLCULO ---
+        function updateCalculations() {
+            let currentTotalBeforeTax = 66031.00;
+            let finalPriceAfterDiscount = 62331.00;
+            const invoiceOptionEmitir = document.getElementById('invoiceOptionEmitir');
+            const originalPriceDisplay = document.getElementById('originalPriceDisplay');
+            const finalPriceDisplay = document.getElementById('finalPriceDisplay');
+            const discountExplanation = document.getElementById('discountExplanation');
+            
+            if (invoiceOptionEmitir && invoiceOptionEmitir.checked) {
+                finalPriceAfterDiscount = 62331.00 * 1.17;
+                currentTotalWithTax = finalPriceAfterDiscount;
+                VALOR_OBRA = finalPriceAfterDiscount;
+                
+                originalPriceDisplay.innerHTML = `Total orçado: <span class="money-value">R$ ${currentTotalBeforeTax.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>`;
+                finalPriceDisplay.innerHTML = `<span class="money-value">R$ ${finalPriceAfterDiscount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>`;
+                discountExplanation.textContent = `Com desconto aplicado + acréscimo de 17% para emissão de NF.`;
+            } else {
+                finalPriceAfterDiscount = 62331.00;
+                currentTotalWithTax = finalPriceAfterDiscount;
+                VALOR_OBRA = finalPriceAfterDiscount;
+                
+                originalPriceDisplay.innerHTML = `Total orçado: <span class="money-value">R$ ${currentTotalBeforeTax.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>`;
+                finalPriceDisplay.innerHTML = `<span class="money-value">R$ ${finalPriceAfterDiscount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>`;
+                discountExplanation.textContent = `Desconto aplicado para mantermos o preço acordado no nosso orçamento inicial.`;
+            }
+        }
+        
+        function updatePaymentPageValues() {
+            const paymentOriginal = document.getElementById('paymentOriginalPrice');
+            const paymentFinal = document.getElementById('paymentFinalPrice');
+            const paymentExplanation = document.getElementById('paymentDiscountExplanation');
+            
+            if (paymentOriginal) paymentOriginal.innerHTML = document.getElementById('originalPriceDisplay').innerHTML;
+            if (paymentFinal) paymentFinal.innerHTML = document.getElementById('finalPriceDisplay').innerHTML;
+            if (paymentExplanation) paymentExplanation.textContent = document.getElementById('discountExplanation').textContent;
+        }
+        
+        // --- FUNÇÕES DE PAGAMENTO ---
+        function showCashPayment() {
+            hideAllPaymentSections();
+            document.getElementById('cashPaymentContent').style.display = 'block';
+            document.getElementById('mainPaymentChoices').classList.add('hidden');
+            document.getElementById('mainBackBtnContainer').classList.add('hidden');
+            metodoPagamentoSelecionado = 'cash';
+        }
+        
+        function showTokenPayment() {
+            hideAllPaymentSections();
+            document.getElementById('tokenPaymentContent').style.display = 'block';
+            document.getElementById('mainPaymentChoices').classList.add('hidden');
+            document.getElementById('mainBackBtnContainer').classList.add('hidden');
+            metodoPagamentoSelecionado = 'tokens';
+            
+            if (!tonConnectUI) {
+                setTimeout(() => {
+                    inicializarTonConnect();
+                }, 100);
+            }
+        }
+        
+        function hideAllPaymentSections() {
+            document.getElementById('cashPaymentContent').style.display = 'none';
+            document.getElementById('tokenPaymentContent').style.display = 'none';
+            document.getElementById('mainPaymentChoices').classList.remove('hidden');
+            document.getElementById('mainBackBtnContainer').classList.remove('hidden');
+            metodoPagamentoSelecionado = null;
+        }
+        
+        // --- FUNÇÕES DO SISTEMA DE TOKENS ---
+        function inicializarTonWeb() {
+            try {
+                tonweb = new TonWeb(new TonWeb.HttpProvider('https://toncenter.com/api/v2/jsonRPC'));
+                return true;
+            } catch (error) {
+                console.error('Erro ao inicializar TonWeb:', error);
+                showToast('Erro ao inicializar sistema de tokens', 'error');
+                return false;
+            }
+        }
+        
+        function inicializarTonConnect() {
+            try {
+                tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
+                    manifestUrl: 'https://ton-connect.github.io/demo-dapp-with-wallet/tonconnect-manifest.json',
+                    buttonRootId: 'tonConnectButton'
+                });
+                
+                tonConnectUI.onStatusChange(walletInfo => {
+                    if (walletInfo) {
+                        elements.statusCarteira.innerHTML = `<span class="spinner mr-2"></span> Carregando saldo...`;
+                        elements.statusCarteira.className = 'bg-blue-100 text-blue-800 font-semibold text-center py-3 rounded-lg border border-blue-300 mb-5';
+                        
+                        const endereco = walletInfo.account.address;
+                        try {
+                            const address = new TonWeb.utils.Address(endereco);
+                            enderecoUsuario = address.toString(true, true, false);
+                        } catch (error) {
+                            enderecoUsuario = endereco;
+                        }
+                        
+                        elements.enderecoCarteira.textContent = enderecoUsuario;
+                        elements.walletInfo.style.display = 'block';
+                        
+                        buscarSaldoTokens();
+                    } else {
+                        resetWalletUI();
+                    }
+                });
+                
+                return true;
+            } catch (error) {
+                console.error('Erro ao inicializar TON Connect:', error);
+                showToast('Erro ao conectar carteira', 'error');
+                return false;
+            }
+        }
+        
+        function resetWalletUI() {
+            elements.statusCarteira.innerHTML = `<i class="fa-solid fa-link mr-2" aria-hidden="true"></i>Conecte sua carteira para pagar com tokens`;
+            elements.statusCarteira.className = 'bg-yellow-100 text-yellow-800 font-semibold text-center py-3 rounded-lg border border-yellow-300 mb-5';
+            elements.walletInfo.style.display = 'none';
+            elements.calculadoraTokens.style.display = 'none';
+            document.getElementById('adjustedPaymentConditions').style.display = 'none';
+        }
+        
+        async function buscarSaldoTokens() {
+            try {
+                console.log('🔍 Consultando saldo para:', enderecoUsuario);
+                showLoading();
+                
+                let retries = 0;
+                const maxRetries = 5;
+                let delay = 1000;
+                
+                while (retries < maxRetries) {
+                    try {
+                        const jettonMinter = new TonWeb.token.jetton.JettonMinter(tonweb.provider, {
+                            address: TOKEN_MAEOKA
+                        });
+                        
+                        const userJettonWalletAddress = await jettonMinter.getJettonWalletAddress(
+                            new TonWeb.utils.Address(enderecoUsuario)
+                        );
+                        
+                        const jettonWallet = new TonWeb.token.jetton.JettonWallet(tonweb.provider, {
+                            address: userJettonWalletAddress
+                        });
+                        
+                        const jettonData = await jettonWallet.getData();
+                        const saldoNano = jettonData.balance;
+                        saldoUsuario = parseFloat(TonWeb.utils.fromNano(saldoNano));
+                        
+                        console.log('✅ Saldo obtido:', saldoUsuario, 'MAEOKA');
+                        break;
+                    } catch (blockchainError) {
+                        console.warn('⚠️ Erro na tentativa', retries + 1, ':', blockchainError);
+                        retries++;
+                        if (retries < maxRetries) {
+                            await new Promise(res => setTimeout(res, delay));
+                            delay *= 2;
+                        } else {
+                            throw blockchainError;
+                        }
+                    }
+                }
+                
+                hideLoading();
+                updateWalletUIWithBalance();
+                
+            } catch (error) {
+                console.error('❌ Erro ao buscar saldo:', error);
+                hideLoading();
+                showToast('Erro ao consultar saldo', 'error');
+                elements.statusCarteira.innerHTML = `❌ Erro ao consultar saldo`;
+                elements.statusCarteira.className = 'bg-red-100 text-red-800 font-semibold text-center py-3 rounded-lg border border-red-300 mb-5';
+            }
+        }
+        
+        function updateWalletUIWithBalance() {
+            elements.statusCarteira.innerHTML = `✅ Carteira Conectada - Saldo: ${saldoUsuario.toLocaleString('pt-BR', {minimumFractionDigits: 2})} MAEOKA`;
+            elements.statusCarteira.className = 'bg-green-100 text-green-800 font-semibold text-center py-3 rounded-lg border border-green-300 mb-5';
+            
+            elements.saldoTokens.innerHTML = `<span class="font-bold">${saldoUsuario.toLocaleString('pt-BR', {minimumFractionDigits: 2})} MAEOKA</span>`;
+            
+            const maxTokensPorLimite = VALOR_OBRA * LIMITE_PERCENTUAL;
+            const maxTokens = Math.min(saldoUsuario, maxTokensPorLimite);
+            
+            elements.sliderTokens.max = Math.floor(maxTokens);
+            elements.tokenInput.max = Math.floor(maxTokens);
+            elements.sliderTokens.value = 0;
+            elements.tokenInput.value = 0;
+            
+            document.getElementById('infoSaldo').innerHTML = `
+                Você tem: <strong class="text-gray-900">${saldoUsuario.toLocaleString('pt-BR', {minimumFractionDigits: 2})} MAEOKA</strong> | 
+                Máximo para esta obra: <strong class="text-gray-900">${maxTokensPorLimite.toLocaleString('pt-BR', {minimumFractionDigits: 2})} MAEOKA</strong> 
+                (40% de R$ ${VALOR_OBRA.toLocaleString('pt-BR', {minimumFractionDigits: 2})})
+            `;
+            
+            if (saldoUsuario === 0) {
+                showNoTokensMessage();
+            } else {
+                showTokenCalculator();
+            }
+            
+            elements.calculadoraTokens.style.display = 'block';
+        }
+        
+        function showNoTokensMessage() {
+            elements.calculadoraTokens.innerHTML = `
+                <div class="bg-red-50 p-6 rounded-lg text-center border-2 border-red-300">
+                    <h3 class="text-xl font-bold text-red-800 mb-4">
+                        <i class="fa-solid fa-circle-exclamation mr-2" aria-hidden="true"></i>SEM TOKENS MAEOKA
+                    </h3>
+                    <p class="text-gray-700">Sua carteira não possui tokens MAEOKA.</p>
+                    <p class="text-sm text-gray-500 mt-2">Para usar esta opção de pagamento, você precisa ter tokens MAEOKA em sua carteira.</p>
+                    <a href="https://example.com/adquirir-tokens" target="_blank" class="text-blue-600 hover:underline mt-4 inline-block">
+                        Como adquirir tokens?
+                    </a>
+                </div>
+            `;
+            updateAdjustedPaymentConditions(VALOR_OBRA, VALOR_OBRA);
+            document.getElementById('adjustedPaymentConditions').style.display = 'block';
+            elements.continueTokenBtn.disabled = false;
+            elements.continueTokenBtn.textContent = 'Continuar sem Tokens';
+        }
+        
+        function showTokenCalculator() {
+            const valorOriginalObra = document.getElementById('valorOriginalObra');
+            if (valorOriginalObra) {
+                valorOriginalObra.textContent = `R$ ${VALOR_OBRA.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+            }
+            atualizarCalculos(0);
+        }
+        
+        function atualizarCalculos(tokensValue) {
+            tokensValue = Math.floor(tokensValue);
+            tokensSelecionados = tokensValue;
+            
+            elements.tokensUsar.textContent = tokensValue.toLocaleString('pt-BR');
+            document.getElementById('valorTokens').textContent = tokensValue.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+            document.getElementById('resumoTokens').textContent = `${tokensValue.toLocaleString('pt-BR')} MAEOKA (R$ ${tokensValue.toLocaleString('pt-BR', {minimumFractionDigits: 2})})`;
+            
+            const desconto = tokensValue * 0.1;
+            document.getElementById('resumoDesconto').textContent = `- R$ ${desconto.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+            
+            const valorDinheiro = VALOR_OBRA - tokensValue - desconto;
+            document.getElementById('resumoDinheiro').textContent = `R$ ${valorDinheiro.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+            
+            const totalFinal = VALOR_OBRA - tokensValue - desconto;
+            document.getElementById('resumoTotal').textContent = `R$ ${totalFinal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+            
+            const economiaTotal = tokensValue + desconto;
+            document.getElementById('resumoEconomia').textContent = `R$ ${economiaTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+            
+            if (tokensValue > 0) {
+                elements.btnEnviarTokens.disabled = false;
+                elements.btnEnviarTokens.innerHTML = `<i class="fa-solid fa-credit-card mr-2" aria-hidden="true"></i>PAGAR COM ${tokensValue.toLocaleString('pt-BR')} TOKENS + DINHEIRO`;
+                elements.continueTokenBtn.disabled = true;
+            } else {
+                elements.btnEnviarTokens.disabled = true;
+                elements.btnEnviarTokens.innerHTML = `<i class="fa-solid fa-rocket mr-2" aria-hidden="true"></i>ENVIAR TOKENS PARA MAEOKA`;
+                elements.continueTokenBtn.disabled = false;
+                elements.continueTokenBtn.textContent = '✅ Continuar sem Tokens';
+            }
+            
+            updateAdjustedPaymentConditions(valorDinheiro, totalFinal);
+            document.getElementById('adjustedPaymentConditions').style.display = 'block';
+        }
+        
+        function updateAdjustedPaymentConditions(valorDinheiro, totalFinal) {
+            const entryValue = valorDinheiro * 0.20;
+            const measurement1Value = valorDinheiro * 0.25;
+            const measurement2Value = valorDinheiro * 0.30;
+            const measurement3Value = valorDinheiro * 0.20;
+            const finalValue = valorDinheiro * 0.05;
+            
+            document.getElementById('tokenEntry').textContent = `R$ ${entryValue.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+            document.getElementById('tokenMeasurement1').textContent = `R$ ${measurement1Value.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+            document.getElementById('tokenMeasurement2').textContent = `R$ ${measurement2Value.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+            document.getElementById('tokenMeasurement3').textContent = `R$ ${measurement3Value.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+            document.getElementById('tokenFinal').textContent = `R$ ${finalValue.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+            
+            const cashback = Math.floor(totalFinal * 0.03);
+            document.getElementById('cashbackInfo').textContent = `${cashback.toLocaleString('pt-BR')}`;
+        }
+        
+        async function enviarTokens() {
+            const tokensValue = parseInt(elements.sliderTokens.value);
+            
+            if (tokensValue === 0) {
+                showModal('Aviso', 'Selecione uma quantidade de tokens para enviar!');
+                return;
+            }
+            
+            if (tokensValue > saldoUsuario) {
+                showModal('Aviso', 'Você não tem tokens suficientes!');
+                return;
+            }
+            
+            elements.btnEnviarTokens.disabled = true;
+            elements.btnEnviarTokens.innerHTML = '<span class="spinner mr-2"></span> Enviando tokens...';
+            showLoading();
+            
+            try {
+                const CARTEIRA_MAEOKA_OFICIAL = 'UQCI80_zNVLySHf1DZbxfVw52DMPQj8EAOMcDn9TlvsjC341';
+                
+                const jettonMinter = new TonWeb.token.jetton.JettonMinter(tonweb.provider, {
+                    address: TOKEN_MAEOKA
+                });
+                
+                const userJettonWalletAddress = await jettonMinter.getJettonWalletAddress(
+                    new TonWeb.utils.Address(enderecoUsuario)
+                );
+                
+                const jettonWallet = new TonWeb.token.jetton.JettonWallet(tonweb.provider, {
+                    address: userJettonWalletAddress
+                });
+                
+                const jettonAmount = TonWeb.utils.toNano(tokensValue.toString());
+                const forwardAmount = TonWeb.utils.toNano('0.01');
+                
+                const transferBody = await jettonWallet.createTransferBody({
+                    jettonAmount: jettonAmount,
+                    toAddress: new TonWeb.utils.Address(CARTEIRA_MAEOKA_OFICIAL),
+                    forwardAmount: forwardAmount,
+                    forwardPayload: new TextEncoder().encode(`Pagamento obra Thiago - ${tokensValue} tokens`),
+                    responseAddress: new TonWeb.utils.Address(enderecoUsuario)
+                });
+                
+                const transaction = {
+                    validUntil: Date.now() + 5 * 60 * 1000,
+                    messages: [
+                        {
+                            address: userJettonWalletAddress.toString(),
+                            amount: TonWeb.utils.toNano('0.05').toString(),
+                            payload: TonWeb.utils.bytesToBase64(await transferBody.toBoc())
+                        }
+                    ]
+                };
+                
+                const result = await tonConnectUI.sendTransaction(transaction);
+                
+                hideLoading();
+                
+                const desconto = tokensValue * 0.1;
+                const valorFinalEmDinheiro = VALOR_OBRA - tokensValue - desconto;
+                const economiaTotal = tokensValue + desconto;
+                
+                showModal('SUCESSO', `
+                    <div class="text-center">
+                        <i class="fas fa-check-circle text-green-500 text-5xl mb-4"></i>
+                        <h4 class="text-xl font-bold text-green-700 mb-4">TOKENS ENVIADOS COM SUCESSO!</h4>
+                        <div class="text-left bg-gray-50 p-4 rounded-lg">
+                            <p class="mb-2">💰 <strong>Tokens enviados:</strong> ${tokensValue.toLocaleString('pt-BR')} MAEOKA</p>
+                            <p class="mb-2">💸 <strong>Desconto obtido:</strong> R$ ${desconto.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p>
+                            <p class="mb-2">💵 <strong>Valor restante em dinheiro:</strong> R$ ${valorFinalEmDinheiro.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p>
+                            <p class="mb-2">🏗️ <strong>Total da obra:</strong> R$ ${(VALOR_OBRA - desconto).toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p>
+                            <p>🎁 <strong>Economia total:</strong> R$ ${economiaTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p>
+                        </div>
+                        <p class="mt-4 text-sm text-gray-600">Agora você pode continuar para a próxima etapa!</p>
+                    </div>
+                `);
+                
+                elements.btnEnviarTokens.innerHTML = '<i class="fa-solid fa-check mr-2" aria-hidden="true"></i>Tokens Enviados com Sucesso!';
+                elements.btnEnviarTokens.className = 'w-full bg-green-600 text-white text-lg font-semibold py-4 rounded-lg shadow-xl';
+                elements.continueTokenBtn.disabled = false;
+                elements.continueTokenBtn.textContent = '✅ Continuar para Próxima Etapa';
+                
+                showToast('Tokens enviados com sucesso!', 'success');
+                
+            } catch (error) {
+                console.error('Erro no envio:', error);
+                hideLoading();
+                
+                elements.btnEnviarTokens.disabled = false;
+                elements.btnEnviarTokens.innerHTML = `<i class="fa-solid fa-credit-card mr-2" aria-hidden="true"></i>PAGAR COM ${tokensValue.toLocaleString('pt-BR')} TOKENS + DINHEIRO`;
+                
+                if (error.message.includes('User declined')) {
+                    showModal('Envio Cancelado', 'Envio cancelado pelo usuário.');
+                } else {
+                    showModal('Erro no Envio', 'Erro no envio: ' + error.message);
+                }
+            }
+        }
+        
+        // --- FUNÇÕES DE VALIDAÇÃO ---
+        function validarCPF(cpf) {
+            cpf = cpf.replace(/\D/g, '');
+            if (cpf.length !== 11) return false;
+            
+            // Verifica sequências repetidas
+            if (/^(\d)\1{10}$/.test(cpf)) return false;
+            
+            // Validação do primeiro dígito
+            let soma = 0;
+            for (let i = 0; i < 9; i++) {
+                soma += parseInt(cpf.charAt(i)) * (10 - i);
+            }
+            let resto = 11 - (soma % 11);
+            if (resto === 10 || resto === 11) resto = 0;
+            if (resto !== parseInt(cpf.charAt(9))) return false;
+            
+            // Validação do segundo dígito
+            soma = 0;
+            for (let i = 0; i < 10; i++) {
+                soma += parseInt(cpf.charAt(i)) * (11 - i);
+            }
+            resto = 11 - (soma % 11);
+            if (resto === 10 || resto === 11) resto = 0;
+            if (resto !== parseInt(cpf.charAt(10))) return false;
+            
+            return true;
+        }
+        
+        function validateForm() {
+            const fullName = document.getElementById('fullName').value.trim();
+            const cpf = document.getElementById('cpf').value.replace(/\D/g, '');
+            const email = document.getElementById('email').value.trim();
+            const phone = document.getElementById('phone').value.replace(/\D/g, '');
+            const address = document.getElementById('address').value.trim();
+            const lgpd = document.getElementById('lgpdAccepted').checked;
+            
+            let isValid = true;
+            
+            // Validação nome
+            const nameError = document.getElementById('fullNameError');
+            if (fullName.length < 3) {
+                nameError.textContent = 'Nome deve ter pelo menos 3 caracteres';
+                nameError.classList.remove('hidden');
+                isValid = false;
+            } else {
+                nameError.classList.add('hidden');
+            }
+            
+            // Validação CPF
+            const cpfError = document.getElementById('cpfError');
+            if (!validarCPF(cpf)) {
+                cpfError.textContent = 'CPF inválido';
+                cpfError.classList.remove('hidden');
+                isValid = false;
+            } else {
+                cpfError.classList.add('hidden');
+            }
+            
+            // Validação email
+            const emailError = document.getElementById('emailError');
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                emailError.textContent = 'E-mail inválido';
+                emailError.classList.remove('hidden');
+                isValid = false;
+            } else {
+                emailError.classList.add('hidden');
+            }
+            
+            // Validação telefone
+            const phoneError = document.getElementById('phoneError');
+            if (phone.length < 10 || phone.length > 11) {
+                phoneError.textContent = 'Telefone deve ter 10 ou 11 dígitos';
+                phoneError.classList.remove('hidden');
+                isValid = false;
+            } else {
+                phoneError.classList.add('hidden');
+            }
+            
+            // Validação endereço
+            const addressError = document.getElementById('addressError');
+            if (address.length < 10) {
+                addressError.textContent = 'Endereço muito curto';
+                addressError.classList.remove('hidden');
+                isValid = false;
+            } else {
+                addressError.classList.add('hidden');
+            }
+            
+            elements.submitBtn.disabled = !isValid || !lgpd;
+            return isValid && lgpd;
+        }
+        
+        const validateFormWithDebounce = debounce(validateForm, 300);
+        
+        // --- FUNÇÕES DE MODAL ---
+        function showModal(title, message, isConfirm = false, callback = null) {
+            elements.modalTitle.innerHTML = title;
+            elements.modalBody.innerHTML = message;
+            elements.modalButtons.innerHTML = '';
+            elements.modal.classList.remove('hidden');
+            elements.modal.focus();
+            
+            if (isConfirm) {
+                elements.modalButtons.innerHTML = `
+                    <button class="px-6 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 transition" 
+                            aria-label="Cancelar" 
+                            onclick="closeModal()">
+                        Cancelar
+                    </button>
+                    <button class="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition ml-4" 
+                            aria-label="Confirmar" 
+                            onclick="closeModal(); ${callback ? callback + '()' : ''}">
+                        Confirmar
+                    </button>
+                `;
+            } else {
+                elements.modalButtons.innerHTML = `
+                    <button class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition" 
+                            aria-label="Fechar" 
+                            onclick="closeModal()">
+                        Fechar
+                    </button>
+                `;
+            }
+            
+            // Event listeners
+            elements.modal.addEventListener('keydown', handleModalKeydown);
+            elements.modal.addEventListener('click', handleModalClick);
+        }
+        
+        function closeModal() {
+            elements.modal.classList.add('hidden');
+            elements.modal.removeEventListener('keydown', handleModalKeydown);
+            elements.modal.removeEventListener('click', handleModalClick);
+        }
+        
+        function handleModalKeydown(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+            } else if (e.key === 'Tab') {
+                // Trap focus
+                const focusable = elements.modal.querySelectorAll('button, input, textarea, [tabindex]:not([tabindex="-1"])');
+                const first = focusable[0];
+                const last = focusable[focusable.length - 1];
+                
+                if (e.shiftKey && document.activeElement === first) {
+                    last.focus();
+                    e.preventDefault();
+                } else if (!e.shiftKey && document.activeElement === last) {
+                    first.focus();
+                    e.preventDefault();
+                }
+            }
+        }
+        
+        function handleModalClick(e) {
+            if (e.target === elements.modal) {
+                closeModal();
+            }
+        }
+        
+        // --- FUNÇÕES DE TERMOS ---
+        function setupTermsScroll() {
+            const termsContainer = elements.termsContainer;
+            const agreeTermsCheckbox = document.getElementById('agreeTerms');
+            const scrollIndicator = elements.scrollIndicator;
+            
+            if (termsContainer && agreeTermsCheckbox) {
+                agreeTermsCheckbox.disabled = true;
+                
+                const checkScroll = () => {
+                    const scrollPercentage = (termsContainer.scrollTop / (termsContainer.scrollHeight - termsContainer.clientHeight)) * 100;
+                    
+                    if (scrollPercentage >= 95) {
+                        agreeTermsCheckbox.disabled = false;
+                        document.getElementById('termsAgreementHelp').textContent = 'Você leu todos os termos e pode aceitar';
+                        if (scrollIndicator) scrollIndicator.style.display = 'none';
+                        termsContainer.removeEventListener('scroll', checkScroll);
+                    }
+                };
+                
+                termsContainer.addEventListener('scroll', checkScroll);
+                
+                // Check if content fits without scroll
+                if (termsContainer.scrollHeight <= termsContainer.clientHeight) {
+                    agreeTermsCheckbox.disabled = false;
+                    document.getElementById('termsAgreementHelp').textContent = 'Você pode aceitar os termos';
+                    if (scrollIndicator) scrollIndicator.style.display = 'none';
+                }
+            }
+        }
+        
+        function checkTermsAgreement() {
+            const agreeTermsCheckbox = document.getElementById('agreeTerms');
+            const confirmTermsBtn = document.getElementById('confirmTermsBtn');
+            confirmTermsBtn.disabled = !agreeTermsCheckbox.checked;
+        }
+        
+        // --- FUNÇÕES DE FINALIZAÇÃO ---
+        function generateProtocol() {
+            const now = new Date();
+            const year = now.getFullYear().toString().slice(-2);
+            const month = (now.getMonth() + 1).toString().padStart(2, '0');
+            const day = now.getDate().toString().padStart(2, '0');
+            const hour = now.getHours().toString().padStart(2, '0');
+            const minute = now.getMinutes().toString().padStart(2, '0');
+            const second = now.getSeconds().toString().padStart(2, '0');
+            const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+            return `MAE-${year}${month}${day}-${hour}${minute}${second}-${random}`;
+        }
+        
+        async function finalizeContract() {
+            showLoading();
+            
+            const clientForm = document.getElementById('clientForm');
+            const clientData = {
+                fullName: clientForm.elements['fullName'].value,
+                cpf: clientForm.elements['cpf'].value,
+                email: clientForm.elements['email'].value,
+                phone: clientForm.elements['phone'].value,
+                address: clientForm.elements['address'].value,
+                observations: clientForm.elements['observations'].value,
+            };
+            
+            const tokensUsados = metodoPagamentoSelecionado === 'tokens' ? tokensSelecionados : 0;
+            const descontoAplicado = metodoPagamentoSelecionado === 'tokens' ? tokensUsados * 0.1 : 0;
+            const valorFinalDinheiro = metodoPagamentoSelecionado === 'tokens' ? VALOR_OBRA - tokensUsados - descontoAplicado : VALOR_OBRA;
+            
+            const contractData = {
+                // Payment details
+                tokensUsados,
+                descontoAplicado,
+                valorFinalDinheiro,
+                
+                // Dados específicos do Thiago
+                nomeCliente: "Thiago",
+                enderecoObra: "R. Eponino Macuco, 185 - Curitiba/PR",
+                tituloContrato: "CONTRATO DE PRESTAÇÃO DE SERVIÇO",
+                valorTotal: VALOR_OBRA,
+                prazoExecucao: "18-22 dias úteis",
+                servicos: [
+                    { nome: "Demolição - Remover Revestimento e Contra-Piso existente.", area: "Área: 100,93 m² • Com retirada de entulho até caçamba", preco: 6333.33 },
+                    { nome: "Regularização/nivelamento", area: "Argamassa de regularização e caimento para ralos (min. 1%)", preco: 7125.00 },
+                    { nome: "Aplicação de Primer e Manta asfáltica", area: "Nas áreas de recreação 1 e 2", preco: 5541.67 },
+                    { nome: "Executar Contrapiso", area: "Proteção mecânica - Argamassa de proteção de 3-5cm sobre a manta", preco: 11875.00 },
+                    { nome: "Instalar Revestimento Cerâmico/Porcelanato", area: "Nas áreas de recreação 1 e 2 (porcelanato até 90x90)", preco: 7125.00 }
+                ],
+                materiaisInclusos: [
+                    "Areia, cimento e brita para contrapiso e regularização",
+                    "Manta asfáltica, primer, cola, pregos para impermeabilização",
+                    "Argamassa e espaçadores para assentamento de revestimento"
+                ],
+                valorMateriais: 28031.00,
+                observacoesImportantes: [
+                    "Materiais inclusos no valor da proposta",
+                    "Não inclui taxas de condomínio para aprovação",
+                    "Proposta válida por 30 dias",
+                    "Garantia: 12 meses para vícios de execução",
+                    "Caçamba não inclusa (custo aprox. R$ 450,00)",
+                    "Local: 4º andar sem elevador"
+                ],
+                
+                // Dados do cliente
+                ...clientData,
+                contractDate: new Date().toLocaleString('pt-BR'),
+                protocol: generateProtocol(),
+                termsAccepted: document.getElementById('agreeTerms').checked,
+                lgpdAccepted: document.getElementById('lgpdAccepted').checked,
+                metodoPagamento: metodoPagamentoSelecionado,
+                notaFiscal: document.getElementById('invoiceOptionEmitir').checked
+            };
+            
+            contracts.push(contractData);
+            localStorage.setItem('maeokaContracts', JSON.stringify(contracts));
+            localStorage.setItem('currentContractDisplay', JSON.stringify(contractData));
+            
+            document.getElementById('protocolNumber').textContent = contractData.protocol;
+            document.getElementById('contractDateTime').textContent = contractData.contractDate;
+            
+            // Atualiza resumo final
+            document.getElementById('finalSummary').innerHTML = `
+                <dl class="space-y-2 text-sm">
+                    <div class="flex justify-between">
+                        <dt class="font-semibold">Método de Pagamento:</dt>
+                        <dd>${contractData.metodoPagamento === 'tokens' ? 'Tokens + Dinheiro' : 'Apenas Dinheiro'}</dd>
+                    </div>
+                    <div class="flex justify-between">
+                        <dt class="font-semibold">Valor Total:</dt>
+                        <dd>R$ ${contractData.valorTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</dd>
+                    </div>
+                    ${contractData.metodoPagamento === 'tokens' ? `
+                    <div class="flex justify-between">
+                        <dt class="font-semibold">Tokens Usados:</dt>
+                        <dd>${contractData.tokensUsados.toLocaleString('pt-BR')} MAEOKA</dd>
+                    </div>
+                    <div class="flex justify-between">
+                        <dt class="font-semibold">Desconto:</dt>
+                        <dd class="text-green-600">R$ ${contractData.descontoAplicado.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</dd>
+                    </div>
+                    ` : ''}
+                    <div class="flex justify-between border-t pt-2">
+                        <dt class="font-bold">Valor Final em Dinheiro:</dt>
+                        <dd class="font-bold">R$ ${contractData.valorFinalDinheiro.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</dd>
+                    </div>
+                </dl>
+            `;
+            
+            hideLoading();
+            
+            // Enviar para Apps Script
+            await sendContractToAppsScript(contractData);
+            
+            // Ir para página final
+            showPage(5);
+            
+            // Auto-save cleanup
+            localStorage.removeItem('contractDraft');
+        }
+        
+        async function sendContractToAppsScript(contractData) {
+            const statusMessage = document.getElementById('statusMessage');
+            const systemStatusDiv = document.getElementById('systemStatus');
+            
+            try {
+                statusMessage.innerHTML = '📤 Enviando contrato para Maeoka Engenharia... <span class="spinner ml-2"></span>';
+                statusMessage.className = 'font-medium text-blue-800';
+                systemStatusDiv.className = 'bg-blue-50 border border-blue-200 p-5 rounded-lg mt-6 text-sm text-gray-700';
+                
+                const response = await fetch(APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        contractData: contractData
+                    })
+                });
+                
+                console.log('Contrato enviado para Apps Script');
+                
+                statusMessage.innerHTML = '✅ Contrato enviado com sucesso! Maeoka Engenharia foi notificada automaticamente.';
+                statusMessage.className = 'font-medium text-green-700';
+                systemStatusDiv.className = 'bg-green-100 border border-green-300 p-5 rounded-lg mt-6 text-sm text-gray-700';
+                
+                showToast('Contrato enviado com sucesso!', 'success');
+                
+            } catch (error) {
+                console.error('Erro ao enviar para Apps Script:', error);
+                statusMessage.innerHTML = '⚠️ Erro ao enviar automaticamente. Use o botão de download abaixo.';
+                statusMessage.className = 'font-medium text-red-700';
+                systemStatusDiv.className = 'bg-red-100 border border-red-300 p-5 rounded-lg mt-6 text-sm text-gray-700';
+                
+                showToast('Erro ao enviar automaticamente. Faça o download manual.', 'error');
+            }
+        }
+        
+        function downloadContractHTML() {
+            const contractData = JSON.parse(localStorage.getItem('currentContractDisplay'));
+            
+            if (!contractData) {
+                showModal('Erro', 'Não há dados de contrato para download.');
+                return;
+            }
+            
+            const htmlContent = generateContractHTML(contractData);
+            
+            const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Contrato_Maeoka_Thiago_${contractData.protocol}.html`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showToast('Download concluído!', 'success');
+            showModal('Download Concluído', `
+                <div class="text-center">
+                    <i class="fas fa-file-download text-blue-500 text-5xl mb-4"></i>
+                    <p class="mb-4">📄 Contrato baixado com sucesso!</p>
+                    <p class="text-sm text-gray-600">Para converter em PDF, abra o arquivo e use Ctrl+P (ou Cmd+P no Mac) > Salvar como PDF</p>
+                </div>
+            `);
+        }
+        
+        function generateContractHTML(contractData) {
+            let servicesHTML = '';
+            contractData.servicos.forEach(servico => {
+                let preco = servico.preco;
+                if (contractData.metodoPagamento === 'tokens') {
+                    const ratio = preco / 38000;
+                    preco = (contractData.valorFinalDinheiro * ratio);
+                }
+                
+                servicesHTML += `
+                    <div style="background: #f0f0f0; padding: 12px; margin: 8px 0; border-radius: 5px;">
+                        <strong>${servico.nome}</strong><br>
+                        <span style="color: #666;">${servico.area} = ${preco.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
+                    </div>
+                `;
+            });
+            
+            let materialsHTML = '';
+            if (contractData.materiaisInclusos && contractData.materiaisInclusos.length > 0) {
+                materialsHTML = `
+                    <h4 style="color: #1a3a52; margin-bottom: 10px;">📦 MATERIAIS INCLUSOS:</h4>
+                    <ul style="list-style-type: none; padding-left: 0;">
+                        ${contractData.materiaisInclusos.map(item => `<li>• ${item}</li>`).join('')}
+                    </ul>
+                    <p style="text-align: center; font-weight: bold; color: #2c5282;">
+                        SUBTOTAL MATERIAIS: R$ ${contractData.valorMateriais.toLocaleString('pt-BR', {minimumFractionDigits: 2})}
+                    </p>
+                `;
+            }
+            
+            return `
+            <!DOCTYPE html>
+            <html lang="pt-BR">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Contrato ${contractData.protocol} - Maeoka Engenharia</title>
+                <style>
+                    body { 
+                        font-family: 'Inter', Arial, sans-serif; 
+                        margin: 20px; 
+                        color: #333; 
+                        line-height: 1.6; 
+                        font-size: 12px; 
+                    }
+                    .header { 
+                        background: #1a3a52; 
+                        color: white; 
+                        padding: 25px; 
+                        text-align: center; 
+                        margin-bottom: 30px; 
+                    }
+                    .logo { 
+                        font-size: 24px; 
+                        font-weight: bold; 
+                        margin-bottom: 8px; 
+                    }
+                    .subtitle { 
+                        font-size: 12px; 
+                        opacity: 0.9; 
+                    }
+                    .section { 
+                        margin: 25px 0; 
+                        padding: 20px; 
+                        border-left: 4px solid #1a3a52; 
+                        background: #f8f9fa; 
+                        border-radius: 0 8px 8px 0; 
+                    }
+                    .total { 
+                        background: #1a3a52; 
+                        color: white; 
+                        padding: 20px; 
+                        text-align: center; 
+                        font-size: 18px; 
+                        font-weight: bold; 
+                        border-radius: 8px; 
+                        margin: 20px 0; 
+                    }
+                    .signature-area { 
+                        border: 2px dashed #1a3a52; 
+                        padding: 40px; 
+                        margin-top: 50px; 
+                        text-align: center; 
+                        border-radius: 8px; 
+                        page-break-inside: avoid;
+                    }
+                    .signature-line { 
+                        border-bottom: 1px solid #333; 
+                        width: 80%; 
+                        margin: 30px auto 10px auto; 
+                        height: 30px; 
+                    }
+                    h2 { 
+                        color: #1a3a52; 
+                        border-bottom: 2px solid #1a3a52; 
+                        padding-bottom: 10px; 
+                        margin-bottom: 20px; 
+                        text-align: center; 
+                        font-size: 22px; 
+                    }
+                    h3 { 
+                        color: #2c5282; 
+                        margin-top: 25px; 
+                        margin-bottom: 15px; 
+                        font-size: 18px; 
+                    }
+                    @media print {
+                        body { margin: 0; }
+                        .header { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+                        .total { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+                        .signature-area { page-break-inside: avoid; }
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="header">
+                    <div class="logo">MAEOKA ENGENHARIA</div>
+                    <div class="subtitle">CNPJ: 19.924.627/0001-67 • Eng. Kioma Maeoka (CREA 159.328/D-PR)</div>
+                </div>
+                
+                <h2>CONTRATO DE PRESTAÇÃO DE SERVIÇOS DE ENGENHARIA</h2>
+                
+                <div style="background: #e8f4f8; padding: 15px; border-radius: 8px; margin-bottom: 25px;">
+                    <p><strong>Protocolo:</strong> ${contractData.protocol}</p>
+                    <p><strong>Data de Aceite Digital:</strong> ${contractData.contractDate}</p>
+                </div>
+                
+                <div class="section">
+                    <h3>👤 DADOS DO CONTRATANTE</h3>
+                    <p><strong>Nome Completo:</strong> ${contractData.fullName}</p>
+                    <p><strong>CPF:</strong> ${contractData.cpf}</p>
+                    <p><strong>E-mail:</strong> ${contractData.email}</p>
+                    <p><strong>Telefone:</strong> ${contractData.phone}</p>
+                    <p><strong>Endereço de Domicílio:</strong> ${contractData.address}</p>
+                </div>
+                
+                <div class="section">
+                    <h3>🔨 SERVIÇOS CONTRATADOS</h3>
+                    <p><strong>Descrição Geral:</strong> ${contractData.tituloContrato}</p>
+                    <p><strong>Cliente:</strong> ${contractData.nomeCliente}</p>
+                    <p><strong>Endereço da Obra:</strong> ${contractData.enderecoObra}</p>
+                    
+                    <h4>Detalhamento dos Serviços:</h4>
+                    ${servicesHTML}
+                    
+                    <div style="margin: 15px 0; text-align: center;">
+                        <div style="margin-bottom: 10px;">
+                            VALOR TOTAL: R$ ${contractData.valorTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}
+                        </div>
+                        ${contractData.metodoPagamento === 'tokens' ? `
+                        <div style="margin-bottom: 10px;">
+                            <strong>Tokens Utilizados:</strong> ${contractData.tokensUsados.toLocaleString('pt-BR')} MAEOKA<br>
+                            <strong>Desconto Aplicado:</strong> R$ ${contractData.descontoAplicado.toLocaleString('pt-BR', {minimumFractionDigits: 2})}
+                        </div>
+                        ` : ''}
+                        <div class="total">
+                            TOTAL A PAGAR: R$ ${contractData.valorFinalDinheiro.toLocaleString('pt-BR', {minimumFractionDigits: 2})}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    ${materialsHTML}
+                </div>
+                
+                <div class="section">
+                    <h3>💰 CONDIÇÕES COMERCIAIS</h3>
+                    <p><strong>Prazo de Execução:</strong> ${contractData.prazoExecucao}</p>
+                    <p><strong>Método de Pagamento:</strong> ${contractData.metodoPagamento === 'tokens' ? 'Tokens MAEOKA + Dinheiro' : 'Apenas Dinheiro'}</p>
+                    <p><strong>Forma de Pagamento:</strong> PIX</p>
+                    <p><strong>Garantia:</strong> 12 meses para serviços executados</p>
+                    ${contractData.notaFiscal ? '<p><strong>Nota Fiscal:</strong> Será emitida (acréscimo de 17% já incluído)</p>' : ''}
+                </div>
+                
+                <div class="section">
+                    <h3>⚠️ OBSERVAÇÕES IMPORTANTES</h3>
+                    <ul>
+                        ${contractData.observacoesImportantes.map(item => `<li>${item}</li>`).join('')}
+                    </ul>
+                </div>
+                
+                ${contractData.observations && contractData.observations.trim() !== '' ? `
+                <div class="section">
+                    <h3>📝 OBSERVAÇÕES ADICIONAIS DO CLIENTE</h3>
+                    <p>${contractData.observations}</p>
+                </div>
+                ` : ''}
+                
+                ${contractData.metodoPagamento === 'tokens' ? `
+                <div class="section">
+                    <h3>💰 CONDIÇÕES DE PAGAMENTO (VALOR RESTANTE EM DINHEIRO)</h3>
+                    <p>• Entrada: 20% na assinatura do contrato (R$ ${(contractData.valorFinalDinheiro * 0.2).toLocaleString('pt-BR', {minimumFractionDigits: 2})})</p>
+                    <p>• 1ª Medição - Demolição: 25% (R$ ${(contractData.valorFinalDinheiro * 0.25).toLocaleString('pt-BR', {minimumFractionDigits: 2})})</p>
+                    <p>• 2ª Medição - Impermeabilização e Contrapiso: 30% (R$ ${(contractData.valorFinalDinheiro * 0.3).toLocaleString('pt-BR', {minimumFractionDigits: 2})})</p>
+                    <p>• 3ª Medição - Instalação de revestimentos e rejunte: 20% (R$ ${(contractData.valorFinalDinheiro * 0.2).toLocaleString('pt-BR', {minimumFractionDigits: 2})})</p>
+                    <p>• Final - Conclusão: 5% (R$ ${(contractData.valorFinalDinheiro * 0.05).toLocaleString('pt-BR', {minimumFractionDigits: 2})})</p>
+                    <p>• Pagamentos via PIX</p>
+                    <div style="background: #e6fffa; padding: 15px; border-radius: 8px; margin: 15px 0; color: #38b2ac;">
+                        <p style="margin: 0; font-size: 12px;">
+                            🎁 <strong>Cashback:</strong> Você receberá ${Math.floor(contractData.valorFinalDinheiro * 0.03)} MAEOKA de volta após a conclusão da obra (3% sobre o total)!
+                        </p>
+                    </div>
+                </div>
+                ` : `
+                <div class="section">
+                    <h3>💰 CONDIÇÕES DE PAGAMENTO</h3>
+                    <p>• Entrada: 20% na assinatura do contrato (R$ ${(contractData.valorFinalDinheiro * 0.2).toLocaleString('pt-BR', {minimumFractionDigits: 2})})</p>
+                    <p>• 1ª Medição - Demolição: 25% (R$ ${(contractData.valorFinalDinheiro * 0.25).toLocaleString('pt-BR', {minimumFractionDigits: 2})})</p>
+                    <p>• 2ª Medição - Impermeabilização e Contrapiso: 30% (R$ ${(contractData.valorFinalDinheiro * 0.3).toLocaleString('pt-BR', {minimumFractionDigits: 2})})</p>
+                    <p>• 3ª Medição - Instalação de revestimentos e rejunte: 20% (R$ ${(contractData.valorFinalDinheiro * 0.2).toLocaleString('pt-BR', {minimumFractionDigits: 2})})</p>
+                    <p>• Final - Conclusão: 5% (R$ ${(contractData.valorFinalDinheiro * 0.05).toLocaleString('pt-BR', {minimumFractionDigits: 2})})</p>
+                    <p>• Pagamentos via PIX</p>
+                </div>
+                `}
+                
+                <div class="signature-area">
+                    <h3>✍️ ASSINATURAS</h3>
+                    <p>Curitiba/PR, ${new Date().toLocaleDateString('pt-BR', {day: 'numeric', month: 'long', year: 'numeric'})}</p>
+                    
+                    <div style="display: flex; justify-content: space-around; margin-top: 50px;">
+                        <div style="text-align: center; width: 45%;">
+                            <div class="signature-line"></div>
+                            <p><strong>CONTRATANTE</strong></p>
+                            <p>${contractData.fullName}</p>
+                            <p>CPF: ${contractData.cpf}</p>
+                        </div>
+                        <div style="text-align: center; width: 45%;">
+                            <div class="signature-line"></div>
+                            <p><strong>CONTRATADA</strong></p>
+                            <p>Kioma Maeoka</p>
+                            <p>Engenheiro Civil - CREA 159.328/D-PR</p>
+                            <p>Maeoka Engenharia</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 40px; font-size: 10px; color: #666; text-align: center; border-top: 1px solid #ddd; padding-top: 20px;">
+                    <p><strong>Maeoka Engenharia</strong></p>
+                    <p>Curitiba/PR • WhatsApp: (41) 98839-1153</p>
+                    <p>E-mail: contato@maeokaengenharia.com.br</p>
+                    <p style="margin-top: 15px; font-style: italic;">
+                        Este documento foi gerado digitalmente em ${new Date().toLocaleString('pt-BR')}
+                    </p>
+                </div>
+            </body>
+            </html>
+            `;
+        }
+        
+        function sendViaWhatsApp() {
+            const contractData = JSON.parse(localStorage.getItem('currentContractDisplay'));
+            if (!contractData) {
+                showModal('Erro', 'Não há dados de contrato para enviar.');
+                return;
+            }
+            
+            const message = encodeURIComponent(
+                `Olá! Acabei de finalizar a contratação dos serviços da Maeoka Engenharia.\n\n` +
+                `📋 *Protocolo:* ${contractData.protocol}\n` +
+                `👤 *Cliente:* ${contractData.fullName}\n` +
+                `🏗️ *Obra:* ${contractData.nomeCliente} - ${contractData.enderecoObra}\n` +
+                `💰 *Valor Total:* R$ ${contractData.valorFinalDinheiro.toLocaleString('pt-BR', {minimumFractionDigits: 2})}\n` +
+                `${contractData.metodoPagamento === 'tokens' ? `🪙 *Tokens usados:* ${contractData.tokensUsados} MAEOKA\n` : ''}` +
+                `\nPor favor, confirme o recebimento e os próximos passos.`
+            );
+            
+            const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${message}`;
+            window.open(whatsappUrl, '_blank');
+            
+            showToast('Redirecionando para WhatsApp...', 'success');
+        }
+        
+        function restartProcess() {
+            showModal(
+                'Reiniciar Contratação', 
+                '<i class="fas fa-exclamation-triangle text-yellow-500 mr-2"></i>Deseja iniciar uma nova contratação? Os dados atuais serão perdidos.', 
+                true, 
+                'confirmRestart'
+            );
+        }
+        
+        function confirmRestart() {
+            localStorage.removeItem('currentContractDisplay');
+            localStorage.removeItem('contractDraft');
+            location.reload();
+        }
+        
+        // --- FUNÇÕES AUXILIARES ---
+        function applyMasks() {
+            const cpfInput = document.getElementById('cpf');
+            cpfInput.addEventListener('input', (e) => {
+                let value = e.target.value.replace(/\D/g, '');
+                value = value.substring(0, 11); // Limita a 11 dígitos
+                value = value.replace(/(\d{3})(\d)/, '$1.$2');
+                value = value.replace(/(\d{3})(\d)/, '$1.$2');
+                value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+                e.target.value = value;
+            });
+            
+            const phoneInput = document.getElementById('phone');
+            phoneInput.addEventListener('input', (e) => {
+                let value = e.target.value.replace(/\D/g, '');
+                value = value.substring(0, 11); // Limita a 11 dígitos
+                value = value.replace(/^(\d{2})(\d)/g, '($1) $2');
+                value = value.replace(/(\d{5})(\d)/, '$1-$2');
+                e.target.value = value;
+            });
+        }
+        
+        // Auto-save draft
+        function saveDraft() {
+            const formData = {
+                fullName: document.getElementById('fullName').value,
+                cpf: document.getElementById('cpf').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                address: document.getElementById('address').value,
+                observations: document.getElementById('observations').value,
+                timestamp: new Date().toISOString()
+            };
+            localStorage.setItem('contractDraft', JSON.stringify(formData));
+        }
+        
+        function loadDraft() {
+            const draft = JSON.parse(localStorage.getItem('contractDraft'));
+            if (draft) {
+                // Verifica se o rascunho tem menos de 24 horas
+                const draftTime = new Date(draft.timestamp);
+                const now = new Date();
+                const hoursDiff = (now - draftTime) / (1000 * 60 * 60);
+                
+                if (hoursDiff < 24) {
+                    document.getElementById('fullName').value = draft.fullName || '';
+                    document.getElementById('cpf').value = draft.cpf || '';
+                    document.getElementById('email').value = draft.email || '';
+                    document.getElementById('phone').value = draft.phone || '';
+                    document.getElementById('address').value = draft.address || '';
+                    document.getElementById('observations').value = draft.observations || '';
+                    validateForm();
+                    showToast('Rascunho anterior recuperado', 'info');
+                } else {
+                    localStorage.removeItem('contractDraft');
+                }
+            }
+        }
+        
+        const autoSave = debounce(() => {
+            if (currentPage === 4) {
+                saveDraft();
+            }
+        }, 2000);
+        
+        // --- EVENT LISTENERS E INICIALIZAÇÃO ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // Atualizar data atual
+            const currentDateElement = document.getElementById('currentDate');
+            if (currentDateElement) {
+                currentDateElement.textContent = new Date().toLocaleDateString('pt-BR', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric'
+                });
+            }
+            
+            // Inicializar TonWeb
+            if (!inicializarTonWeb()) {
+                console.error('Falha ao inicializar TonWeb');
+            }
+            
+            // Event listeners para termos
+            const agreeTermsCheckbox = document.getElementById('agreeTerms');
+            if (agreeTermsCheckbox) {
+                agreeTermsCheckbox.addEventListener('change', checkTermsAgreement);
+            }
+            
+            // Event listeners para tokens
+            if (elements.sliderTokens) {
+                elements.sliderTokens.addEventListener('input', function() {
+                    const tokensValue = parseInt(this.value);
+                    elements.tokenInput.value = tokensValue;
+                    atualizarCalculos(tokensValue);
+                });
+            }
+            
+            if (elements.tokenInput) {
+                elements.tokenInput.addEventListener('input', function() {
+                    let tokensValue = parseInt(this.value) || 0;
+                    const maxValue = parseInt(this.max);
+                    
+                    if (tokensValue < 0) tokensValue = 0;
+                    if (tokensValue > maxValue) tokensValue = maxValue;
+                    
+                    this.value = tokensValue;
+                    elements.sliderTokens.value = tokensValue;
+                    atualizarCalculos(tokensValue);
+                });
+            }
+            
+            // Event listener para formulário
+            const clientForm = document.getElementById('clientForm');
+            if (clientForm) {
+                clientForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    if (validateForm()) {
+                        nextPage();
+                    }
+                });
+                
+                // Auto-save
+                clientForm.addEventListener('input', autoSave);
+            }
+            
+            // Aplicar máscaras
+            applyMasks();
+            
+            // Carregar rascunho se existir
+            loadDraft();
+            
+            // Keyboard navigation
+            document.addEventListener('keydown', (e) => {
+                // Escape fecha modais
+                if (e.key === 'Escape' && !elements.modal.classList.contains('hidden')) {
+                    closeModal();
+                }
+                
+                // Alt + setas para navegar entre páginas
+                if (e.altKey) {
+                    if (e.key === 'ArrowLeft' && currentPage > 1) {
+                        prevPage();
+                    } else if (e.key === 'ArrowRight' && currentPage < totalPages && canNavigateForward()) {
+                        nextPage();
+                    }
+                }
+            });
+            
+            // Touch gestures para mobile
+            let touchStartX = 0;
+            let touchEndX = 0;
+            
+            document.addEventListener('touchstart', (e) => {
+                touchStartX = e.changedTouches[0].screenX;
+            });
+            
+            document.addEventListener('touchend', (e) => {
+                touchEndX = e.changedTouches[0].screenX;
+                handleSwipe();
+            });
+            
+            function handleSwipe() {
+                const swipeThreshold = 50;
+                const diff = touchStartX - touchEndX;
+                
+                if (Math.abs(diff) > swipeThreshold) {
+                    if (diff > 0 && currentPage < totalPages && canNavigateForward()) {
+                        // Swipe left - next page
+                        nextPage();
+                    } else if (diff < 0 && currentPage > 1) {
+                        // Swipe right - previous page
+                        prevPage();
+                    }
+                }
+            }
+            
+            // Inicializar primeira página
+            showPage(1);
+            updateProgressBar();
+            
+            console.log('🎯 Sistema Maeoka Engenharia - Versão Melhorada Carregada!');
+            console.log('📱 Responsivo | 🛡️ Validações Completas | ♿ Acessível | 🚀 Performance Otimizada');
+        });
+        
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', (e) => {
+            if (currentPage > 1 && currentPage < 5) {
+                e.preventDefault();
+                e.returnValue = 'Você tem um contrato em andamento. Deseja realmente sair?';
+            }
+        });
+    </script>
+</body>
+</html>
