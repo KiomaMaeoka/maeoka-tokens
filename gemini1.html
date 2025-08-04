@@ -136,6 +136,12 @@
             .btn-group button {
                 min-width: 120px;
             }
+            /* Rolagem dos termos em mobile */
+            #termsContainer {
+                max-height: 350px;
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+            }
         }
         /* Stepper Styles */
         .stepper {
@@ -155,10 +161,21 @@
             height: 30px;
             line-height: 30px;
             display: inline-block;
+            transition: background-color 0.3s;
         }
         .step.active .step-number {
-            background: #3498db;
+            background: #3498db; /* Azul para etapa ativa */
         }
+        /* NOVO: Estilo para etapas concluídas */
+        .step.completed .step-number {
+            background: #28a745; /* Verde para etapa concluída */
+        }
+        /* NOVO: Estilo para etapas futuras (não clicáveis) */
+        .step.future {
+            cursor: default;
+            opacity: 0.6;
+        }
+
         /* Tooltip Styles */
         [data-tooltip] {
             position: relative;
@@ -757,7 +774,7 @@
         let VALOR_OBRA = 62331;
         const LIMITE_PERCENTUAL = 0.40;
         let currentPage = 1;
-        let currentTotalWithTax = 62331;
+        let highestStepCompleted = 1; // NOVO: Rastreia a etapa mais alta concluída
         let totalPages = 5;
         let contracts = JSON.parse(localStorage.getItem('maeokaContracts')) || [];
         // Variáveis do sistema de tokens
@@ -793,19 +810,38 @@
         const stepper = document.getElementById('stepper').querySelectorAll('.step');
         const submitBtn = document.getElementById('submitBtn');
         
-        // --- FUNÇÕES DE NAVEGAÇÃO ---
+        // --- FUNÇÕES DE NAVEGAÇÃO E UI ---
+        function updateStepper() {
+            stepper.forEach((step, index) => {
+                const stepNumber = index + 1;
+                step.classList.remove('active', 'completed', 'future');
+
+                if (stepNumber < highestStepCompleted) {
+                    step.classList.add('completed');
+                } else if (stepNumber === currentPage) {
+                    step.classList.add('active');
+                } else {
+                    step.classList.add('future');
+                }
+            });
+        }
+
         function updateProgressBar() {
             const progressBar = document.getElementById('progressBar');
-            const progress = (currentPage / totalPages) * 100;
+            // A barra de progresso reflete a etapa atual, não a mais alta concluída
+            const progress = ((currentPage -1) / (totalPages -1)) * 100;
             progressBar.style.width = progress + '%';
             progressBar.setAttribute('aria-valuenow', progress);
-            // Update stepper
-            stepper.forEach(step => step.classList.remove('active'));
-            if (stepper[currentPage - 1]) {
-                stepper[currentPage - 1].classList.add('active');
-            }
+            updateStepper();
         }
+
         function showPage(pageNumber) {
+            // NOVO: Bloqueia o avanço pelas bolinhas do stepper
+            if (pageNumber > highestStepCompleted) {
+                console.warn(`Navegação bloqueada: Etapa ${pageNumber} ainda não foi alcançada.`);
+                return;
+            }
+
             const pages = document.querySelectorAll('.page');
             pages.forEach(page => page.classList.remove('active'));
             const pageToShow = document.getElementById(`page${pageNumber}`);
@@ -821,9 +857,10 @@
             }
         
             if (pageNumber === 2) {
-                setupTermsScroll(); // Chama a função de rolagem ao entrar na página de termos
+                setupTermsScroll(); 
             }
         }
+
         function nextPage() {
             if (currentPage === 2) {
                 const termsAccepted = document.getElementById('agreeTerms').checked;
@@ -843,11 +880,17 @@
                 }
                 finalizeContract();
             }
+
             if (currentPage < totalPages) {
                 currentPage++;
+                // NOVO: Atualiza a etapa mais alta concluída ao avançar
+                if (currentPage > highestStepCompleted) {
+                    highestStepCompleted = currentPage;
+                }
                 showPage(currentPage);
             }
         }
+
         function prevPage() {
             if (currentPage > 1) {
                 currentPage--;
@@ -1633,18 +1676,15 @@
             if (termsContainer && agreeTermsCheckbox) {
                 agreeTermsCheckbox.disabled = true;
                 const checkScroll = () => {
-                    // Verifica se a rolagem chegou ao fim do container ou se não tem rolagem
-                    const isAtBottom = termsContainer.scrollHeight - termsContainer.scrollTop <= termsContainer.clientHeight + 1;
+                    const isAtBottom = termsContainer.scrollHeight - termsContainer.scrollTop <= termsContainer.clientHeight + 5; // 5px buffer
                     if (isAtBottom) {
                         agreeTermsCheckbox.disabled = false;
                         termsContainer.removeEventListener('scroll', checkScroll);
                     }
                 };
                 
-                // Adiciona o listener de scroll para o container
                 termsContainer.addEventListener('scroll', checkScroll);
 
-                // Verifica na inicialização se o conteúdo já cabe na tela (desktop)
                 if (termsContainer.scrollHeight <= termsContainer.clientHeight) {
                     agreeTermsCheckbox.disabled = false;
                 }
