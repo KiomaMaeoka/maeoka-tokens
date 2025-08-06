@@ -55,6 +55,10 @@
             border-radius: 50%;
             border-top-color: #fff;
             animation: spin 1s ease-in-out infinite;
+            display: none; /* Oculto por padrão */
+        }
+        .spinner.active {
+            display: inline-block; /* Visível quando a classe 'active' é adicionada */
         }
         
         /* --- ESTILOS DO CARTÃO DE RECOMPENSA --- */
@@ -280,7 +284,12 @@
             const button = buttonType === 'verify' ? DOMElements.btnVerify : DOMElements.btnClaim;
             const btnText = buttonType === 'verify' ? DOMElements.verifyBtnText : DOMElements.claimBtnText;
             
-            spinner.style.display = status ? 'inline-block' : 'none';
+            if (status) {
+                spinner.classList.add('active');
+            } else {
+                spinner.classList.remove('active');
+            }
+            
             button.disabled = status;
 
             if (status) {
