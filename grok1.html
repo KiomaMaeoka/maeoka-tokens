@@ -3,422 +3,1838 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resgate de Recompensas - Maeoka Tokens</title>
-    <!-- Fontes e Ícones -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" xintegrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Source+Code+Pro:wght@400;600&display=swap" rel="stylesheet">
+    <title>Contrato Digital - Maeoka Engenharia</title>
     
-    <!-- Bibliotecas JS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" xintegrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@tonconnect/ui@2.0.9/dist/tonconnect-ui.min.js"></script>
     <script src="https://unpkg.com/tonweb/dist/tonweb.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
-        /* --- ESTILOS GERAIS E FONTES --- */
+        /* --- CONFIGURAÇÃO DE FONTES E ESTILOS MODERNOS --- */
         body {
             font-family: 'Poppins', sans-serif;
-            background-color: #f0f4f8; /* Tom de azul/cinza mais claro */
-            background-image: radial-gradient(#dbeafe 1px, transparent 1px);
-            background-size: 20px 20px;
-        }
-        .font-mono { font-family: 'Source Code Pro', monospace; }
-
-        /* --- ANIMAÇÕES E TRANSIÇÕES --- */
-        .app-card-face {
-            backface-visibility: hidden;
-            transition: transform 0.6s, opacity 0.5s;
-            transform-style: preserve-3d;
-        }
-        .app-card-face.is-flipped {
-            transform: rotateY(180deg);
-        }
-        .app-card-face-back {
-            transform: rotateY(180deg);
+            background-color: #f1f5f9; /* bg-slate-100 */
+            color: #1f2937; /* text-gray-800 */
         }
 
-        .fade-in-up {
-            animation: fadeInUp 0.5s ease-out forwards;
-        }
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+        .font-display {
+            font-family: 'Playfair Display', serif;
         }
 
-        /* --- SPINNER MELHORADO --- */
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        /* --- TRANSIÇÕES DE PÁGINA E ANIMAÇÕES --- */
+        .page {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.4s ease-in-out, transform 0.4s ease-in-out;
+            transform: translateY(10px);
+        }
+
+        .page.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
         .spinner {
-            width: 20px; height: 20px;
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top-color: #fff;
-            animation: spin 1s ease-in-out infinite;
-            display: none; /* Adicionado para ocultar por padrão */
-        }
-        
-        /* --- ESTILOS DO CARTÃO DE RECOMPENSA --- */
-        .reward-ticket {
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            border-left: 8px dashed #3b82f6;
-            position: relative;
-        }
-        .reward-ticket::before, .reward-ticket::after {
-            content: '';
-            position: absolute;
+            display: inline-block;
             width: 20px;
             height: 20px;
-            background: #f0f4f8;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top-color: #3b82f6; /* Azul para combinar com o tema */
             border-radius: 50%;
-            left: -14px;
+            animation: spin 1s linear infinite;
         }
-        .reward-ticket::before { top: -10px; }
-        .reward-ticket::after { bottom: -10px; }
+        
+        @keyframes pulse-animation {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7); }
+            70% { transform: scale(1.02); box-shadow: 0 0 0 10px rgba(59, 130, 246, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
+        }
 
+        .btn-pulse {
+            animation: pulse-animation 2s infinite;
+        }
+        
+        /* --- ESTILOS DO NOVO STEPPER --- */
+        .stepper {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            margin: 2rem 0;
+        }
+        .stepper::before {
+            content: '';
+            position: absolute;
+            top: 18px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: #e5e7eb; /* gray-200 */
+            z-index: 1;
+        }
+        .stepper-progress {
+            position: absolute;
+            top: 18px;
+            left: 0;
+            height: 2px;
+            background-color: #3b82f6; /* blue-500 */
+            z-index: 2;
+            transition: width 0.5s ease-in-out;
+        }
+        .step {
+            position: relative;
+            z-index: 3;
+            text-align: center;
+            cursor: pointer;
+            transition: opacity 0.3s;
+            width: 80px;
+        }
+        .step-number {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 0.5rem;
+            font-weight: 600;
+            transition: background-color 0.3s, border-color 0.3s, color 0.3s, transform 0.3s;
+            border: 2px solid #d1d5db; /* gray-300 */
+            background-color: #ffffff;
+            color: #6b7280; /* gray-500 */
+        }
+        .step-label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #6b7280; /* gray-500 */
+            transition: color 0.3s, font-weight 0.3s;
+        }
+        .step.active .step-number {
+            background-color: #3b82f6; /* blue-500 */
+            border-color: #3b82f6;
+            color: #ffffff;
+            transform: scale(1.1);
+        }
+        .step.active .step-label {
+            color: #1e3a8a; /* blue-900 */
+            font-weight: 600;
+        }
+        .step.completed .step-number {
+            background-color: #16a34a; /* green-600 */
+            border-color: #16a34a;
+            color: #ffffff;
+        }
+        .step.completed:hover .step-number {
+            transform: scale(1.1);
+        }
+        .step.completed .step-label {
+            color: #15803d; /* green-700 */
+        }
+        .step.future {
+            cursor: default;
+            opacity: 0.6;
+        }
+
+        /* --- ESTILOS DO MODAL --- */
+        .modal {
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(31, 41, 55, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(4px);
+        }
+        
+        /* --- SCROLLBAR PERSONALIZADA PARA OS TERMOS --- */
+        #termsContainer::-webkit-scrollbar {
+            width: 8px;
+        }
+        #termsContainer::-webkit-scrollbar-track {
+            background: #e5e7eb;
+        }
+        #termsContainer::-webkit-scrollbar-thumb {
+            background-color: #9ca3af;
+            border-radius: 10px;
+            border: 2px solid #e5e7eb;
+        }
+
+        /* --- ESTILOS PARA BOTÕES NA PÁGINA FINAL --- */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            width: 100%;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 0.5rem;
+            transition: all 0.2s ease-in-out;
+            cursor: pointer;
+        }
+        .btn-danger {
+            background-color: #dc2626; /* red-600 */
+            color: white;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        .btn-danger:hover {
+            background-color: #b91c1c; /* red-700 */
+            transform: translateY(-2px);
+        }
+        .btn-secondary {
+            background-color: #6b7280; /* gray-500 */
+            color: white;
+        }
+        .btn-secondary:hover {
+            background-color: #4b5563; /* gray-600 */
+        }
+        
+        /* NOVO: Estilo para o container do aceite dos termos */
+        #agreeTermsContainer {
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        /* --- AJUSTES DE RESPONSIVIDADE (MOBILE-FIRST) --- */
+
+        /* 🚀 Fontes fluidas para títulos principais, evitando que fiquem grandes demais ou pequenos demais. */
+        header h1 {
+            /* Mín: ~30px, Preferencial: cresce com a tela, Máx: ~56px */
+            font-size: clamp(1.875rem, 5vw + 1rem, 3.5rem);
+            line-height: 1.2;
+        }
+
+        .page > h2 {
+            /* Mín: ~24px, Preferencial: cresce com a tela, Máx: ~36px */
+            font-size: clamp(1.5rem, 4vw + 1rem, 2.25rem);
+        }
+
+        #finalPriceDisplay, #finalPriceDisplayPage3 {
+            /* Mín: ~36px, Preferencial: cresce com a tela, Máx: ~60px */
+            font-size: clamp(2.25rem, 8vw + 1rem, 3.75rem);
+        }
+        
+        #successState h2 {
+             font-size: clamp(2rem, 5vw + 1rem, 3rem);
+        }
+
+
+        /* 📱 Ajustes específicos para telas pequenas (smartphones) */
+        @media (max-width: 640px) {
+            /* Reduz o tamanho da fonte dos passos para caber em telas menores */
+            .step-label {
+                font-size: 0.7rem; /* ~11px */
+                line-height: 1.2;
+                max-width: 60px; /* Garante que o texto não ultrapasse o espaço */
+                margin: 0 auto;
+            }
+
+            .step {
+                width: 65px; /* Reduz a largura do passo */
+            }
+
+            /* Ajusta o padding dos botões para não serem muito altos */
+            .btn, button.flex-1 {
+                padding-top: 0.8rem;
+                padding-bottom: 0.8rem;
+                font-size: 0.95rem;
+            }
+            
+            /* Ajusta a exibição dos detalhes do serviço para empilhar em telas pequenas */
+            .service-details {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .service-details .price {
+                margin-top: 0.5rem;
+            }
+        }
     </style>
 </head>
-<body class="flex items-center justify-center min-h-screen p-4">
+<body class="bg-slate-100">
 
-    <div id="appContainer" class="w-full max-w-2xl">
-        <div id="appCard" class="bg-white rounded-2xl shadow-2xl overflow-hidden transition-all duration-500">
-            <header class="bg-gradient-to-r from-blue-900 to-blue-600 text-white text-center p-6 md:p-8 shadow-lg relative overflow-hidden">
-                <div class="absolute -top-4 -left-4 w-24 h-24 bg-white/10 rounded-full"></div>
-                <div class="absolute -bottom-8 -right-2 w-32 h-32 bg-white/10 rounded-full"></div>
-                <h1 class="text-2xl md:text-4xl font-bold tracking-wide mb-2 relative z-10">🎁 RESGATE DE RECOMPENSAS</h1>
-                <p class="text-xs md:text-sm opacity-90 relative z-10">Sistema de Cashback Maeoka Tokens</p>
+    <div class="container mx-auto p-4 md:p-8 max-w-5xl">
+        <div class="bg-white rounded-2xl shadow-2xl overflow-hidden min-h-[80vh] flex flex-col">
+            
+            <header class="bg-gradient-to-r from-blue-900 to-blue-500 text-white text-center p-6 md:p-12 shadow-lg">
+                <h1 class="font-display tracking-tight mb-2">MAEOKA ENGENHARIA</h1>
+                <p class="text-xs sm:text-sm md:text-base opacity-90 tracking-wider">CNPJ: 19.924.627/0001-67 • Eng. Kioma Maeoka (CREA 159.328/D-PR)</p>
             </header>
 
-            <main class="p-6 md:p-10 min-h-[400px] flex flex-col justify-center">
+            <div class="p-4 sm:p-6 md:p-10 border-b border-gray-200">
+                <div class="stepper" id="stepper">
+                    <div class="stepper-progress" id="stepper-progress-bar" style="width: 0%;"></div>
+                    <div class="step" data-step="1" onclick="showPage(1)"><div class="step-number">1</div><span class="step-label">Proposta</span></div>
+                    <div class="step" data-step="2" onclick="showPage(2)"><div class="step-number">2</div><span class="step-label">Termos</span></div>
+                    <div class="step" data-step="3" onclick="showPage(3)"><div class="step-number">3</div><span class="step-label">Pagamento</span></div>
+                    <div class="step" data-step="4" onclick="showPage(4)"><div class="step-number">4</div><span class="step-label">Dados</span></div>
+                    <div class="step" data-step="5" onclick="showPage(5)"><div class="step-number">5</div><span class="step-label">Finalizar</span></div>
+                </div>
+            </div>
+
+            <main class="p-4 sm:p-6 md:p-10 flex-grow">
                 
-                <!-- ESTADO 1: VERIFICAÇÃO -->
-                <div id="verifySection" class="app-card-face w-full">
-                    <div class="bg-slate-50 border border-slate-200 rounded-lg p-6 transition-all duration-300">
-                        <h2 class="text-xl md:text-2xl font-bold text-blue-900 text-center mb-6">Identifique sua Recompensa</h2>
-                        <div class="space-y-6 max-w-lg mx-auto">
-                            <div>
-                                <label for="obraNumero" class="block text-sm font-medium text-gray-700 mb-1">Número da Obra</label>
-                                <div class="relative">
-                                    <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3"><i class="fa-solid fa-hashtag text-gray-400"></i></div>
-                                    <input type="text" id="obraNumero" placeholder="Ex: 2025-123" class="w-full pl-10 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition-colors">
+                <!-- PÁGINA 1: PROPOSTA -->
+                <div class="page active" id="page1">
+                    <h2 class="font-bold text-blue-900 text-center mb-8 pb-4 border-b-2">
+                        Contrato de Prestação de Serviço
+                    </h2>
+                    
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 md:p-6 mb-8 text-sm">
+                        <p><strong class="font-semibold text-gray-700">Cliente:</strong> <span id="infoClienteNome"></span></p>
+                        <p class="mt-1"><strong class="font-semibold text-gray-700">Endereço da Obra:</strong> <span id="infoObraEndereco"></span></p>
+                        <p class="mt-1"><strong class="font-semibold text-gray-700">Data:</strong> <span id="infoPropostaData"></span></p>
+                    </div>
+
+                    <h3 class="text-xl md:text-2xl font-semibold text-blue-800 mb-6 border-b pb-2">Serviços Contratados:</h3>
+                    <div class="space-y-4 mb-8" id="listaServicos">
+                        <!-- SERVIÇOS SERÃO INJETADOS AQUI VIA JS -->
+                    </div>
+                    <div class="bg-blue-100 text-blue-900 font-bold text-center py-4 mt-6 rounded-lg text-lg md:text-xl" id="subtotalServicosContainer">
+                        Subtotal Serviços: <span id="subtotalServicos"></span>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-8 mt-8">
+                        <div class="bg-green-50 border-l-4 border-green-500 rounded-lg p-4 md:p-6 shadow-sm">
+                            <h4 class="text-lg md:text-xl font-semibold text-gray-900 mb-4">Serviços Inclusos no Processo:</h4>
+                            <div class="grid grid-cols-1 gap-4 text-sm">
+                                <div class="bg-white p-4 rounded-lg shadow-md" id="servicoInclusoART" style="display: none;">
+                                    <p class="font-bold">Anotação de Responsabilidade Técnica (ART)</p>
+                                    <p class="text-gray-600">Registro junto ao CREA-PR</p>
+                                </div>
+                                <div class="bg-white p-4 rounded-lg shadow-md">
+                                    <p class="font-bold">Gerenciamento de Obra</p>
+                                    <p class="text-gray-600">Acompanhamento técnico completo</p>
                                 </div>
                             </div>
-                            <div>
-                                <label for="senhaRecompensa" class="block text-sm font-medium text-gray-700 mb-1">Código de Resgate</label>
-                                <div class="relative">
-                                    <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3"><i class="fa-solid fa-key text-gray-400"></i></div>
-                                    <input type="password" id="senhaRecompensa" placeholder="Código único da sua recompensa" class="w-full pl-10 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition-colors">
+                        </div>
+                        <div class="bg-gray-100 rounded-lg p-4 md:p-6 shadow-sm" id="materiaisContainer">
+                            <h4 class="text-lg md:text-xl font-semibold text-gray-900 mb-4">Materiais Inclusos:</h4>
+                            <div class="space-y-3" id="listaMateriais">
+                                <!-- MATERIAIS SERÃO INJETADOS AQUI VIA JS -->
+                            </div>
+                            <div class="bg-blue-100 text-blue-900 font-bold text-center py-4 mt-6 rounded-lg text-lg md:text-xl" id="subtotalMateriaisContainer">
+                                Subtotal Materiais: <span id="subtotalMateriais"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 md:p-6 mt-8 shadow-sm">
+                        <h4 class="text-lg md:text-xl font-semibold text-yellow-800 mb-4">Observações Importantes</h4>
+                        <ul id="listaObservacoes" class="list-disc list-inside text-sm text-gray-600 space-y-1">
+                            <!-- OBSERVAÇÕES SERÃO INJETADAS AQUI VIA JS -->
+                        </ul>
+                    </div>
+                    
+                    <div class="bg-gray-100 border-l-4 border-blue-500 rounded-lg p-4 md:p-6 mt-8 shadow-sm">
+                        <h3 class="text-lg md:text-xl font-semibold text-blue-900 mb-5">Concordância de Nota Fiscal</h3>
+                        <div class="flex flex-col space-y-4 text-sm text-gray-700">
+                            <label class="flex items-center cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-all">
+                                <input type="radio" name="invoiceOption" value="cliente" id="invoiceOptionCliente" onchange="updateCalculations()" checked class="mr-3 h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300">
+                                Não será necessário nota fiscal, o cliente fica responsável pela emissão da nota.
+                            </label>
+                            <label class="flex items-center cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-all">
+                                <input type="radio" name="invoiceOption" value="emitir" id="invoiceOptionEmitir" onchange="updateCalculations()" class="mr-3 h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300">
+                                Será necessário emitir nota fiscal (acréscimo de 17% sobre o valor final).
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="bg-blue-900 text-white rounded-lg p-6 md:p-8 text-center shadow-2xl mt-8 total-section">
+                        <h3 class="text-xl md:text-2xl font-bold mb-2">Valor Total do Investimento</h3>
+                        <div class="bg-gray-100 bg-opacity-20 rounded-lg p-4 mb-4">
+                            <p class="text-gray-200 text-base md:text-lg line-through" id="originalPriceDisplay"></p>
+                            <div class="font-extrabold my-2" id="finalPriceDisplay"></div>
+                            <p class="text-xs md:text-sm opacity-80 italic" id="discountExplanation"></p>
+                        </div>
+                        <p class="text-sm opacity-80 mt-2">Prazo de Execução: <span id="prazoExecucao"></span></p>
+                    </div>
+
+                    <div class="mt-8">
+                        <button class="w-full bg-blue-600 text-white text-lg font-semibold py-4 rounded-lg shadow-xl hover:bg-blue-700 transition-colors duration-300 transform hover:scale-105 btn-pulse" onclick="nextPage()">
+                            Aceitar Proposta e Continuar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- PÁGINA 2: TERMOS -->
+                <div class="page" id="page2">
+                    <h2 class="font-bold text-blue-900 text-center mb-8 pb-4 border-b-2">
+                        Termo de Ciência e Responsabilidade
+                    </h2>
+                    
+                    <p class="text-center text-gray-600 italic mb-8 bg-blue-50 p-4 md:p-6 rounded-lg text-sm md:text-base border-l-4 border-blue-200">
+                        Para garantir transparência total no nosso trabalho, queremos esclarecer alguns pontos importantes sobre o processo de reforma:
+                    </p>
+                    
+                    <div class="bg-gray-100 rounded-lg p-4 md:p-8 shadow-sm border-l-4 border-blue-500 space-y-6 max-h-[500px] overflow-y-auto" id="termsContainer">
+                        <div>
+                            <h3 class="text-lg md:text-xl font-semibold text-gray-900 mb-3">Proteção de Móveis e Objetos</h3>
+                            <ul class="space-y-3 text-sm text-gray-700 list-disc list-inside">
+                                <li>Nossa equipe fará a proteção dos móveis conforme padrão do mercado.</li>
+                                <li class="bg-red-100 border border-red-300 text-red-800 p-4 rounded-lg"><strong class="font-semibold">Importante:</strong> Após a proteção ser instalada, o cliente deve verificar e aprovar se está adequada.</li>
+                                <li>Uma vez aprovada a proteção pelo cliente, a responsabilidade por eventuais danos fica transferida.</li>
+                                <li>Mesmo com toda proteção e cuidado, reformas envolvem movimentação constante de materiais, podendo ocorrer impactos acidentais.</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h3 class="text-lg md:text-xl font-semibold text-gray-900 mb-3">Objetos de Valor</h3>
+                            <ul class="space-y-3 text-sm text-gray-700 list-disc list-inside">
+                                <li class="bg-yellow-100 border border-yellow-300 text-yellow-800 p-4 rounded-lg"><strong class="font-semibold">Obrigatório:</strong> Itens de grande valor (financeiro ou sentimental) devem ser removidos do ambiente.</li>
+                                <li><strong class="font-semibold">Apenas quando for impossível remover:</strong> guardar em cômodo que não será reformado ou solicitar isolamento especial.</li>
+                                <li>A empresa não se responsabiliza por objetos de valor que permaneceram no local mesmo após orientação.</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h3 class="text-lg md:text-xl font-semibold text-gray-900 mb-3">Durante a Execução</h3>
+                            <ul class="space-y-3 text-sm text-gray-700 list-disc list-inside">
+                                <li>Geração de pó é inevitável (mesmo com proteção).</li>
+                                <li>A reorganização final dos móveis não está incluída no serviço.</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h3 class="text-lg md:text-xl font-semibold text-gray-900 mb-3">Particularidades da Obra</h3>
+                            <ul id="listaParticularidades" class="list-disc list-inside text-sm text-gray-700 space-y-2">
+                                <!-- ITENS INJETADOS VIA JS -->
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div id="agreeTermsContainer" class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 md:p-6 mt-8 shadow-sm flex items-center">
+                        <input type="checkbox" id="agreeTerms" onchange="checkTermsAgreement()" class="mr-3 h-6 w-6 text-yellow-600 focus:ring-yellow-500 border-gray-300 rounded" disabled>
+                        <label for="agreeTerms" class="text-sm cursor-pointer text-gray-700">
+                            <strong class="font-semibold">Li e estou de acordo com os Termos de Ciência e Responsabilidade acima.</strong>
+                        </label>
+                    </div>
+
+                    <div class="flex flex-col md:flex-row gap-4 mt-8">
+                        <button class="flex-1 bg-gray-500 text-white font-semibold py-4 rounded-lg shadow-md hover:bg-gray-600 transition-colors duration-300" aria-label="Voltar para página anterior" onclick="prevPage()">
+                            <i class="fa-solid fa-arrow-left mr-2" aria-hidden="true"></i>Voltar
+                        </button>
+                        <button class="flex-1 bg-blue-600 text-white font-semibold py-4 rounded-lg shadow-md hover:bg-blue-700 transition-colors duration-300 disabled:bg-gray-400 disabled:cursor-not-allowed" id="confirmTermsBtn" aria-label="Confirmar termos e avançar" onclick="nextPage()" disabled>
+                            Confirmar e Avançar<i class="fa-solid fa-arrow-right ml-2" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- PÁGINA 3: PAGAMENTO -->
+                <div class="page" id="page3">
+                    <h2 class="font-bold text-blue-900 text-center mb-8 pb-4 border-b-2">
+                        Condições de Pagamento
+                    </h2>
+                    <div class="bg-blue-900 text-white rounded-lg p-6 md:p-8 text-center shadow-2xl mt-8 total-section">
+                        <h3 class="text-xl md:text-2xl font-bold mb-2">Valor Total do Investimento</h3>
+                        <div class="bg-gray-100 bg-opacity-20 rounded-lg p-4 mb-4">
+                            <p class="text-gray-200 text-base md:text-lg line-through" id="originalPriceDisplayPage3"></p>
+                            <div class="font-extrabold my-2" id="finalPriceDisplayPage3"></div>
+                            <p class="text-xs md:text-sm opacity-80 italic" id="discountExplanationPage3"></p>
+                        </div>
+                    </div>
+                    <div id="mainPaymentChoices" class="bg-gray-100 border-l-4 border-blue-500 rounded-lg p-4 md:p-6 mt-8 shadow-sm">
+                        <h3 class="text-xl md:text-2xl font-semibold text-blue-900 mb-5">Escolha sua Forma de Pagamento:</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-center">
+                            <div class="bg-white border border-gray-300 hover:border-blue-500 p-6 rounded-lg shadow-sm cursor-pointer transition-all duration-300" onclick="showCashPayment()">
+                                <i class="fa-solid fa-money-bill-wave text-4xl text-blue-500 mb-4"></i>
+                                <h4 class="text-lg md:text-xl font-semibold text-blue-800 mb-2">Pagamento apenas em Dinheiro</h4>
+                                <p class="text-sm text-gray-600">Condições tradicionais de pagamento parcelado</p>
+                            </div>
+                            <div class="bg-white border border-gray-300 hover:border-green-500 p-6 rounded-lg shadow-sm cursor-pointer transition-all duration-300" onclick="showTokenPayment()">
+                                <i class="fa-brands fa-bitcoin text-4xl text-green-500 mb-4"></i>
+                                <h4 class="text-lg md:text-xl font-semibold text-blue-800 mb-2">Pagamento com Tokens MAEOKA + Dinheiro</h4>
+                                <p class="text-sm text-gray-600" id="tokenOfferText"></p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="mainBackBtnContainer" class="flex justify-end mt-8">
+                        <button class="bg-gray-500 text-white font-semibold py-4 px-10 rounded-lg shadow-md hover:bg-gray-600 transition-colors duration-300" aria-label="Voltar para página anterior" onclick="prevPage()">
+                            <i class="fa-solid fa-arrow-left mr-2" aria-hidden="true"></i>Voltar
+                        </button>
+                    </div>
+
+                    <!-- Seção Dinheiro -->
+                    <div class="hidden mt-8" id="cashPaymentContent">
+                        <h3 class="text-xl md:text-2xl font-semibold text-gray-900 mb-5">Condições de Pagamento</h3>
+                        <div class="bg-gray-50 border-l-4 border-green-500 rounded-lg p-4 md:p-6 shadow-sm">
+                            <ul class="list-disc list-inside text-sm md:text-base text-gray-700 space-y-2" id="cashPaymentBreakdown">
+                                <!-- PARCELAS SERÃO INJETADAS AQUI -->
+                            </ul>
+                        </div>
+                        <div class="flex flex-col md:flex-row gap-4 mt-8">
+                            <button class="flex-1 bg-gray-500 text-white font-semibold py-4 rounded-lg shadow-md hover:bg-gray-600 transition-colors duration-300" aria-label="Voltar para escolhas de pagamento" onclick="hideAllPaymentSections()">
+                                <i class="fa-solid fa-arrow-left mr-2" aria-hidden="true"></i>Voltar
+                            </button>
+                            <button class="flex-1 bg-blue-600 text-white font-semibold py-3 rounded-lg shadow-md hover:bg-blue-700 transition-colors duration-300 flex flex-col items-center justify-center" aria-label="Continuar com pagamento em dinheiro" onclick="nextPage()">
+                                <span class="font-bold">Continuar com Pagamento</span>
+                                <span class="text-xs font-normal opacity-90">em Dinheiro <i class="fa-solid fa-arrow-right ml-1" aria-hidden="true"></i></span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Seção Tokens -->
+                    <div class="hidden mt-8" id="tokenPaymentContent">
+                        <h4 class="text-xl md:text-2xl font-semibold text-gray-900 mb-5">Pagamento com Tokens MAEOKA</h4>
+                        <div class="bg-yellow-100 text-yellow-800 font-semibold text-center py-3 rounded-lg border border-yellow-300 mb-5" id="statusCarteira">
+                            <i class="fa-solid fa-link mr-2" aria-hidden="true"></i>Conecte sua carteira para pagar com tokens
+                        </div>
+                        <div id="tonConnectButton" class="flex justify-center my-4"></div>
+                        <div class="bg-white p-5 rounded-lg shadow-inner border border-gray-200 mt-6 hidden" id="walletInfo">
+                            <h5 class="text-lg font-semibold text-gray-800">Sua Carteira</h5>
+                            <p class="text-sm mt-2"><strong>Endereço:</strong></p>
+                            <div class="bg-gray-100 text-xs font-mono p-2 rounded break-all border mt-1" id="enderecoCarteira"></div>
+                            <p class="text-sm mt-2"><strong>Saldo:</strong> <span id="saldoTokens" class="font-bold">0 MAEOKA</span></p>
+                        </div>
+                        <div class="bg-blue-50 p-4 md:p-6 rounded-lg border border-blue-200 mt-6 hidden" id="calculadoraTokens">
+                            <h5 class="text-xl font-semibold text-blue-900 mb-1">Calculadora de Pagamento</h5>
+                            <p class="text-sm text-gray-600 mb-4" id="tokenCalculatorOfferText"></p>
+                            <div class="bg-white p-4 rounded-lg border border-gray-200">
+                                <label for="tokenInput" class="block text-sm font-semibold text-gray-800 mb-2">Tokens a usar:</label>
+                                <div class="flex flex-col sm:flex-row items-center gap-4 mt-2">
+                                    <input type="range" min="0" max="1000" value="0" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer" id="sliderTokens">
+                                    <input type="number" id="tokenInput" min="0" max="1000" value="0" class="w-full sm:w-32 p-2 border border-gray-300 rounded-lg text-sm text-center">
                                 </div>
                             </div>
-                            <button id="btnVerify" class="w-full bg-blue-600 text-white text-lg font-semibold py-3 rounded-lg shadow-xl hover:bg-blue-700 transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-3">
-                                <div class="spinner" id="verifySpinner"></div>
-                                <span id="verifyBtnText">🔍 VERIFICAR RECOMPENSA</span>
+                            <div class="bg-white p-5 rounded-lg mt-6 border-l-4 border-blue-500">
+                                <h6 class="font-bold text-lg text-blue-800 mb-3">Resumo do Pagamento</h6>
+                                <div class="space-y-2 text-sm">
+                                    <div class="flex justify-between pb-1 border-b"><span class="text-gray-600">Valor original da obra:</span><span id="valorOriginalObra"></span></div>
+                                    <div class="flex justify-between pb-1 border-b"><span class="text-gray-600">Tokens a usar:</span><span class="font-semibold" id="resumoTokens">0 MAEOKA (R$ 0,00)</span></div>
+                                    <div class="flex justify-between pb-1 border-b"><span class="text-gray-600" id="resumoDescontoLabel"></span><span class="text-green-600 font-semibold" id="resumoDesconto">- R$ 0,00</span></div>
+                                    <div class="flex justify-between pb-1 border-b"><span class="text-gray-600">Valor em dinheiro:</span><span class="font-semibold" id="resumoDinheiro"></span></div>
+                                    <div class="flex justify-between pt-3 border-t-2 border-blue-500 text-base md:text-lg font-bold"><span>Total a Pagar:</span><span id="resumoTotal"></span></div>
+                                    <div class="flex justify-between pt-2 text-green-600 font-bold text-base md:text-lg"><span>Economia:</span><span id="resumoEconomia">R$ 0,00</span></div>
+                                </div>
+                            </div>
+                            <button class="w-full bg-blue-600 text-white text-lg font-semibold py-3 rounded-lg shadow-xl hover:bg-blue-700 transition-colors duration-300 disabled:bg-gray-400 disabled:cursor-not-allowed mt-6" id="btnEnviarTokens" onclick="enviarTokens()"></button>
+                        </div>
+                        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-5 mt-6 shadow-sm hidden" id="adjustedPaymentConditions">
+                            <h4 class="text-lg md:text-xl font-semibold text-yellow-800 mb-4">Condições (Valor Restante em Dinheiro)</h4>
+                            <ul class="list-disc list-inside text-sm text-gray-700 space-y-2" id="tokenPaymentBreakdown"></ul>
+                            <div class="bg-green-100 text-green-800 p-3 rounded-lg mt-4 text-sm font-semibold border border-green-300" id="cashbackContainer"></div>
+                        </div>
+                        <div class="flex flex-col md:flex-row gap-4 mt-8">
+                            <button class="flex-1 bg-gray-500 text-white font-semibold py-4 rounded-lg shadow-md hover:bg-gray-600 transition-colors duration-300" aria-label="Voltar para escolhas de pagamento" onclick="hideAllPaymentSections()">
+                                <i class="fa-solid fa-arrow-left mr-2" aria-hidden="true"></i>Voltar
+                            </button>
+                            <button class="flex-1 bg-blue-600 text-white font-semibold py-4 rounded-lg shadow-md hover:bg-blue-700 transition-colors duration-300 disabled:bg-gray-400 disabled:cursor-not-allowed" id="continueTokenBtn" disabled onclick="nextPage()">
+                                Continuar<i class="fa-solid fa-arrow-right ml-2" aria-hidden="true"></i>
                             </button>
                         </div>
                     </div>
                 </div>
 
-                <!-- ESTADO 2: INFORMAÇÕES DA RECOMPENSA -->
-                <div id="rewardSection" class="hidden opacity-0 transition-opacity duration-500">
-                    <!-- Recompensa Disponível -->
-                    <div id="rewardAvailable" class="hidden fade-in-up">
-                        <h2 class="text-2xl md:text-3xl font-bold text-green-600 text-center mb-6">✅ Recompensa Encontrada!</h2>
-                        <div class="reward-ticket p-6 mb-6 text-sm">
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3">
-                                <div><strong class="text-slate-800">Obra:</strong> <span id="infoObra"></span></div>
-                                <div><strong class="text-slate-800">Cliente:</strong> <span id="infoCliente"></span></div>
-                                <div><strong class="text-slate-800">Indicador:</strong> <span id="infoIndicador"></span></div>
-                                <div><strong class="text-slate-800">Valor da Obra:</strong> R$ <span id="infoValor"></span></div>
+                <!-- PÁGINA 4: DADOS -->
+                <div class="page" id="page4">
+                    <h2 class="font-bold text-blue-900 text-center mb-8 pb-4 border-b-2">
+                        Dados do Contratante
+                    </h2>
+                    <form id="clientForm" class="space-y-6" novalidate>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="form-group">
+                                <label for="fullName" class="block text-sm font-medium text-gray-700 mb-1">Nome Completo *</label>
+                                <input type="text" id="fullName" name="fullName" autocomplete="name" required placeholder="Ex: João da Silva" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                                <p class="text-red-500 text-xs mt-1 hidden" id="fullNameError">Campo obrigatório</p>
+                            </div>
+                            <div class="form-group">
+                                <label for="cpf" class="block text-sm font-medium text-gray-700 mb-1">CPF *</label>
+                                <input type="text" id="cpf" name="cpf" autocomplete="off" required placeholder="000.000.000-00" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                                <p class="text-red-500 text-xs mt-1 hidden" id="cpfError">CPF inválido</p>
                             </div>
                         </div>
-                        <div class="bg-blue-900 text-white rounded-lg p-6 text-center shadow-lg my-6">
-                            <h3 class="text-base md:text-lg font-bold opacity-80">Você vai receber</h3>
-                            <div class="text-4xl md:text-5xl font-extrabold my-2" id="infoTokens">0 MAEOKA</div>
-                            <p class="text-sm md:text-base opacity-80">Equivalente a R$ <span id="infoValorTokens">0,00</span></p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="form-group">
+                                <label for="email" class="block text-sm font-medium text-gray-700 mb-1">E-mail *</label>
+                                <input type="email" id="email" name="email" autocomplete="email" required placeholder="Ex: joao.silva@email.com" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                                <p class="text-red-500 text-xs mt-1 hidden" id="emailError">E-mail inválido</p>
+                            </div>
+                            <div class="form-group">
+                                <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">Telefone/WhatsApp *</label>
+                                <input type="tel" id="phone" name="phone" autocomplete="tel" required placeholder="(41) 99999-9999" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                                <p class="text-red-500 text-xs mt-1 hidden" id="phoneError">Telefone inválido</p>
+                            </div>
                         </div>
-                        <div id="tonConnectButton" class="flex justify-center my-6"></div>
-                        <button id="btnClaim" class="w-full bg-green-600 text-white text-lg font-semibold py-3 rounded-lg shadow-md hover:bg-green-700 transition-all disabled:bg-slate-400 disabled:cursor-not-allowed flex items-center justify-center gap-3" disabled>
-                            <div class="spinner" id="claimSpinner"></div>
-                            <span id="claimBtnText">📝 SOLICITAR RECOMPENSA</span>
-                        </button>
-                    </div>
-                    <!-- Recompensa Já Resgatada -->
-                    <div id="rewardClaimed" class="hidden fade-in-up">
-                        <h2 class="text-2xl md:text-3xl font-bold text-yellow-600 text-center mb-2">⚠️ Recompensa Já Resgatada</h2>
-                        <p class="text-center text-gray-600 mb-6">Esta recompensa foi solicitada para a carteira abaixo.</p>
-                        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 md:p-6 text-center">
-                            <p class="font-semibold text-yellow-800">Carteira de Destino:</p>
-                            <div class="bg-white text-xs md:text-sm font-mono p-3 rounded break-all border mt-2" id="claimedWalletAddress"></div>
+                        <div class="form-group">
+                            <label for="address" class="block text-sm font-medium text-gray-700 mb-1">Endereço de Domicílio *</label>
+                            <textarea id="address" name="address" rows="3" autocomplete="street-address" required placeholder="Ex: Rua das Flores, 123, Centro, Curitiba - PR, 80000-000" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"></textarea>
+                            <p class="text-red-500 text-xs mt-1 hidden" id="addressError">Campo obrigatório</p>
                         </div>
-                    </div>
-                    <div class="mt-6 text-center">
-                        <button onclick="restartProcess()" class="bg-slate-500 text-white font-semibold py-2 px-6 rounded-lg shadow-md hover:bg-slate-600 transition-colors">
-                            <i class="fa-solid fa-magnifying-glass mr-2"></i>Verificar Outra
-                        </button>
-                    </div>
+                        <div class="form-group">
+                            <label for="observations" class="block text-sm font-medium text-gray-700 mb-1">Observações Adicionais</label>
+                            <textarea id="observations" name="observations" rows="3" placeholder="Alguma informação adicional importante..." class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"></textarea>
+                        </div>
+                        
+                        <div class="bg-gray-100 border border-gray-200 rounded-lg p-6 text-sm text-gray-700">
+                            <h4 class="text-lg font-semibold text-gray-900 mb-3">Proteção de Dados Pessoais (LGPD)</h4>
+                            <p class="leading-relaxed">
+                                <strong class="font-semibold">Como utilizamos seus dados:</strong><br>
+                                • Seus dados serão utilizados exclusivamente para execução do contrato<br>
+                                • Comunicação sobre o andamento da obra e serviços<br>
+                                • Cumprimento de obrigações legais e fiscais<br>
+                                • Não compartilhamos dados com terceiros sem autorização<br>
+                                • Você pode solicitar exclusão dos dados a qualquer momento
+                            </p>
+                        </div>
+                        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-6 flex items-center text-sm text-gray-700">
+                            <input type="checkbox" id="lgpdAccepted" required class="mr-3 h-5 w-5 text-yellow-600 focus:ring-yellow-500 rounded">
+                            <label for="lgpdAccepted" class="cursor-pointer">
+                                <strong class="font-semibold">Autorizo o tratamento dos meus dados pessoais pela Maeoka Engenharia conforme descrito acima, de acordo com a Lei Geral de Proteção de Dados (LGPD - Lei 13.709/2018).</strong>
+                            </label>
+                        </div>
+                        
+                        <div class="flex flex-col md:flex-row gap-4 mt-8">
+                            <button type="button" class="flex-1 bg-gray-500 text-white font-semibold py-4 rounded-lg shadow-md hover:bg-gray-600 transition-colors duration-300" aria-label="Voltar para página anterior" onclick="prevPage()">
+                                <i class="fa-solid fa-arrow-left mr-2" aria-hidden="true"></i>Voltar
+                            </button>
+                            <button type="submit" class="flex-1 bg-blue-600 text-white font-semibold py-3 rounded-lg shadow-md hover:bg-blue-700 transition-colors duration-300 disabled:bg-gray-400 disabled:cursor-not-allowed flex flex-col items-center justify-center" id="submitBtn" aria-label="Finalizar contratação" disabled>
+                                <span class="font-bold">Finalizar Contratação</span>
+                                <span class="text-xs font-normal opacity-90">e Gerar Documento <i class="fa-solid fa-arrow-right ml-1" aria-hidden="true"></i></span>
+                            </button>
+                        </div>
+                    </form>
                 </div>
 
-                <!-- ESTADO 3: SUCESSO -->
-                <div id="successSection" class="hidden opacity-0 transition-opacity duration-500 text-center fade-in-up">
-                    <div class="text-7xl text-green-500 mb-4"><i class="fa-solid fa-party-horn"></i></div>
-                    <h2 class="text-3xl md:text-4xl font-bold text-green-700 mb-4">Solicitação Registrada!</h2>
-                    <p class="text-base md:text-lg text-gray-700 mb-6">Sua solicitação foi enviada com sucesso.</p>
-                    <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 space-y-4 text-left">
-                        <p><strong>Tokens solicitados:</strong> <span class="font-bold text-blue-700" id="successTokens"></span></p>
-                        <p><strong>Carteira de Destino:</strong></p>
-                        <div class="bg-slate-100 text-xs md:text-sm font-mono p-3 rounded break-all border" id="successWallet"></div>
+                <!-- PÁGINA 5: FINALIZAÇÃO -->
+                <div class="page" id="page5">
+                    <div id="loadingState" class="flex flex-col items-center justify-center text-center h-full pt-10">
+                        <div class="spinner" style="width: 50px; height: 50px; border-top-color: #3b82f6; border-width: 5px;"></div>
+                        <h2 class="text-2xl font-semibold text-gray-700 mt-6">Finalizando Contratação...</h2>
+                        <p id="statusMessage" class="text-gray-500 mt-2">Enviando contrato para a Maeoka Engenharia...</p>
                     </div>
-                    <div class="mt-8">
-                         <button onclick="restartProcess()" class="bg-blue-600 text-white text-lg font-semibold py-3 px-8 rounded-lg shadow-md hover:bg-blue-700 transition-colors">
-                             <i class="fa-solid fa-gift mr-2"></i>Resgatar Outra Recompensa
-                         </button>
+
+                    <div id="successState" class="hidden">
+                        <div class="text-center">
+                            <div class="text-7xl md:text-8xl text-green-500 mb-4"><i class="fa-solid fa-circle-check"></i></div>
+                            <h2 class="font-display text-gray-800">Contratação Realizada!</h2>
+                            <p class="text-base md:text-lg text-gray-600 mt-2 mb-8">Obrigado por escolher a Maeoka Engenharia. Estamos ansiosos para começar.</p>
+                        </div>
+
+                        <div class="bg-slate-50 border border-slate-200 rounded-xl p-6 mb-8">
+                            <h3 class="text-xl font-display text-gray-800 mb-4">Resumo Final</h3>
+                            <div id="finalSummary" class="text-sm space-y-2 text-gray-700"></div>
+                            <div class="mt-4 pt-4 border-t border-slate-200">
+                                <p><strong>Protocolo:</strong> <span id="protocolNumber" class="font-mono text-blue-700"></span></p>
+                                <p><strong>Data/Hora:</strong> <span id="contractDateTime" class="font-mono"></span></p>
+                            </div>
+                        </div>
+
+                        <div class="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-8">
+                            <h3 class="text-xl font-display text-gray-800 mb-4">Próximos Passos</h3>
+                            <ul class="space-y-3 text-sm md:text-base">
+                                <li class="flex items-center gap-3"><span class="flex items-center justify-center h-8 w-8 rounded-full bg-blue-500 text-white font-bold shrink-0">1</span><span>Baixe o documento gerado para seus arquivos.</span></li>
+                                <li class="flex items-center gap-3"><span class="flex items-center justify-center h-8 w-8 rounded-full bg-blue-500 text-white font-bold shrink-0">2</span><span>Nossa equipe entrará em contato via WhatsApp para agendar a vistoria técnica.</span></li>
+                                <li class="flex items-center gap-3"><span class="flex items-center justify-center h-8 w-8 rounded-full bg-blue-500 text-white font-bold shrink-0">3</span><span>Definiremos o cronograma detalhado e a data de início da obra.</span></li>
+                            </ul>
+                        </div>
+                        
+                        <div class="mt-10 flex flex-col md:flex-row gap-4">
+                            <button class="btn btn-danger" onclick="downloadContractHTML()">
+                                <i class="fa-solid fa-file-arrow-down"></i> Baixar Documento
+                            </button>
+                            <button class="btn btn-secondary" onclick="restartProcess()">
+                                <i class="fa-solid fa-redo"></i> Nova Contratação
+                            </button>
+                        </div>
                     </div>
                 </div>
-
             </main>
         </div>
     </div>
-    
-    <!-- MODAL DE FEEDBACK -->
-    <div id="feedbackModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4 transition-opacity duration-300" onclick="closeModal()">
-        <div class="bg-white rounded-2xl shadow-xl p-6 md:p-8 w-full max-w-md text-center transform transition-all duration-300 scale-95" onclick="event.stopPropagation()">
-            <div id="modalIcon" class="text-5xl mb-4"></div>
-            <h3 id="modalTitle" class="text-xl md:text-2xl font-bold mb-4"></h3>
-            <p id="modalMessage" class="text-gray-600 mb-6"></p>
-            <button onclick="closeModal()" class="w-full bg-blue-600 text-white font-semibold py-3 px-8 rounded-lg hover:bg-blue-700 transition-colors">OK</button>
+
+    <div id="llmModal" class="modal hidden" tabindex="-1" aria-modal="true" role="dialog">
+        <div class="bg-white rounded-xl shadow-lg p-6 md:p-8 w-11/12 max-w-lg relative m-4">
+            <button class="absolute top-4 right-4 text-gray-400 text-2xl hover:text-gray-800 transition-colors" aria-label="Fechar modal" onclick="closeModal()"><i class="fa-solid fa-xmark"></i></button>
+            <h3 id="modalTitle" class="text-2xl font-display text-gray-800 text-center mb-4"></h3>
+            <div id="modalBody" class="text-sm text-gray-700 leading-relaxed max-h-96 overflow-y-auto"></div>
+            <div id="modalButtons" class="mt-6 flex justify-end gap-4"></div>
         </div>
     </div>
 
-    <script>
-        // --- CONFIGURAÇÕES E CONSTANTES ---
-        const API_URL = 'https://script.google.com/macros/s/AKfycbxWiKqFxvCaPqKgZM7sjNBrimnXOoiGOgCgXzX_UjtUV95EMotoJAzO-yzgtVl-WkyG/exec';
-        const TON_MANIFEST_URL = 'https://ton-connect.github.io/demo-dapp-with-wallet/tonconnect-manifest.json';
-        const API_ACTIONS = { VERIFY: 'verificar', GET_FULL_DATA: 'buscarCompleto', CLAIM: 'claim' };
+<script>
+// ====================================================================================
+// PASSO 1: COLE AQUI A "FICHA DE CADASTRO" (JSON) DO NOVO CLIENTE
+// ====================================================================================
+const dadosDoContrato = {
+    "cliente": {
+        "nome": "Bruno Brand e Ana Paula Giffoni Neubauer"
+    },
+    "obra": {
+        "endereco": "R. Eng. Niepce da Silva, 144 - Portão, Curitiba - PR, 80610-280 (Condomínio Le Jardin)",
+        "prazoExecucao": "45-90 dias",
+        "particularidades": [
+            "Não inclui emissão de Anotação de Responsabilidade Técnica (ART).",
+            "O cliente se compromete a fornecer as caçambas para a remoção dos entulhos.",
+            "Serviços extras (elétrica, iluminação) não estão no escopo e serão cobrados à parte (apenas mão de obra)."
+        ]
+    },
+    "escopo": {
+        "incluiART": false
+    },
+    "proposta": {
+        "validadeDias": 30
+    },
+    "servicos": [
+        { "nome": "ETAPA 1 – Proteções, Abertura, Demolição e Retiradas", "detalhes": "Proteção de bens, retirada de itens, demolição de paredes/pisos e aberturas.", "preco": 10000.00 },
+        { "nome": "ETAPA 2 – Instalação de Revestimento e Regularizações", "detalhes": "Instalação de porcelanato, azulejos, rejunte e regularização de portas.", "preco": 10000.00 },
+        { "nome": "ETAPA 3 - Pintura e Conclusão", "detalhes": "Pintura lisa interna completa e retoques finais.", "preco": 5000.00 },
+        { "nome": "Administração de Obra", "detalhes": "Gerenciamento completo da obra e assistência na compra de materiais.", "preco": 4200.00 }
+    ],
+    "materiais": {
+        "itens": [
+            { "nome": "Responsabilidade do Cliente", "detalhes": "O cliente é responsável pela aquisição dos materiais." },
+            { "nome": "Assistência na Compra", "detalhes": "A administração da obra oferecerá assistência, buscando melhores preços." }
+        ],
+        "subtotal": 0.00
+    },
+    "financeiro": {
+        "subtotalServicos": 29200.00,
+        "valorOrcadoOriginal": 29200.00,
+        "valorFinalComDesconto": 27740.00,
+        "motivoDesconto": "Desconto de 5% para pagamento via PIX.",
+        "pagamentoParcelas": [
+            { "etapa": "Entrada (Execução Etapa 1)", "percentual": 0.3424657534, "descricao": "40% do subtotal de execução" },
+            { "etapa": "Início (Administração)", "percentual": 0.0719178082, "descricao": "50% do subtotal de administração" },
+            { "etapa": "Conclusão Etapa 2", "percentual": 0.3424657534, "descricao": "40% do subtotal de execução" },
+            { "etapa": "Conclusão Etapa 3", "percentual": 0.1712328767, "descricao": "20% do subtotal de execução" },
+            { "etapa": "Conclusão Final (Administração)", "percentual": 0.0719178082, "descricao": "50% do subtotal de administração" }
+        ]
+    },
+    "observacoes": [
+        "Equipamentos necessários são de responsabilidade dos profissionais contratados."
+    ],
+    "tokens": {
+        "tokenAddress": "EQCUgsVus4fW5TY2bxBQWSyiwLETOr2iNlVied-szVuJ1t4W",
+        "walletAddress": "UQCI80_zNVLySHf1DZbxfVw52DMPQj8EAOMcDn9TlvsjC341",
+        "limitePercentual": 0.40,
+        "descontoPercentual": 0.10,
+        "cashbackPercentual": 0.03
+    }
+};
+// ====================================================================================
+// FIM DA ÁREA DE EDIÇÃO
+// ====================================================================================
 
-        // --- CACHE DE ELEMENTOS DO DOM ---
-        const DOMElements = {
-            appCard: document.getElementById('appCard'),
-            verifySection: document.getElementById('verifySection'),
-            rewardSection: document.getElementById('rewardSection'),
-            successSection: document.getElementById('successSection'),
-            obraNumeroInput: document.getElementById('obraNumero'),
-            senhaRecompensaInput: document.getElementById('senhaRecompensa'),
-            btnVerify: document.getElementById('btnVerify'),
-            verifySpinner: document.getElementById('verifySpinner'),
-            verifyBtnText: document.getElementById('verifyBtnText'),
-            rewardAvailable: document.getElementById('rewardAvailable'),
-            rewardClaimed: document.getElementById('rewardClaimed'),
-            infoObra: document.getElementById('infoObra'),
-            infoCliente: document.getElementById('infoCliente'),
-            infoIndicador: document.getElementById('infoIndicador'),
-            infoValor: document.getElementById('infoValor'),
-            infoTokens: document.getElementById('infoTokens'),
-            infoValorTokens: document.getElementById('infoValorTokens'),
-            claimedWalletAddress: document.getElementById('claimedWalletAddress'),
-            btnClaim: document.getElementById('btnClaim'),
-            claimSpinner: document.getElementById('claimSpinner'),
-            claimBtnText: document.getElementById('claimBtnText'),
-            successTokens: document.getElementById('successTokens'),
-            successWallet: document.getElementById('successWallet'),
-            feedbackModal: document.getElementById('feedbackModal'),
-            modalIcon: document.getElementById('modalIcon'),
-            modalTitle: document.getElementById('modalTitle'),
-            modalMessage: document.getElementById('modalMessage'),
+
+const TOKEN_MAEOKA = dadosDoContrato.tokens.tokenAddress;
+const CARTEIRA_MAEOKA_OFICIAL = dadosDoContrato.tokens.walletAddress;
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwBZ1yMroV2ejwzOYXAm-ZsuiqOI-vnpxJxO3AultPFEj8hVgSijBGZhPnsNj8vsZc_1w/exec';
+let VALOR_OBRA = dadosDoContrato.financeiro.valorFinalComDesconto;
+const LIMITE_PERCENTUAL_TOKENS = dadosDoContrato.tokens.limitePercentual;
+let currentPage = 1;
+let highestStepCompleted = 1;
+let totalPages = 5;
+let contracts = JSON.parse(localStorage.getItem('maeokaContracts')) || [];
+// Variáveis do sistema de tokens
+let saldoUsuario = 0;
+let enderecoUsuarioRaw = ''; 
+let tonweb = null;
+let tonConnectUI = null;
+let metodoPagamentoSelecionado = null;
+
+const statusCarteira = document.getElementById('statusCarteira');
+const walletInfo = document.getElementById('walletInfo');
+const enderecoCarteira = document.getElementById('enderecoCarteira');
+const saldoTokens = document.getElementById('saldoTokens');
+const calculadoraTokens = document.getElementById('calculadoraTokens');
+const sliderTokens = document.getElementById('sliderTokens');
+const tokenInput = document.getElementById('tokenInput');
+const btnEnviarTokens = document.getElementById('btnEnviarTokens');
+const continueTokenBtn = document.getElementById('continueTokenBtn');
+const modal = document.getElementById('llmModal');
+const modalTitle = document.getElementById('modalTitle');
+const modalBody = document.getElementById('modalBody');
+const modalButtons = document.getElementById('modalButtons');
+// Elementos do resumo
+const resumoTokens = document.getElementById('resumoTokens');
+const resumoDesconto = document.getElementById('resumoDesconto');
+const resumoDinheiro = document.getElementById('resumoDinheiro');
+const resumoTotal = document.getElementById('resumoTotal');
+const resumoEconomia = document.getElementById('resumoEconomia');
+const valorOriginalObra = document.getElementById('valorOriginalObra');
+const termsContainer = document.getElementById('termsContainer');
+const submitBtn = document.getElementById('submitBtn');
+
+function popularDadosIniciais() {
+    // Página 1
+    document.getElementById('infoClienteNome').textContent = dadosDoContrato.cliente.nome;
+    document.getElementById('infoObraEndereco').textContent = dadosDoContrato.obra.endereco;
+    document.getElementById('infoPropostaData').textContent = new Date().toLocaleDateString('pt-BR');
+
+    document.getElementById('prazoExecucao').textContent = dadosDoContrato.obra.prazoExecucao;
+
+    const listaServicos = document.getElementById('listaServicos');
+    listaServicos.innerHTML = '';
+    dadosDoContrato.servicos.forEach(s => {
+        listaServicos.innerHTML += `
+            <div class="bg-white border-l-4 border-blue-500 rounded-r-lg p-5 shadow-md transition-transform hover:scale-[1.02] service-item">
+                <p class="font-semibold text-lg text-gray-800">${s.nome}</p>
+                <div class="flex justify-between items-center text-sm mt-2 text-gray-600 service-details">
+                    <div class="flex-1 pr-4">${s.detalhes}</div>
+                    <div class="font-bold text-blue-700 text-base md:text-lg price">${formatCurrency(s.preco)}</div>
+                </div>
+            </div>`;
+    });
+
+    document.getElementById('subtotalServicos').textContent = formatCurrency(dadosDoContrato.financeiro.subtotalServicos);
+
+    if(dadosDoContrato.materiais && dadosDoContrato.materiais.itens.length > 0) {
+        const listaMateriais = document.getElementById('listaMateriais');
+        listaMateriais.innerHTML = '';
+        dadosDoContrato.materiais.itens.forEach(m => {
+            listaMateriais.innerHTML += `
+            <div class="bg-white border-l-4 border-blue-500 rounded-md p-3">
+                <p class="font-medium text-sm">${m.nome}</p>
+                <p class="text-xs text-gray-500">${m.detalhes}</p>
+            </div>`;
+        });
+        document.getElementById('subtotalMateriais').textContent = formatCurrency(dadosDoContrato.materiais.subtotal);
+    } else {
+        document.getElementById('materiaisContainer').style.display = 'none';
+    }
+
+    const listaObservacoes = document.getElementById('listaObservacoes');
+    listaObservacoes.innerHTML = '';
+    dadosDoContrato.observacoes.forEach(o => {
+        listaObservacoes.innerHTML += `<li>${o}</li>`;
+    });
+    
+    const artContainer = document.getElementById('servicoInclusoART');
+    if (dadosDoContrato.escopo && dadosDoContrato.escopo.incluiART) {
+        artContainer.style.display = 'block';
+    } else {
+        artContainer.style.display = 'none';
+    }
+
+    // Página 2
+    const particularidadesContainer = document.getElementById('listaParticularidades');
+    particularidadesContainer.innerHTML = '';
+    if (dadosDoContrato.obra.particularidades && dadosDoContrato.obra.particularidades.length > 0) {
+        dadosDoContrato.obra.particularidades.forEach(p => {
+            const li = document.createElement('li');
+            li.textContent = p;
+            particularidadesContainer.appendChild(li);
+        });
+    } else {
+        const li = document.createElement('li');
+        li.textContent = 'Nenhuma particularidade específica para esta obra.';
+        particularidadesContainer.appendChild(li);
+    }
+
+
+    // Página 3
+    const tokenOffer = `Use até ${dadosDoContrato.tokens.limitePercentual * 100}% em tokens e ganhe ${dadosDoContrato.tokens.descontoPercentual * 100}% de desconto`;
+    document.getElementById('tokenOfferText').textContent = tokenOffer;
+    document.getElementById('tokenCalculatorOfferText').innerHTML = `Use até <strong class="text-blue-700">${dadosDoContrato.tokens.limitePercentual * 100}%</strong> do valor em tokens e ganhe <strong class="text-green-600">${dadosDoContrato.tokens.descontoPercentual * 100}% de desconto</strong> sobre o valor usado.`;
+    document.getElementById('resumoDescontoLabel').textContent = `Desconto de ${dadosDoContrato.tokens.descontoPercentual * 100}%:`;
+    document.getElementById('cashbackContainer').innerHTML = `<i class="fa-solid fa-gift mr-2" aria-hidden="true"></i><strong>Cashback:</strong> Você receberá <span id="cashbackInfo">0</span> MAEOKA de volta após a conclusão da obra (${dadosDoContrato.tokens.cashbackPercentual * 100}% sobre o total)!`;
+    
+    updateCalculations();
+}
+
+function updateStepper() {
+    const progressBar = document.getElementById('stepper-progress-bar');
+    const progress = ((currentPage - 1) / (totalPages - 1)) * 100;
+    if(progressBar) progressBar.style.width = `${progress}%`;
+
+    document.querySelectorAll('.step').forEach((step, index) => {
+        const stepNumber = index + 1;
+        step.classList.remove('active', 'completed', 'future');
+
+        if (stepNumber < currentPage) {
+            step.classList.add('completed');
+        } else if (stepNumber === currentPage) {
+            step.classList.add('active');
+        }
+        
+        if (stepNumber > highestStepCompleted) {
+            step.classList.add('future');
+        } else {
+            step.classList.remove('future');
+        }
+    });
+}
+
+function showPage(pageNumber) {
+    if (pageNumber > highestStepCompleted) {
+        console.warn(`Navegação bloqueada: Etapa ${pageNumber} ainda não foi alcançada.`);
+        return;
+    }
+
+    const pages = document.querySelectorAll('.page');
+    pages.forEach(page => page.classList.remove('active'));
+    const pageToShow = document.getElementById(`page${pageNumber}`);
+    if (pageToShow) {
+        pageToShow.classList.add('active');
+        currentPage = pageNumber;
+        updateStepper();
+        window.scrollTo(0, 0);
+    }
+
+    if (pageNumber === 3) {
+        updatePaymentPageDisplay();
+    }
+
+    if (pageNumber === 2) {
+        setupTermsScroll(); 
+    }
+
+    if (pageNumber === 5) {
+        // Show loading by default
+        document.getElementById('loadingState').style.display = 'flex';
+        document.getElementById('successState').classList.add('hidden');
+        finalizeContract();
+    }
+}
+
+function nextPage() {
+    if (currentPage === 2) {
+        const termsAccepted = document.getElementById('agreeTerms').checked;
+        if (!termsAccepted) {
+            showModal('Aviso', 'Por favor, aceite os Termos de Ciência e Responsabilidade para continuar.');
+            return;
+        }
+    } else if (currentPage === 4) {
+        const isFormValid = validateForm(true);
+        if (!isFormValid) {
+            if (!document.getElementById('lgpdAccepted').checked) {
+                showModal('Aviso', 'É necessário aceitar os termos da LGPD para continuar.');
+            }
+            return; 
+        }
+    }
+
+    if (currentPage < totalPages) {
+        currentPage++;
+        if (currentPage > highestStepCompleted) {
+            highestStepCompleted = currentPage;
+        }
+        showPage(currentPage);
+    }
+}
+
+function prevPage() {
+    if (currentPage > 1) {
+        currentPage--;
+        showPage(currentPage);
+    }
+}
+
+function formatCurrency(value) {
+    return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+}
+
+function updateCalculations() {
+    const invoiceOptionEmitir = document.getElementById('invoiceOptionEmitir');
+    const originalPriceDisplay = document.getElementById('originalPriceDisplay');
+    const finalPriceDisplay = document.getElementById('finalPriceDisplay');
+    const discountExplanation = document.getElementById('discountExplanation');
+
+    let baseValue = dadosDoContrato.financeiro.valorFinalComDesconto;
+    
+    if (invoiceOptionEmitir.checked) {
+        VALOR_OBRA = baseValue * 1.17; // 17% de acréscimo
+        discountExplanation.textContent = `Com desconto aplicado + acréscimo de 17% para emissão de NF.`;
+    } else {
+        VALOR_OBRA = baseValue;
+        discountExplanation.textContent = dadosDoContrato.financeiro.motivoDesconto;
+    }
+    
+    originalPriceDisplay.textContent = `Total orçado: ${formatCurrency(dadosDoContrato.financeiro.valorOrcadoOriginal)}`;
+    finalPriceDisplay.textContent = formatCurrency(VALOR_OBRA);
+    
+    updatePaymentPageDisplay();
+    updateCashPaymentBreakdown();
+}
+
+function updatePaymentPageDisplay() {
+    const originalPriceDisplayPage3 = document.getElementById('originalPriceDisplayPage3');
+    const finalPriceDisplayPage3 = document.getElementById('finalPriceDisplayPage3');
+    const discountExplanationPage3 = document.getElementById('discountExplanationPage3');
+
+    if(originalPriceDisplayPage3) {
+        originalPriceDisplayPage3.textContent = document.getElementById('originalPriceDisplay').textContent;
+        finalPriceDisplayPage3.textContent = document.getElementById('finalPriceDisplay').textContent;
+        discountExplanationPage3.textContent = document.getElementById('discountExplanation').textContent;
+    }
+}
+
+function updateCashPaymentBreakdown() {
+    const container = document.getElementById('cashPaymentBreakdown');
+    container.innerHTML = '';
+    dadosDoContrato.financeiro.pagamentoParcelas.forEach(parcela => {
+        const valorParcela = VALOR_OBRA * parcela.percentual;
+        const li = document.createElement('li');
+        li.innerHTML = `${parcela.etapa}: ${parcela.descricao} (${formatCurrency(valorParcela)})`;
+        container.appendChild(li);
+    });
+    const liPix = document.createElement('li');
+    liPix.className = 'font-bold mt-2';
+    liPix.textContent = 'Pagamentos via PIX';
+    container.appendChild(liPix);
+}
+
+function showCashPayment() {
+    hideAllPaymentSections();
+    document.getElementById('cashPaymentContent').classList.remove('hidden');
+    document.getElementById('mainPaymentChoices').classList.add('hidden');
+    metodoPagamentoSelecionado = 'cash';
+    document.getElementById('mainBackBtnContainer').classList.add('hidden');
+}
+function showTokenPayment() {
+    hideAllPaymentSections();
+    document.getElementById('tokenPaymentContent').classList.remove('hidden');
+    document.getElementById('mainPaymentChoices').classList.add('hidden');
+    metodoPagamentoSelecionado = 'tokens';
+    document.getElementById('mainBackBtnContainer').classList.add('hidden');
+
+    if (!tonConnectUI) {
+        setTimeout(() => {
+            initializeTonConnect();
+        }, 100);
+    }
+}
+function hideAllPaymentSections() {
+    document.getElementById('cashPaymentContent').classList.add('hidden');
+    document.getElementById('tokenPaymentContent').classList.add('hidden');
+    document.getElementById('mainPaymentChoices').classList.remove('hidden');
+    metodoPagamentoSelecionado = null;
+    document.getElementById('mainBackBtnContainer').classList.remove('hidden');
+}
+
+function initializeTonWeb() {
+    try {
+        tonweb = new TonWeb(new TonWeb.HttpProvider('https://toncenter.com/api/v2/jsonRPC'));
+        return true;
+    } catch (error) {
+        console.error('Erro ao inicializar TonWeb:', error);
+        return false;
+    }
+}
+function initializeTonConnect() {
+    try {
+        tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
+            manifestUrl: 'https://ton-connect.github.io/demo-dapp-with-wallet/tonconnect-manifest.json',
+            buttonRootId: 'tonConnectButton'
+        });
+        tonConnectUI.onStatusChange(walletInfo => {
+            if (walletInfo) {
+                statusCarteira.innerHTML = `<span class="spinner mr-2"></span> Carregando saldo...`;
+                statusCarteira.className = 'bg-blue-100 text-blue-800 font-semibold text-center py-3 rounded-lg border border-blue-300 mb-5';
+                
+                enderecoUsuarioRaw = walletInfo.account.address;
+                const addressForDisplay = new TonWeb.utils.Address(enderecoUsuarioRaw);
+                enderecoCarteira.textContent = addressForDisplay.toString(true, true, false);
+                
+                document.getElementById('walletInfo').classList.remove('hidden');
+                buscarSaldoTokens();
+                
+            } else {
+                enderecoUsuarioRaw = '';
+                document.getElementById('walletInfo').classList.add('hidden');
+                calculadoraTokens.classList.add('hidden');
+                document.getElementById('adjustedPaymentConditions').classList.add('hidden');
+                statusCarteira.innerHTML = `<i class="fa-solid fa-link mr-2" aria-hidden="true"></i>Conecte sua carteira para pagar com tokens`;
+                statusCarteira.className = 'bg-yellow-100 text-yellow-800 font-semibold text-center py-3 rounded-lg border border-yellow-300 mb-5';
+            }
+        });
+    
+        return true;
+    } catch (error) {
+        console.error('Erro ao inicializar TON Connect:', error);
+        return false;
+    }
+}
+async function buscarSaldoTokens() {
+    if (!enderecoUsuarioRaw) return;
+    try {
+        console.log('🔍 Consultando saldo real na blockchain para:', enderecoUsuarioRaw);
+    
+        let retries = 0;
+        const maxRetries = 5;
+        let delay = 1000;
+        while(retries < maxRetries) {
+            try {
+                const jettonMinter = new TonWeb.token.jetton.JettonMinter(tonweb.provider, {
+                    address: TOKEN_MAEOKA
+                });
+                
+                const userJettonWalletAddress = await jettonMinter.getJettonWalletAddress(
+                    new TonWeb.utils.Address(enderecoUsuarioRaw) 
+                );
+                
+                const jettonWallet = new TonWeb.token.jetton.JettonWallet(tonweb.provider, {
+                    address: userJettonWalletAddress
+                });
+                
+                const jettonData = await jettonWallet.getData();
+                const saldoNano = jettonData.balance;
+                saldoUsuario = parseFloat(TonWeb.utils.fromNano(saldoNano));
+                
+                console.log('✅ Saldo real obtido:', saldoUsuario, 'MAEOKA');
+                break;
+            } catch (blockchainError) {
+                console.warn('⚠️ Erro na consulta blockchain:', blockchainError);
+                retries++;
+                if (retries < maxRetries) {
+                    await new Promise(res => setTimeout(res, delay));
+                    delay *= 2;
+                } else {
+                    console.error('❌ Erro final após múltiplas tentativas:', blockchainError);
+                    saldoUsuario = 0;
+                    throw blockchainError;
+                }
+            }
+        }
+    
+        statusCarteira.innerHTML = `✅ Carteira Conectada - Saldo carregado!`;
+        statusCarteira.className = 'bg-green-100 text-green-800 font-semibold text-center py-3 rounded-lg border border-green-300 mb-5';
+    
+        saldoTokens.innerHTML = `<span class="font-bold">${saldoUsuario.toLocaleString('pt-BR', {minimumFractionDigits: 2})} MAEOKA</span>`;
+    
+        const maxTokensPorLimite = VALOR_OBRA * LIMITE_PERCENTUAL_TOKENS;
+        const maxTokens = Math.min(saldoUsuario, maxTokensPorLimite);
+    
+        sliderTokens.max = Math.floor(maxTokens);
+        tokenInput.max = Math.floor(maxTokens);
+        sliderTokens.value = 0;
+        tokenInput.value = 0;
+    
+        const valorOriginalObraEl = document.getElementById('valorOriginalObra');
+        if (valorOriginalObraEl) {
+            valorOriginalObraEl.textContent = formatCurrency(VALOR_OBRA);
+        }
+    
+        if (saldoUsuario === 0) {
+            statusCarteira.innerHTML = `⚠️ Carteira conectada - Sem tokens MAEOKA`;
+            statusCarteira.className = 'bg-yellow-100 text-yellow-800 font-semibold text-center py-3 rounded-lg border border-yellow-300 mb-5';
+        
+            calculadoraTokens.innerHTML = `
+                <div class="bg-red-50 p-6 rounded-lg text-center border-2 border-red-300">
+                    <h3 class="text-xl font-bold text-red-800 mb-4"><i class="fa-solid fa-circle-exclamation mr-2" aria-hidden="true"></i>SEM TOKENS MAEOKA</h3>
+                    <p class="text-gray-700">Sua carteira não possui tokens MAEOKA.</p>
+                    <p class="text-sm text-gray-500 mt-2">Para usar esta opção de pagamento, você precisa ter tokens MAEOKA em sua carteira.</p>
+                    <a href="https://example.com/adquirir-tokens" target="_blank" class="text-blue-600 hover:underline">Como adquirir tokens?</a>
+                </div>
+            `;
+            updateAdjustedPaymentConditions(VALOR_OBRA);
+            document.getElementById('adjustedPaymentConditions').classList.remove('hidden');
+        } else {
+            atualizarCalculos(0);
+        }
+    
+        calculadoraTokens.classList.remove('hidden');
+    
+    } catch (error) {
+        console.error('❌ Erro geral na busca de saldo:', error);
+        statusCarteira.innerHTML = `❌ Erro ao consultar saldo`;
+        statusCarteira.className = 'bg-red-100 text-red-800 font-semibold text-center py-3 rounded-lg border border-red-300 mb-5';
+    }
+}
+function atualizarCalculos(tokensValue) {
+    resumoTokens.textContent = `${tokensValue.toLocaleString('pt-BR')} MAEOKA (${formatCurrency(tokensValue)})`;
+
+    const desconto = tokensValue * dadosDoContrato.tokens.descontoPercentual;
+    resumoDesconto.textContent = `- ${formatCurrency(desconto)}`;
+
+    const valorDinheiro = VALOR_OBRA - tokensValue - desconto;
+    resumoDinheiro.textContent = formatCurrency(valorDinheiro);
+
+    resumoTotal.textContent = formatCurrency(valorDinheiro);
+
+    const economiaTotal = tokensValue + desconto;
+    resumoEconomia.textContent = formatCurrency(economiaTotal);
+
+    if (tokensValue > 0) {
+        btnEnviarTokens.disabled = false;
+        btnEnviarTokens.innerHTML = `
+            <div class="flex flex-col items-center justify-center">
+                <span class="font-bold text-base md:text-lg">
+                    <i class="fa-solid fa-credit-card mr-2" aria-hidden="true"></i>
+                    PAGAR COM ${tokensValue.toLocaleString('pt-BR')} TOKENS
+                </span>
+                <span class="text-xs font-normal opacity-90 -mt-1">
+                    + restante em dinheiro
+                </span>
+            </div>`;
+        continueTokenBtn.disabled = true;
+    } else {
+        btnEnviarTokens.disabled = true;
+        btnEnviarTokens.innerHTML = `
+            <div class="flex flex-col items-center justify-center">
+                <span class="font-bold text-base md:text-lg">
+                    <i class="fa-solid fa-credit-card mr-2" aria-hidden="true"></i>
+                    PAGAR COM TOKENS
+                </span>
+                <span class="text-xs font-normal opacity-90 -mt-1">
+                    Selecione a quantidade acima
+                </span>
+            </div>`;
+        continueTokenBtn.disabled = false;
+        continueTokenBtn.innerHTML = '✅ Continuar sem Tokens <i class="fa-solid fa-arrow-right ml-2" aria-hidden="true"></i>';
+    }
+    updateAdjustedPaymentConditions(valorDinheiro);
+    document.getElementById('adjustedPaymentConditions').classList.remove('hidden');
+}
+function updateAdjustedPaymentConditions(valorDinheiro) {
+    const container = document.getElementById('tokenPaymentBreakdown');
+    container.innerHTML = '';
+    dadosDoContrato.financeiro.pagamentoParcelas.forEach(parcela => {
+        const valorParcela = valorDinheiro * parcela.percentual;
+        const li = document.createElement('li');
+        li.innerHTML = `${parcela.etapa}: ${parcela.descricao} (<span class="font-bold">${formatCurrency(valorParcela)}</span>)`;
+        container.appendChild(li);
+    });
+    const liPix = document.createElement('li');
+    liPix.className = 'font-bold mt-2';
+    liPix.textContent = 'Pagamentos via PIX';
+    container.appendChild(liPix);
+
+    const cashback = Math.floor(VALOR_OBRA * dadosDoContrato.tokens.cashbackPercentual);
+    document.getElementById('cashbackInfo').textContent = `${cashback.toLocaleString('pt-BR')} MAEOKA`;
+}
+async function enviarTokens() {
+    const tokensValue = parseInt(sliderTokens.value);
+
+    if (tokensValue === 0) {
+        showModal('Aviso', 'Selecione uma quantidade de tokens para enviar!');
+        return;
+    }
+
+    if (tokensValue > saldoUsuario) {
+        showModal('Aviso', 'Você não tem tokens suficientes!');
+        return;
+    }
+
+    btnEnviarTokens.disabled = true;
+    btnEnviarTokens.innerHTML = '<span class="spinner mr-2"></span> Enviando tokens...';
+
+    try {
+        const jettonMinter = new TonWeb.token.jetton.JettonMinter(tonweb.provider, {
+            address: TOKEN_MAEOKA
+        });
+        
+        const userJettonWalletAddress = await jettonMinter.getJettonWalletAddress(
+            new TonWeb.utils.Address(enderecoUsuarioRaw)
+        );
+        
+        const jettonWallet = new TonWeb.token.jetton.JettonWallet(tonweb.provider, {
+            address: userJettonWalletAddress
+        });
+        
+        const jettonAmount = TonWeb.utils.toNano(tokensValue.toString());
+        const forwardAmount = TonWeb.utils.toNano('0.01');
+        
+        const shortClientName = dadosDoContrato.cliente.nome.split(' ')[0];
+        const commentText = `Pgto obra ${shortClientName} - ${tokensValue} MAEOKA`;
+        const commentCell = new TonWeb.boc.Cell();
+        commentCell.bits.writeUint(0, 32);
+        commentCell.bits.writeString(commentText);
+
+        const transferBody = await jettonWallet.createTransferBody({
+            jettonAmount: jettonAmount,
+            toAddress: new TonWeb.utils.Address(CARTEIRA_MAEOKA_OFICIAL),
+            forwardAmount: forwardAmount,
+            forwardPayload: commentCell,
+            responseAddress: new TonWeb.utils.Address(enderecoUsuarioRaw)
+        });
+        
+        const transaction = {
+            validUntil: Date.now() + 5 * 60 * 1000,
+            messages: [
+                {
+                    address: userJettonWalletAddress.toString(false), 
+                    amount: TonWeb.utils.toNano('0.05').toString(),
+                    payload: TonWeb.utils.bytesToBase64(await transferBody.toBoc())
+                }
+            ]
+        };
+        
+        console.log('Construindo transação:', JSON.stringify(transaction, null, 2));
+        const result = await tonConnectUI.sendTransaction(transaction);
+        console.log('Transação enviada, resultado:', result);
+        
+        const desconto = tokensValue * dadosDoContrato.tokens.descontoPercentual;
+        const valorFinalEmDinheiro = VALOR_OBRA - tokensValue - desconto;
+        const economiaTotal = tokensValue + desconto;
+        
+        showModal('SUCESSO', `✅ TOKENS ENVIADOS COM SUCESSO!<br><br>` +
+            `💰 Tokens enviados: ${tokensValue.toLocaleString('pt-BR')} MAEOKA<br>` +
+            `💸 Desconto obtido: ${formatCurrency(desconto)}<br>` +
+            `💵 Valor restante em dinheiro: ${formatCurrency(valorFinalEmDinheiro)}<br>` +
+            `🎁 Economia total: ${formatCurrency(economiaTotal)}<br><br>` +
+            `Agora você pode continuar para a próxima etapa!`);
+        
+        btnEnviarTokens.innerHTML = '<i class="fa-solid fa-check mr-2" aria-hidden="true"></i>Tokens Enviados com Sucesso!';
+        btnEnviarTokens.className = 'w-full bg-green-600 text-white text-lg font-semibold py-4 rounded-lg shadow-xl';
+        continueTokenBtn.disabled = false;
+        continueTokenBtn.innerHTML = '✅ Continuar para Próxima Etapa <i class="fa-solid fa-arrow-right ml-2" aria-hidden="true"></i>';
+        
+    } catch (error) {
+        console.error('Erro detalhado no envio:', error);
+        
+        btnEnviarTokens.disabled = false;
+        atualizarCalculos(tokensValue); // Reset button text
+        
+        if (error.message.includes('User declined')) {
+            showModal('Envio Cancelado', 'Envio cancelado pelo usuário.');
+        } else {
+            showModal('Erro no Envio', 'Ocorreu um erro ao tentar enviar a transação: ' + error.message);
+        }
+    }
+}
+
+function checkTermsAgreement() {
+    const agreeTermsCheckbox = document.getElementById('agreeTerms');
+    const confirmTermsBtn = document.getElementById('confirmTermsBtn');
+    confirmTermsBtn.disabled = !agreeTermsCheckbox.checked;
+}
+
+function showModal(title, message, isConfirm = false, callback = null) {
+    modalTitle.innerHTML = title;
+    modalBody.innerHTML = message;
+    modalButtons.innerHTML = '';
+    modal.classList.remove('hidden');
+    modal.focus();
+
+    if (isConfirm) {
+        const cancelBtn = document.createElement('button');
+        cancelBtn.className = 'px-6 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 transition';
+        cancelBtn.setAttribute('aria-label', 'Cancelar');
+        cancelBtn.textContent = 'Cancelar';
+        cancelBtn.onclick = closeModal;
+
+        const confirmBtn = document.createElement('button');
+        confirmBtn.className = 'px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition ml-4';
+        confirmBtn.setAttribute('aria-label', 'Confirmar');
+        confirmBtn.textContent = 'Confirmar';
+        confirmBtn.onclick = () => {
+            closeModal();
+            if (callback && typeof callback === 'function') {
+                callback();
+            }
         };
 
-        // --- ESTADO DA APLICAÇÃO ---
-        let appState = { dadosRecompensa: null, enderecoUsuario: '', tonweb: null, tonConnectUI: null, isLoading: false };
+        modalButtons.appendChild(cancelBtn);
+        modalButtons.appendChild(confirmBtn);
 
-        // --- INICIALIZAÇÃO ---
-        document.addEventListener('DOMContentLoaded', () => {
-            try {
-                appState.tonweb = new TonWeb(new TonWeb.HttpProvider('https://toncenter.com/api/v2/jsonRPC'));
-            } catch (error) {
-                showModal('Erro Crítico', 'Não foi possível carregar um componente essencial. Por favor, recarregue a página.', 'error');
-            }
-            appState.tonConnectUI = new TON_CONNECT_UI.TonConnectUI({ manifestUrl: TON_MANIFEST_URL, buttonRootId: 'tonConnectButton' });
-            
-            appState.tonConnectUI.onStatusChange(walletInfo => {
-                if (walletInfo) {
-                    const rawAddress = walletInfo.account.address;
-                    try { appState.enderecoUsuario = new TonWeb.utils.Address(rawAddress).toString(true, true, false); } 
-                    catch (e) { appState.enderecoUsuario = rawAddress; }
-                    
-                    if (appState.dadosRecompensa && !appState.dadosRecompensa.claimed) {
-                        DOMElements.btnClaim.disabled = false;
-                    }
-                } else {
-                    appState.enderecoUsuario = '';
-                    DOMElements.btnClaim.disabled = true;
-                }
-            });
+    } else {
+        const okBtn = document.createElement('button');
+        okBtn.className = 'w-full bg-blue-600 text-white font-semibold py-3 px-8 rounded-lg hover:bg-blue-700 transition';
+        okBtn.textContent = 'OK';
+        okBtn.onclick = closeModal;
+        modalButtons.appendChild(okBtn);
+    }
 
-            DOMElements.btnVerify.addEventListener('click', handleVerify);
-            DOMElements.btnClaim.addEventListener('click', handleClaim);
-        });
-
-        // --- FUNÇÕES DE UI E TRANSIÇÃO DE ESTADO ---
-        function switchState(state) {
-            const sections = {
-                verify: DOMElements.verifySection,
-                reward: DOMElements.rewardSection,
-                success: DOMElements.successSection
-            };
-
-            Object.values(sections).forEach(section => {
-                section.classList.add('hidden', 'opacity-0');
-            });
-            
-            if (sections[state]) {
-                sections[state].classList.remove('hidden');
-                setTimeout(() => sections[state].classList.remove('opacity-0'), 50); // Delay for transition
-            }
+    modal.addEventListener('keydown', trapFocus);
+}
+function closeModal() {
+    modal.classList.add('hidden');
+    modal.removeEventListener('keydown', trapFocus);
+}
+function trapFocus(e) {
+    if (e.key === 'Tab') {
+        const focusable = modal.querySelectorAll('button, input, textarea, [tabindex]:not([tabindex="-1"])');
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+            last.focus();
+            e.preventDefault();
+        } else if (!e.shiftKey && document.activeElement === last) {
+            first.focus();
+            e.preventDefault();
         }
+    }
+}
+window.alert = function(message) {
+    showModal('Aviso', message);
+};
+window.confirm = function(message, callback) {
+    showModal('Confirmação', message, true, callback);
+};
 
-        function setLoading(status, buttonType) {
-            appState.isLoading = status;
-            const spinner = buttonType === 'verify' ? DOMElements.verifySpinner : DOMElements.claimSpinner;
-            const button = buttonType === 'verify' ? DOMElements.btnVerify : DOMElements.btnClaim;
-            const btnText = buttonType === 'verify' ? DOMElements.verifyBtnText : DOMElements.claimBtnText;
-            
-            spinner.style.display = status ? 'inline-block' : 'none';
-            button.disabled = status;
+function generateProtocol() {
+    const now = new Date();
+    const year = now.getFullYear().toString().slice(-2);
+    const month = (now.getMonth() + 1).toString().padStart(2, '0');
+    const day = now.getDate().toString().padStart(2, '0');
+    const hour = now.getHours().toString().padStart(2, '0');
+    const minute = now.getMinutes().toString().padStart(2, '0');
+    const second = now.getSeconds().toString().padStart(2, '0');
+    return `MAE-${year}${month}${day}-${hour}${minute}${second}`;
+}
 
-            if (status) {
-                btnText.textContent = buttonType === 'verify' ? 'VERIFICANDO...' : 'SOLICITANDO...';
+// ====================================================================================
+// FUNÇÃO CORRIGIDA
+// ====================================================================================
+function finalizeContract() {
+    const clientForm = document.getElementById('clientForm');
+    const clientData = {
+        fullName: clientForm.elements['fullName'].value,
+        cpf: clientForm.elements['cpf'].value,
+        email: clientForm.elements['email'].value,
+        phone: clientForm.elements['phone'].value,
+        address: clientForm.elements['address'].value,
+        observations: clientForm.elements['observations'].value,
+    };
+    const tokensUsados = metodoPagamentoSelecionado === 'tokens' ? Math.floor(parseFloat(sliderTokens.value)) : 0;
+    const descontoAplicado = metodoPagamentoSelecionado === 'tokens' ? tokensUsados * dadosDoContrato.tokens.descontoPercentual : 0;
+    const valorFinalDinheiro = VALOR_OBRA - tokensUsados - descontoAplicado;
+
+    const finalContractData = {
+        ...dadosDoContrato,
+        cliente: {
+            ...dadosDoContrato.cliente,
+            ...clientData
+        },
+        financeiro: {
+            ...dadosDoContrato.financeiro,
+            valorFinalDaObra: VALOR_OBRA,
+            metodoPagamento: metodoPagamentoSelecionado,
+            tokensUsados,
+            descontoAplicado,
+            valorFinalDinheiro,
+            emissaoNotaFiscal: document.getElementById('invoiceOptionEmitir').checked
+        },
+        protocolo: generateProtocol(),
+        dataContrato: new Date().toLocaleString('pt-BR'),
+        termosAceitos: document.getElementById('agreeTerms').checked,
+        lgpdAceito: document.getElementById('lgpdAccepted').checked,
+    };
+
+    contracts.push(finalContractData);
+    localStorage.setItem('maeokaContracts', JSON.stringify(contracts));
+    localStorage.setItem('currentContractDisplay', JSON.stringify(finalContractData));
+
+    // Mostra a tela de carregamento
+    document.getElementById('loadingState').style.display = 'flex';
+    document.getElementById('successState').classList.add('hidden');
+    document.getElementById('statusMessage').innerHTML = 'Enviando contrato para a Maeoka Engenharia...';
+
+    // Despacha a requisição para o Apps Script
+    sendContractToAppsScript(finalContractData).then((dispatched) => {
+        // Usa um timeout para uma melhor experiência do usuário, permitindo que ele leia a mensagem de status
+        setTimeout(() => {
+            if (dispatched) {
+                document.getElementById('statusMessage').innerHTML = '✅ Contrato enviado! Preparando o resumo final...';
             } else {
-                btnText.textContent = buttonType === 'verify' ? '🔍 VERIFICAR RECOMPENSA' : '📝 SOLICITAR RECOMPENSA';
+                document.getElementById('statusMessage').innerHTML = '⚠️ Erro ao notificar. Por favor, baixe o documento e envie manualmente.';
             }
-        }
 
-        function showModal(title, message, type = 'info') {
-            const icons = {
-                info: '<i class="fa-solid fa-circle-info text-blue-500"></i>',
-                success: '<i class="fa-solid fa-circle-check text-green-500"></i>',
-                error: '<i class="fa-solid fa-circle-xmark text-red-500"></i>',
-                warning: '<i class="fa-solid fa-circle-exclamation text-yellow-500"></i>'
-            };
-            DOMElements.modalIcon.innerHTML = icons[type] || icons['info'];
-            DOMElements.modalTitle.textContent = title;
-            DOMElements.modalMessage.innerHTML = message;
-            DOMElements.feedbackModal.classList.remove('hidden');
-            DOMElements.feedbackModal.classList.add('flex');
-            setTimeout(() => {
-                DOMElements.feedbackModal.classList.remove('opacity-0');
-                DOMElements.feedbackModal.querySelector('div > div').classList.remove('scale-95');
-            }, 10);
-        }
+            // Preenche os detalhes do resumo final
+            document.getElementById('protocolNumber').textContent = finalContractData.protocolo;
+            document.getElementById('contractDateTime').textContent = finalContractData.dataContrato;
 
-        function closeModal() {
-            DOMElements.feedbackModal.classList.add('opacity-0');
-            DOMElements.feedbackModal.querySelector('div > div').classList.add('scale-95');
-            setTimeout(() => {
-                DOMElements.feedbackModal.classList.add('hidden');
-                DOMElements.feedbackModal.classList.remove('flex');
-            }, 300);
-        }
+            document.getElementById('finalSummary').innerHTML = `
+                <div class="space-y-2 text-sm">
+                    <p><strong>Nome do Cliente:</strong> ${finalContractData.cliente.fullName}</p>
+                    <p><strong>CPF:</strong> ${finalContractData.cliente.cpf}</p>
+                    <p><strong>E-mail:</strong> ${finalContractData.cliente.email}</p>
+                    <p><strong>Endereço de Domicílio:</strong> ${finalContractData.cliente.address}</p>
+                    <p><strong>Método de Pagamento:</strong> ${finalContractData.financeiro.metodoPagamento === 'tokens' ? 'Tokens MAEOKA + Dinheiro' : 'Apenas Dinheiro'}</p>
+                    <p><strong>Valor Total da Obra:</strong> ${formatCurrency(finalContractData.financeiro.valorFinalDaObra)}</p>
+                    ${finalContractData.financeiro.metodoPagamento === 'tokens' ? `
+                    <p><strong>Tokens Usados:</strong> ${finalContractData.financeiro.tokensUsados.toLocaleString('pt-BR')} MAEOKA</p>
+                    <p><strong>Desconto com Tokens:</strong> ${formatCurrency(finalContractData.financeiro.descontoAplicado)}</p>
+                    <p><strong>Valor Final em Dinheiro:</strong> ${formatCurrency(finalContractData.financeiro.valorFinalDinheiro)}</p>
+                    <p class="text-green-600 font-semibold"><strong>Economia Total:</strong> ${formatCurrency(finalContractData.financeiro.tokensUsados + finalContractData.financeiro.descontoAplicado)}</p>
+                    ` : ''}
+                </div>
+            `;
 
-        function restartProcess() {
-            appState.dadosRecompensa = null;
-            appState.enderecoUsuario = '';
-            DOMElements.obraNumeroInput.value = '';
-            DOMElements.senhaRecompensaInput.value = '';
-            if (appState.tonConnectUI.connected) appState.tonConnectUI.disconnect();
+            // Esconde o carregamento e mostra a tela de sucesso
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('successState').classList.remove('hidden');
+        }, 2500); // Espera 2.5 segundos antes de mostrar a tela final
+    });
+}
+// ====================================================================================
+
+async function sendContractToAppsScript(contractData) {
+    try {
+        await fetch(APPS_SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                contractData: contractData
+            })
+        });
+        console.log('Requisição de envio de contrato despachada.');
+        return true;
+    } catch (error) {
+        console.error('Erro ao despachar para Apps Script:', error);
+        return false;
+    }
+}
+
+function downloadContractHTML() {
+    const contractData = JSON.parse(localStorage.getItem('currentContractDisplay'));
+
+    if (!contractData) {
+        showModal('Erro', 'Não há dados de contrato para download.');
+        return;
+    }
+
+    const servicesHTML = contractData.servicos.map(servico => `
+        <div style="background: #f0f0f0; padding: 12px; margin: 8px 0; border-radius: 5px;">
+            <strong>${servico.nome}</strong><br>
+            <span style="color: #666;">${servico.detalhes} = ${formatCurrency(servico.preco)}</span>
+        </div>
+    `).join('');
+
+    const materialsHTML = contractData.materiais.itens.map(item => `
+        <div style="background: #f0f0f0; padding: 12px; margin: 8px 0; border-radius: 5px;">
+            <strong>${item.nome}</strong><br>
+            <span style="color: #666;">${item.detalhes}</span>
+        </div>
+    `).join('');
+
+    const observationsHTML = contractData.observacoes.map(item => `<li>${item}</li>`).join('');
+
+    let paymentBreakdownHTML = '';
+    const valorBaseParcela = contractData.financeiro.metodoPagamento === 'tokens' ? contractData.financeiro.valorFinalDinheiro : contractData.financeiro.valorFinalDaObra;
+    
+    contractData.financeiro.pagamentoParcelas.forEach(p => {
+        paymentBreakdownHTML += `<p>• ${p.etapa}: ${p.descricao} (${formatCurrency(valorBaseParcela * p.percentual)})</p>`;
+    });
+
+    const htmlContent = `
+    <!DOCTYPE html>
+    <html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Contrato ${contractData.protocolo} - Maeoka Engenharia</title>
+        <style>
+            body { font-family: 'Poppins', Arial, sans-serif; margin: 20px; color: #333; line-height: 1.6; font-size: 12px; }
+            .header { background: #1e3a8a; color: white; padding: 25px; text-align: center; margin-bottom: 30px; }
+            .logo { font-size: 24px; font-weight: bold; margin-bottom: 8px; }
+            .subtitle { font-size: 12px; opacity: 0.9; }
+            .section { margin: 25px 0; padding: 20px; border-left: 4px solid #1e3a8a; background: #f8f9fa; border-radius: 0 8px 8px 0; }
+            .total { background: #1e3a8a; color: white; padding: 20px; text-align: center; font-size: 18px; font-weight: bold; border-radius: 8px; margin: 20px 0; }
+            .signature-area { border: 2px dashed #1e3a8a; padding: 40px; margin-top: 50px; text-align: center; border-radius: 8px; }
+            .signature-line { border-bottom: 1px solid #333; width: 80%; margin: 30px auto 10px auto; height: 30px; }
+            h2 { color: #1e3a8a; border-bottom: 2px solid #1e3a8a; padding-bottom: 10px; margin-bottom: 20px; text-align: center; font-size: 22px; }
+            h3 { color: #2563eb; margin-top: 25px; margin-bottom: 15px; font-size: 18px; }
+            @media print {
+                body { margin: 0; }
+                .header, .total { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="header">
+            <div class="logo">MAEOKA ENGENHARIA</div>
+            <div class="subtitle">CNPJ: 19.924.627/0001-67 • Eng. Kioma Maeoka (CREA 159.328/D-PR)</div>
+        </div>
+        <h2>CONTRATO DE PRESTAÇÃO DE SERVIÇOS DE ENGENHARIA</h2>
+    
+        <div style="background: #e0e7ff; padding: 15px; border-radius: 8px; margin-bottom: 25px;">
+            <p><strong>Protocolo:</strong> ${contractData.protocolo}</p>
+            <p><strong>Data de Aceite Digital:</strong> ${contractData.dataContrato}</p>
+        </div>
+        <div class="section">
+            <h3>👤 DADOS DO CONTRATANTE</h3>
+            <p><strong>Nome Completo:</strong> ${contractData.cliente.fullName}</p>
+            <p><strong>CPF:</strong> ${contractData.cliente.cpf}</p>
+            <p><strong>E-mail:</strong> ${contractData.cliente.email}</p>
+            <p><strong>Telefone:</strong> ${contractData.cliente.phone}</p>
+            <p><strong>Endereço de Domicílio:</strong> ${contractData.cliente.address}</p>
+        </div>
+        <div class="section">
+            <h3>📍 DADOS DA OBRA</h3>
+            <p><strong>Endereço da Obra:</strong> ${contractData.obra.endereco}</p>
+            <p><strong>Prazo de Execução:</strong> ${contractData.obra.prazoExecucao}</p>
+        </div>
+        <div class="section">
+            <h3>🔨 SERVIÇOS CONTRATADOS</h3>
+            ${servicesHTML}
+            <p style="text-align: right; font-weight: bold; color: #2563eb;">SUBTOTAL SERVIÇOS: ${formatCurrency(contractData.financeiro.subtotalServicos)}</p>
+        </div>
+        <div class="section">
+            <h3>📦 MATERIAIS INCLUSOS</h3>
+            ${materialsHTML}
+            <p style="text-align: right; font-weight: bold; color: #2563eb;">SUBTOTAL MATERIAIS: ${formatCurrency(contractData.materiais.subtotal)}</p>
+        </div>
+        <div class="section">
+            <h3>💰 CONDIÇÕES COMERCIAIS</h3>
+            <p><strong>Valor Total Orçado:</strong> ${formatCurrency(contractData.financeiro.valorOrcadoOriginal)}</p>
+            <p><strong>Valor Final com Desconto:</strong> ${formatCurrency(contractData.financeiro.valorFinalComDesconto)}</p>
+            ${contractData.financeiro.emissaoNotaFiscal ? `<p><strong>Acréscimo de NF (17%):</strong> ${formatCurrency(contractData.financeiro.valorFinalComDesconto * 0.17)}</p>` : ''}
+            <div class="total">VALOR TOTAL DO CONTRATO: ${formatCurrency(contractData.financeiro.valorFinalDaObra)}</div>
+            ${contractData.financeiro.metodoPagamento === 'tokens' ? `
+                <p><strong>Tokens Usados:</strong> ${contractData.financeiro.tokensUsados.toLocaleString('pt-BR')} MAEOKA</p>
+                <p><strong>Desconto Adicional com Tokens:</strong> ${formatCurrency(contractData.financeiro.descontoAplicado)}</p>
+                <p><strong>Valor a ser pago em Dinheiro (PIX):</strong> ${formatCurrency(contractData.financeiro.valorFinalDinheiro)}</p>
+            ` : ''}
+        </div>
+        <div class="section">
+            <h3>🗓️ PARCELAMENTO (PAGAMENTO EM DINHEIRO)</h3>
+            ${paymentBreakdownHTML}
+        </div>
+        <div class="section">
+            <h3>⚠️ OBSERVAÇÕES IMPORTANTES</h3>
+            <ul>${observationsHTML}</ul>
+        </div>
+        ${contractData.cliente.observations && contractData.cliente.observations.trim() !== '' ? `
+        <div class="section">
+            <h3>📝 OBSERVAÇÕES ADICIONAIS DO CLIENTE</h3>
+            <p>${contractData.cliente.observations}</p>
+        </div>
+        ` : ''}
+        <div class="signature-area">
+            <h3>✍️ ASSINATURAS</h3>
+            <p>Curitiba/PR, ${new Date().toLocaleDateString('pt-BR', {day: 'numeric', month: 'long', year: 'numeric'})}</p>
             
-            switchState('verify');
-        }
+            <div style="display: flex; justify-content: space-around; margin-top: 50px;">
+                <div style="text-align: center; width: 45%;">
+                    <div class="signature-line"></div>
+                    <p><strong>CONTRATANTE</strong></p>
+                    <p>${contractData.cliente.fullName}</p>
+                    <p>CPF: ${contractData.cliente.cpf}</p>
+                </div>
+                <div style="text-align: center; width: 45%;">
+                    <div class="signature-line"></div>
+                    <p><strong>CONTRATADA</strong></p>
+                    <p>Kioma Maeoka</p>
+                    <p>Engenheiro Civil - CREA 159.328/D-PR</p>
+                    <p>Maeoka Engenharia</p>
+                </div>
+            </div>
+        </div>
+        <div style="margin-top: 40px; font-size: 10px; color: #666; text-align: center; border-top: 1px solid #ddd; padding-top: 20px;">
+            <p><strong>Maeoka Engenharia</strong></p>
+            <p>Curitiba/PR • WhatsApp: (41) 98839-1153</p>
+            <p>E-mail: contato@maeokaengenharia.com.br</p>
+            <p style="margin-top: 15px; font-style: italic;">
+                Este documento foi gerado digitalmente em ${new Date().toLocaleString('pt-BR')}
+            </p>
+        </div>
+    </body>
+    </html>
+    `;
+    const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Contrato_Maeoka_${contractData.cliente.nome.split(' ')[0]}_${contractData.protocolo}.html`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
 
-        // --- LÓGICA PRINCIPAL (API E AÇÕES) ---
-        async function handleVerify() {
-            if (appState.isLoading) return;
-            const obra = DOMElements.obraNumeroInput.value.trim();
-            const senha = DOMElements.senhaRecompensaInput.value.trim();
-            if (!obra || !senha) {
-                showModal('Atenção', 'Por favor, preencha o número da obra e o código de resgate.', 'warning');
-                return;
-            }
-            setLoading(true, 'verify');
+    showModal('Download Concluído', `📄 Contrato do(a) ${contractData.cliente.nome} baixado com sucesso! Para PDF, use Ctrl+P > Salvar como PDF no browser.`);
+}
+function restartProcess() {
+    showModal('Reiniciar Contratação', 'Deseja iniciar uma nova contratação? Os dados atuais serão perdidos.', true, () => {
+        localStorage.removeItem('currentContractDisplay');
+        localStorage.removeItem('contractDraft');
+        location.reload();
+    });
+}
 
-            try {
-                const data = await apiFetch(API_ACTIONS.VERIFY, { obra, senha });
-                if (data.encontrado) {
-                    appState.dadosRecompensa = data;
-                    populateRewardInfo(data);
-                    switchState('reward');
-                    if (data.claimed === 'TRUE' || data.claimed === true) {
-                        const fullData = await apiFetch(API_ACTIONS.GET_FULL_DATA, { obra, senha });
-                        DOMElements.claimedWalletAddress.textContent = fullData.carteira || 'Endereço não disponível';
-                        DOMElements.rewardAvailable.classList.add('hidden');
-                        DOMElements.rewardClaimed.classList.remove('hidden');
-                    } else {
-                        DOMElements.rewardClaimed.classList.add('hidden');
-                        DOMElements.rewardAvailable.classList.remove('hidden');
-                    }
-                } else {
-                    showModal('Não Encontrado', 'Recompensa não encontrada.<br>Verifique os dados e tente novamente.', 'error');
-                }
-            } catch (error) {
-                showModal('Erro de Conexão', 'Não foi possível comunicar com o sistema. Tente novamente mais tarde.', 'error');
-            } finally {
-                setLoading(false, 'verify');
-            }
+// --- INICIALIZAÇÃO ---
+document.addEventListener('DOMContentLoaded', () => {
+    popularDadosIniciais();
+    initializeTonWeb();
+    applyMasks();
+    loadDraft();
+    showPage(1);
+
+    // Adiciona event listeners
+    document.getElementById('clientForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        nextPage();
+    });
+    document.getElementById('clientForm').addEventListener('input', debounce(() => {
+        validateForm(false);
+        saveDraft();
+    }, 300));
+    sliderTokens.addEventListener('input', handleSliderInput);
+    tokenInput.addEventListener('input', handleTokenInput);
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+            closeModal();
         }
+    });
+});
+
+function applyMasks() {
+    const cpfInput = document.getElementById('cpf');
+    cpfInput.addEventListener('input', (e) => {
+        let value = e.target.value.replace(/\D/g, '').slice(0, 11);
+        value = value.replace(/(\d{3})(\d)/, '$1.$2');
+        value = value.replace(/(\d{3})(\d)/, '$1.$2');
+        value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+        e.target.value = value;
+    });
+
+    const phoneInput = document.getElementById('phone');
+    phoneInput.addEventListener('input', (e) => {
+        let value = e.target.value.replace(/\D/g, '').slice(0, 11);
+        if (value.length > 10) {
+            value = value.replace(/^(\d\d)(\d{5})(\d{4}).*/, '($1) $2-$3');
+        } else if (value.length > 5) {
+            value = value.replace(/^(\d\d)(\d{4})(\d{0,4}).*/, '($1) $2-$3');
+        } else if (value.length > 2) {
+            value = value.replace(/^(\d\d)(\d*)/, '($1) $2');
+        } else {
+            value = value.replace(/^(\d*)/, '($1');
+        }
+        e.target.value = value;
+    });
+}
+
+function validarCPF(cpf) {
+    cpf = cpf.replace(/\D/g, '');
+    if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) return false;
+    let soma = 0, resto;
+    for (let i = 1; i <= 9; i++) soma += parseInt(cpf.substring(i-1, i)) * (11 - i);
+    resto = (soma * 10) % 11;
+    if ((resto === 10) || (resto === 11)) resto = 0;
+    if (resto !== parseInt(cpf.substring(9, 10))) return false;
+    soma = 0;
+    for (let i = 1; i <= 10; i++) soma += parseInt(cpf.substring(i-1, i)) * (12 - i);
+    resto = (soma * 10) % 11;
+    if ((resto === 10) || (resto === 11)) resto = 0;
+    if (resto !== parseInt(cpf.substring(10, 11))) return false;
+    return true;
+}
+
+function validateForm(showAllErrors = false) {
+    const fields = {
+        fullName: { value: document.getElementById('fullName').value.trim(), valid: (v) => v !== '', errorEl: 'fullNameError' },
+        cpf: { value: document.getElementById('cpf').value, valid: validarCPF, errorEl: 'cpfError' },
+        email: { value: document.getElementById('email').value.trim(), valid: (v) => /\S+@\S+\.\S+/.test(v), errorEl: 'emailError' },
+        phone: { value: document.getElementById('phone').value.replace(/\D/g, ''), valid: (v) => v.length >= 10, errorEl: 'phoneError' },
+        address: { value: document.getElementById('address').value.trim(), valid: (v) => v !== '', errorEl: 'addressError' },
+    };
+
+    let isFormValid = true;
+
+    for (const key in fields) {
+        const field = fields[key];
+        const isValid = field.valid(field.value);
+        const errorElement = document.getElementById(field.errorEl);
         
-        async function handleClaim() {
-            if (appState.isLoading || !appState.dadosRecompensa || !appState.enderecoUsuario) {
-                showModal('Atenção', 'Conecte sua carteira para poder solicitar a recompensa.', 'warning');
-                return;
+        if (!isValid) {
+            isFormValid = false;
+            if (showAllErrors || field.value.length > 0) {
+                errorElement.classList.remove('hidden');
             }
-            setLoading(true, 'claim');
-            try {
-                const { obra, senha } = getCredentialsFromState();
-                const result = await apiFetch(API_ACTIONS.CLAIM, { obra, senha, carteira: appState.enderecoUsuario });
-                if (result.sucesso) {
-                    displaySuccessMessage();
-                    confetti({ particleCount: 150, spread: 90, origin: { y: 0.6 } });
-                } else {
-                    throw new Error(result.mensagem || 'O sistema não conseguiu registrar a solicitação.');
-                }
-            } catch(error) {
-                showModal('Erro na Solicitação', `Ocorreu um problema: ${error.message}`, 'error');
-            } finally {
-                setLoading(false, 'claim');
-            }
+        } else {
+            errorElement.classList.add('hidden');
         }
+    }
+    
+    const lgpd = document.getElementById('lgpdAccepted').checked;
+    if (!lgpd) {
+        isFormValid = false;
+    }
+    
+    submitBtn.disabled = !isFormValid;
+    return isFormValid;
+}
 
-        // --- FUNÇÕES UTILITÁRIAS ---
-        function populateRewardInfo(data) {
-            const obraNum = DOMElements.obraNumeroInput.value.trim();
-            DOMElements.infoObra.textContent = obraNum;
-            DOMElements.infoCliente.textContent = data.cliente;
-            DOMElements.infoIndicador.textContent = data.indicador;
-            DOMElements.infoValor.textContent = data.valor.toLocaleString('pt-BR');
-            DOMElements.infoTokens.textContent = `${data.tokens.toLocaleString('pt-BR')} MAEOKA`;
-            DOMElements.infoValorTokens.textContent = data.tokens.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
-        }
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+function setupTermsScroll() {
+    const agreeTermsCheckbox = document.getElementById('agreeTerms');
+    const agreeTermsContainer = document.getElementById('agreeTermsContainer');
+    if (termsContainer && agreeTermsCheckbox && agreeTermsContainer) {
+        agreeTermsCheckbox.disabled = true;
+        agreeTermsContainer.style.opacity = '0.5'; 
+        agreeTermsContainer.style.cursor = 'not-allowed';
+
+        const revealCheckbox = () => {
+            agreeTermsContainer.style.opacity = '1';
+            agreeTermsContainer.style.cursor = 'default';
+            agreeTermsCheckbox.disabled = false;
+            termsContainer.removeEventListener('scroll', checkScroll);
+        };
+
+        const checkScroll = () => {
+            const isAtBottom = termsContainer.scrollHeight - termsContainer.scrollTop <= termsContainer.clientHeight + 5;
+            if (isAtBottom) {
+                revealCheckbox();
+            }
+        };
         
-        function displaySuccessMessage() {
-            const { tokens } = appState.dadosRecompensa;
-            DOMElements.successTokens.textContent = `${tokens.toLocaleString('pt-BR')} MAEOKA`;
-            DOMElements.successWallet.textContent = appState.enderecoUsuario;
-            switchState('success');
-        }
+        termsContainer.addEventListener('scroll', checkScroll);
 
-        function getCredentialsFromState() {
-            return {
-                obra: DOMElements.obraNumeroInput.value.trim(),
-                senha: DOMElements.senhaRecompensaInput.value.trim()
-            };
+        if (termsContainer.scrollHeight <= termsContainer.clientHeight) {
+            revealCheckbox();
         }
+    }
+}
 
-        async function apiFetch(action, params) {
-            const url = new URL(API_URL);
-            url.searchParams.append('action', action);
-            for (const key in params) url.searchParams.append(key, params[key]);
-            const response = await fetch(url);
-            if (!response.ok) throw new Error(`Erro na API (status: ${response.status})`);
-            return response.json();
-        }
-    </script>
+function saveDraft() {
+    const formData = {
+        fullName: document.getElementById('fullName').value,
+        cpf: document.getElementById('cpf').value,
+        email: document.getElementById('email').value,
+        phone: document.getElementById('phone').value,
+        address: document.getElementById('address').value,
+        observations: document.getElementById('observations').value,
+    };
+    localStorage.setItem('contractDraft', JSON.stringify(formData));
+}
+function loadDraft() {
+    const draft = JSON.parse(localStorage.getItem('contractDraft'));
+    if (draft) {
+        document.getElementById('fullName').value = draft.fullName || '';
+        document.getElementById('cpf').value = draft.cpf || '';
+        document.getElementById('email').value = draft.email || '';
+        document.getElementById('phone').value = draft.phone || '';
+        document.getElementById('address').value = draft.address || '';
+        document.getElementById('observations').value = draft.observations || '';
+        validateForm();
+    }
+}
+
+function handleSliderInput(e) {
+    const value = Math.floor(parseFloat(e.target.value));
+    tokenInput.value = value;
+    atualizarCalculos(value);
+}
+
+function handleTokenInput(e) {
+    let value = Math.floor(parseFloat(e.target.value));
+    const max = parseFloat(e.target.max);
+    if (isNaN(value) || value < 0) value = 0;
+    if (value > max) value = max;
+    e.target.value = value;
+    sliderTokens.value = value;
+    atualizarCalculos(value);
+}
+
+</script>
 </body>
 </html>
