@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resgate de Recompensas - Maeoka Tokens</title>
+    <!-- Fontes e Ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" xintegrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Source+Code+Pro:wght@400;600&display=swap" rel="stylesheet">
+    
+    <!-- Bibliotecas JS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@tonconnect/ui@2.0.9/dist/tonconnect-ui.min.js"></script>
+    <script src="https://unpkg.com/tonweb/dist/tonweb.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+    <style>
+        /* --- ESTILOS GERAIS E FONTES --- */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f0f4f8; /* Tom de azul/cinza mais claro */
+            background-image: radial-gradient(#dbeafe 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        .font-mono { font-family: 'Source Code Pro', monospace; }
+
+        /* --- ANIMAÇÕES E TRANSIÇÕES --- */
+        .app-card-face {
+            backface-visibility: hidden;
+            transition: transform 0.6s, opacity 0.5s;
+            transform-style: preserve-3d;
+        }
+        .app-card-face.is-flipped {
+            transform: rotateY(180deg);
+        }
+        .app-card-face-back {
+            transform: rotateY(180deg);
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.5s ease-out forwards;
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- SPINNER MELHORADO --- */
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .spinner {
+            width: 20px; height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        /* --- ESTILOS DO CARTÃO DE RECOMPENSA --- */
+        .reward-ticket {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-left: 8px dashed #3b82f6;
+            position: relative;
+        }
+        .reward-ticket::before, .reward-ticket::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: #f0f4f8;
+            border-radius: 50%;
+            left: -14px;
+        }
+        .reward-ticket::before { top: -10px; }
+        .reward-ticket::after { bottom: -10px; }
+
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4">
+
+    <div id="appContainer" class="w-full max-w-2xl">
+        <div id="appCard" class="bg-white rounded-2xl shadow-2xl overflow-hidden transition-all duration-500">
+            <header class="bg-gradient-to-r from-blue-900 to-blue-600 text-white text-center p-6 md:p-8 shadow-lg relative overflow-hidden">
+                <div class="absolute -top-4 -left-4 w-24 h-24 bg-white/10 rounded-full"></div>
+                <div class="absolute -bottom-8 -right-2 w-32 h-32 bg-white/10 rounded-full"></div>
+                <h1 class="text-2xl md:text-4xl font-bold tracking-wide mb-2 relative z-10">🎁 RESGATE DE RECOMPENSAS</h1>
+                <p class="text-xs md:text-sm opacity-90 relative z-10">Sistema de Cashback Maeoka Tokens</p>
+            </header>
+
+            <main class="p-6 md:p-10 min-h-[400px] flex flex-col justify-center">
+                
+                <!-- ESTADO 1: VERIFICAÇÃO -->
+                <div id="verifySection" class="app-card-face w-full">
+                    <div class="bg-slate-50 border border-slate-200 rounded-lg p-6 transition-all duration-300">
+                        <h2 class="text-xl md:text-2xl font-bold text-blue-900 text-center mb-6">Identifique sua Recompensa</h2>
+                        <div class="space-y-6 max-w-lg mx-auto">
+                            <div>
+                                <label for="obraNumero" class="block text-sm font-medium text-gray-700 mb-1">Número da Obra</label>
+                                <div class="relative">
+                                    <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3"><i class="fa-solid fa-hashtag text-gray-400"></i></div>
+                                    <input type="text" id="obraNumero" placeholder="Ex: 2025-123" class="w-full pl-10 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition-colors">
+                                </div>
+                            </div>
+                            <div>
+                                <label for="senhaRecompensa" class="block text-sm font-medium text-gray-700 mb-1">Código de Resgate</label>
+                                <div class="relative">
+                                    <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3"><i class="fa-solid fa-key text-gray-400"></i></div>
+                                    <input type="password" id="senhaRecompensa" placeholder="Código único da sua recompensa" class="w-full pl-10 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition-colors">
+                                </div>
+                            </div>
+                            <button id="btnVerify" class="w-full bg-blue-600 text-white text-lg font-semibold py-3 rounded-lg shadow-xl hover:bg-blue-700 transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-3">
+                                <div class="spinner" id="verifySpinner"></div>
+                                <span id="verifyBtnText">🔍 VERIFICAR RECOMPENSA</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ESTADO 2: INFORMAÇÕES DA RECOMPENSA -->
+                <div id="rewardSection" class="hidden opacity-0 transition-opacity duration-500">
+                    <!-- Recompensa Disponível -->
+                    <div id="rewardAvailable" class="hidden fade-in-up">
+                        <h2 class="text-2xl md:text-3xl font-bold text-green-600 text-center mb-6">✅ Recompensa Encontrada!</h2>
+                        <div class="reward-ticket p-6 mb-6 text-sm">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3">
+                                <div><strong class="text-slate-800">Obra:</strong> <span id="infoObra"></span></div>
+                                <div><strong class="text-slate-800">Cliente:</strong> <span id="infoCliente"></span></div>
+                                <div><strong class="text-slate-800">Indicador:</strong> <span id="infoIndicador"></span></div>
+                                <div><strong class="text-slate-800">Valor da Obra:</strong> R$ <span id="infoValor"></span></div>
+                            </div>
+                        </div>
+                        <div class="bg-blue-900 text-white rounded-lg p-6 text-center shadow-lg my-6">
+                            <h3 class="text-base md:text-lg font-bold opacity-80">Você vai receber</h3>
+                            <div class="text-4xl md:text-5xl font-extrabold my-2" id="infoTokens">0 MAEOKA</div>
+                            <p class="text-sm md:text-base opacity-80">Equivalente a R$ <span id="infoValorTokens">0,00</span></p>
+                        </div>
+                        <div id="tonConnectButton" class="flex justify-center my-6"></div>
+                        <button id="btnClaim" class="w-full bg-green-600 text-white text-lg font-semibold py-3 rounded-lg shadow-md hover:bg-green-700 transition-all disabled:bg-slate-400 disabled:cursor-not-allowed flex items-center justify-center gap-3" disabled>
+                            <div class="spinner" id="claimSpinner"></div>
+                            <span id="claimBtnText">📝 SOLICITAR RECOMPENSA</span>
+                        </button>
+                    </div>
+                    <!-- Recompensa Já Resgatada -->
+                    <div id="rewardClaimed" class="hidden fade-in-up">
+                        <h2 class="text-2xl md:text-3xl font-bold text-yellow-600 text-center mb-2">⚠️ Recompensa Já Resgatada</h2>
+                        <p class="text-center text-gray-600 mb-6">Esta recompensa foi solicitada para a carteira abaixo.</p>
+                        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 md:p-6 text-center">
+                            <p class="font-semibold text-yellow-800">Carteira de Destino:</p>
+                            <div class="bg-white text-xs md:text-sm font-mono p-3 rounded break-all border mt-2" id="claimedWalletAddress"></div>
+                        </div>
+                    </div>
+                    <div class="mt-6 text-center">
+                        <button onclick="restartProcess()" class="bg-slate-500 text-white font-semibold py-2 px-6 rounded-lg shadow-md hover:bg-slate-600 transition-colors">
+                            <i class="fa-solid fa-magnifying-glass mr-2"></i>Verificar Outra
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ESTADO 3: SUCESSO -->
+                <div id="successSection" class="hidden opacity-0 transition-opacity duration-500 text-center fade-in-up">
+                    <div class="text-7xl text-green-500 mb-4"><i class="fa-solid fa-party-horn"></i></div>
+                    <h2 class="text-3xl md:text-4xl font-bold text-green-700 mb-4">Solicitação Registrada!</h2>
+                    <p class="text-base md:text-lg text-gray-700 mb-6">Sua solicitação foi enviada com sucesso.</p>
+                    <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 space-y-4 text-left">
+                        <p><strong>Tokens solicitados:</strong> <span class="font-bold text-blue-700" id="successTokens"></span></p>
+                        <p><strong>Carteira de Destino:</strong></p>
+                        <div class="bg-slate-100 text-xs md:text-sm font-mono p-3 rounded break-all border" id="successWallet"></div>
+                    </div>
+                    <div class="mt-8">
+                         <button onclick="restartProcess()" class="bg-blue-600 text-white text-lg font-semibold py-3 px-8 rounded-lg shadow-md hover:bg-blue-700 transition-colors">
+                             <i class="fa-solid fa-gift mr-2"></i>Resgatar Outra Recompensa
+                         </button>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+    
+    <!-- MODAL DE FEEDBACK -->
+    <div id="feedbackModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4 transition-opacity duration-300" onclick="closeModal()">
+        <div class="bg-white rounded-2xl shadow-xl p-6 md:p-8 w-full max-w-md text-center transform transition-all duration-300 scale-95" onclick="event.stopPropagation()">
+            <div id="modalIcon" class="text-5xl mb-4"></div>
+            <h3 id="modalTitle" class="text-xl md:text-2xl font-bold mb-4"></h3>
+            <p id="modalMessage" class="text-gray-600 mb-6"></p>
+            <button onclick="closeModal()" class="w-full bg-blue-600 text-white font-semibold py-3 px-8 rounded-lg hover:bg-blue-700 transition-colors">OK</button>
+        </div>
+    </div>
+
+    <script>
+        // --- CONFIGURAÇÕES E CONSTANTES ---
+        const API_URL = 'https://script.google.com/macros/s/AKfycbxWiKqFxvCaPqKgZM7sjNBrimnXOoiGOgCgXzX_UjtUV95EMotoJAzO-yzgtVl-WkyG/exec';
+        const TON_MANIFEST_URL = 'https://ton-connect.github.io/demo-dapp-with-wallet/tonconnect-manifest.json';
+        const API_ACTIONS = { VERIFY: 'verificar', GET_FULL_DATA: 'buscarCompleto', CLAIM: 'claim' };
+
+        // --- CACHE DE ELEMENTOS DO DOM ---
+        const DOMElements = {
+            appCard: document.getElementById('appCard'),
+            verifySection: document.getElementById('verifySection'),
+            rewardSection: document.getElementById('rewardSection'),
+            successSection: document.getElementById('successSection'),
+            obraNumeroInput: document.getElementById('obraNumero'),
+            senhaRecompensaInput: document.getElementById('senhaRecompensa'),
+            btnVerify: document.getElementById('btnVerify'),
+            verifySpinner: document.getElementById('verifySpinner'),
+            verifyBtnText: document.getElementById('verifyBtnText'),
+            rewardAvailable: document.getElementById('rewardAvailable'),
+            rewardClaimed: document.getElementById('rewardClaimed'),
+            infoObra: document.getElementById('infoObra'),
+            infoCliente: document.getElementById('infoCliente'),
+            infoIndicador: document.getElementById('infoIndicador'),
+            infoValor: document.getElementById('infoValor'),
+            infoTokens: document.getElementById('infoTokens'),
+            infoValorTokens: document.getElementById('infoValorTokens'),
+            claimedWalletAddress: document.getElementById('claimedWalletAddress'),
+            btnClaim: document.getElementById('btnClaim'),
+            claimSpinner: document.getElementById('claimSpinner'),
+            claimBtnText: document.getElementById('claimBtnText'),
+            successTokens: document.getElementById('successTokens'),
+            successWallet: document.getElementById('successWallet'),
+            feedbackModal: document.getElementById('feedbackModal'),
+            modalIcon: document.getElementById('modalIcon'),
+            modalTitle: document.getElementById('modalTitle'),
+            modalMessage: document.getElementById('modalMessage'),
+        };
+
+        // --- ESTADO DA APLICAÇÃO ---
+        let appState = { dadosRecompensa: null, enderecoUsuario: '', tonweb: null, tonConnectUI: null, isLoading: false };
+
+        // --- INICIALIZAÇÃO ---
+        document.addEventListener('DOMContentLoaded', () => {
+            try {
+                appState.tonweb = new TonWeb(new TonWeb.HttpProvider('https://toncenter.com/api/v2/jsonRPC'));
+            } catch (error) {
+                showModal('Erro Crítico', 'Não foi possível carregar um componente essencial. Por favor, recarregue a página.', 'error');
+            }
+            appState.tonConnectUI = new TON_CONNECT_UI.TonConnectUI({ manifestUrl: TON_MANIFEST_URL, buttonRootId: 'tonConnectButton' });
+            
+            appState.tonConnectUI.onStatusChange(walletInfo => {
+                if (walletInfo) {
+                    const rawAddress = walletInfo.account.address;
+                    try { appState.enderecoUsuario = new TonWeb.utils.Address(rawAddress).toString(true, true, false); } 
+                    catch (e) { appState.enderecoUsuario = rawAddress; }
+                    
+                    if (appState.dadosRecompensa && !appState.dadosRecompensa.claimed) {
+                        DOMElements.btnClaim.disabled = false;
+                    }
+                } else {
+                    appState.enderecoUsuario = '';
+                    DOMElements.btnClaim.disabled = true;
+                }
+            });
+
+            DOMElements.btnVerify.addEventListener('click', handleVerify);
+            DOMElements.btnClaim.addEventListener('click', handleClaim);
+        });
+
+        // --- FUNÇÕES DE UI E TRANSIÇÃO DE ESTADO ---
+        function switchState(state) {
+            const sections = {
+                verify: DOMElements.verifySection,
+                reward: DOMElements.rewardSection,
+                success: DOMElements.successSection
+            };
+
+            Object.values(sections).forEach(section => {
+                section.classList.add('hidden', 'opacity-0');
+            });
+            
+            if (sections[state]) {
+                sections[state].classList.remove('hidden');
+                setTimeout(() => sections[state].classList.remove('opacity-0'), 50); // Delay for transition
+            }
+        }
+
+        function setLoading(status, buttonType) {
+            appState.isLoading = status;
+            const spinner = buttonType === 'verify' ? DOMElements.verifySpinner : DOMElements.claimSpinner;
+            const button = buttonType === 'verify' ? DOMElements.btnVerify : DOMElements.btnClaim;
+            const btnText = buttonType === 'verify' ? DOMElements.verifyBtnText : DOMElements.claimBtnText;
+            
+            spinner.style.display = status ? 'inline-block' : 'none';
+            button.disabled = status;
+
+            if (status) {
+                btnText.textContent = buttonType === 'verify' ? 'VERIFICANDO...' : 'SOLICITANDO...';
+            } else {
+                btnText.textContent = buttonType === 'verify' ? '🔍 VERIFICAR RECOMPENSA' : '📝 SOLICITAR RECOMPENSA';
+            }
+        }
+
+        function showModal(title, message, type = 'info') {
+            const icons = {
+                info: '<i class="fa-solid fa-circle-info text-blue-500"></i>',
+                success: '<i class="fa-solid fa-circle-check text-green-500"></i>',
+                error: '<i class="fa-solid fa-circle-xmark text-red-500"></i>',
+                warning: '<i class="fa-solid fa-circle-exclamation text-yellow-500"></i>'
+            };
+            DOMElements.modalIcon.innerHTML = icons[type] || icons['info'];
+            DOMElements.modalTitle.textContent = title;
+            DOMElements.modalMessage.innerHTML = message;
+            DOMElements.feedbackModal.classList.remove('hidden');
+            DOMElements.feedbackModal.classList.add('flex');
+            setTimeout(() => {
+                DOMElements.feedbackModal.classList.remove('opacity-0');
+                DOMElements.feedbackModal.querySelector('div > div').classList.remove('scale-95');
+            }, 10);
+        }
+
+        function closeModal() {
+            DOMElements.feedbackModal.classList.add('opacity-0');
+            DOMElements.feedbackModal.querySelector('div > div').classList.add('scale-95');
+            setTimeout(() => {
+                DOMElements.feedbackModal.classList.add('hidden');
+                DOMElements.feedbackModal.classList.remove('flex');
+            }, 300);
+        }
+
+        function restartProcess() {
+            appState.dadosRecompensa = null;
+            appState.enderecoUsuario = '';
+            DOMElements.obraNumeroInput.value = '';
+            DOMElements.senhaRecompensaInput.value = '';
+            if (appState.tonConnectUI.connected) appState.tonConnectUI.disconnect();
+            
+            switchState('verify');
+        }
+
+        // --- LÓGICA PRINCIPAL (API E AÇÕES) ---
+        async function handleVerify() {
+            if (appState.isLoading) return;
+            const obra = DOMElements.obraNumeroInput.value.trim();
+            const senha = DOMElements.senhaRecompensaInput.value.trim();
+            if (!obra || !senha) {
+                showModal('Atenção', 'Por favor, preencha o número da obra e o código de resgate.', 'warning');
+                return;
+            }
+            setLoading(true, 'verify');
+
+            try {
+                const data = await apiFetch(API_ACTIONS.VERIFY, { obra, senha });
+                if (data.encontrado) {
+                    appState.dadosRecompensa = data;
+                    populateRewardInfo(data);
+                    switchState('reward');
+                    if (data.claimed === 'TRUE' || data.claimed === true) {
+                        const fullData = await apiFetch(API_ACTIONS.GET_FULL_DATA, { obra, senha });
+                        DOMElements.claimedWalletAddress.textContent = fullData.carteira || 'Endereço não disponível';
+                        DOMElements.rewardAvailable.classList.add('hidden');
+                        DOMElements.rewardClaimed.classList.remove('hidden');
+                    } else {
+                        DOMElements.rewardClaimed.classList.add('hidden');
+                        DOMElements.rewardAvailable.classList.remove('hidden');
+                    }
+                } else {
+                    showModal('Não Encontrado', 'Recompensa não encontrada.<br>Verifique os dados e tente novamente.', 'error');
+                }
+            } catch (error) {
+                showModal('Erro de Conexão', 'Não foi possível comunicar com o sistema. Tente novamente mais tarde.', 'error');
+            } finally {
+                setLoading(false, 'verify');
+            }
+        }
+        
+        async function handleClaim() {
+            if (appState.isLoading || !appState.dadosRecompensa || !appState.enderecoUsuario) {
+                showModal('Atenção', 'Conecte sua carteira para poder solicitar a recompensa.', 'warning');
+                return;
+            }
+            setLoading(true, 'claim');
+            try {
+                const { obra, senha } = getCredentialsFromState();
+                const result = await apiFetch(API_ACTIONS.CLAIM, { obra, senha, carteira: appState.enderecoUsuario });
+                if (result.sucesso) {
+                    displaySuccessMessage();
+                    confetti({ particleCount: 150, spread: 90, origin: { y: 0.6 } });
+                } else {
+                    throw new Error(result.mensagem || 'O sistema não conseguiu registrar a solicitação.');
+                }
+            } catch(error) {
+                showModal('Erro na Solicitação', `Ocorreu um problema: ${error.message}`, 'error');
+            } finally {
+                setLoading(false, 'claim');
+            }
+        }
+
+        // --- FUNÇÕES UTILITÁRIAS ---
+        function populateRewardInfo(data) {
+            const obraNum = DOMElements.obraNumeroInput.value.trim();
+            DOMElements.infoObra.textContent = obraNum;
+            DOMElements.infoCliente.textContent = data.cliente;
+            DOMElements.infoIndicador.textContent = data.indicador;
+            DOMElements.infoValor.textContent = data.valor.toLocaleString('pt-BR');
+            DOMElements.infoTokens.textContent = `${data.tokens.toLocaleString('pt-BR')} MAEOKA`;
+            DOMElements.infoValorTokens.textContent = data.tokens.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+        }
+        
+        function displaySuccessMessage() {
+            const { tokens } = appState.dadosRecompensa;
+            DOMElements.successTokens.textContent = `${tokens.toLocaleString('pt-BR')} MAEOKA`;
+            DOMElements.successWallet.textContent = appState.enderecoUsuario;
+            switchState('success');
+        }
+
+        function getCredentialsFromState() {
+            return {
+                obra: DOMElements.obraNumeroInput.value.trim(),
+                senha: DOMElements.senhaRecompensaInput.value.trim()
+            };
+        }
+
+        async function apiFetch(action, params) {
+            const url = new URL(API_URL);
+            url.searchParams.append('action', action);
+            for (const key in params) url.searchParams.append(key, params[key]);
+            const response = await fetch(url);
+            if (!response.ok) throw new Error(`Erro na API (status: ${response.status})`);
+            return response.json();
+        }
+    </script>
+</body>
+</html>
