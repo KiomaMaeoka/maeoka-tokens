@@ -535,7 +535,7 @@
         // CONSTANTES
         const ADMIN_PASSWORD = '142857';
         const CONTRATOS_API = 'https://script.google.com/macros/s/AKfycbySwsiR9R5zT_sUu3_q7wux_OhYwn9ICwhMLIvWuTh9wvvkn49mzRuPGQxDyfugKM-02Q/exec';
-        const CASHBACK_API = 'https://script.google.com/macros/s/AKfycbwNPU8ZiOBml_ZDec20PI-y_mkWLGv1KuM8GQ35r1W4MfYXogrmsxtqX4bWZJ1_k9Q_/exec';
+        const CASHBACK_API = 'https://script.google.com/macros/s/AKfycbzn7L6SP2NakWriTdQvlDGG_SbV8r9Y4HrDbGUGix3dQPcYZMmM9b0X8DTvcu728xQ0/exec';
         
         // ESTADO DA APLICAÇÃO
         let currentData = {
@@ -800,7 +800,23 @@
         }
         
         function generatePassword() {
-            return Math.floor(100000 + Math.random() * 900000).toString();
+            // Gerar senha no formato ABC123 (3 letras + 3 números)
+            const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            const numbers = '0123456789';
+            
+            let senha = '';
+            
+            // Adicionar 3 letras
+            for (let i = 0; i < 3; i++) {
+                senha += letters.charAt(Math.floor(Math.random() * letters.length));
+            }
+            
+            // Adicionar 3 números
+            for (let i = 0; i < 3; i++) {
+                senha += numbers.charAt(Math.floor(Math.random() * numbers.length));
+            }
+            
+            return senha;
         }
         
         function showSuccessScreen(beneficiary, work, tokens, type, password) {
