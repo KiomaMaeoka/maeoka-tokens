@@ -307,7 +307,7 @@
                         <h3 class="text-2xl font-bold mb-2">Valor Total do Investimento</h3>
                         <div class="bg-gray-100 bg-opacity-20 rounded-lg p-4 mb-4">
                             <p class="text-gray-200 text-lg line-through" id="originalPriceDisplay"></p>
-                            <div class="text-4xl md:text-5xl font-extrabold my-2" id="finalPriceDisplay"></div>
+                            <div class="text-5xl font-extrabold my-2" id="finalPriceDisplay"></div>
                             <p class="text-sm opacity-80 italic" id="discountExplanation"></p>
                         </div>
                         <p class="text-sm opacity-80 mt-2">Prazo de Execução: <span id="prazoExecucao"></span></p>
@@ -389,7 +389,7 @@
                         <h3 class="text-2xl font-bold mb-2">Valor Total do Investimento</h3>
                         <div class="bg-gray-100 bg-opacity-20 rounded-lg p-4 mb-4">
                             <p class="text-gray-200 text-lg line-through" id="originalPriceDisplayPage3"></p>
-                            <div class="text-4xl md:text-5xl font-extrabold my-2" id="finalPriceDisplayPage3"></div>
+                            <div class="text-5xl font-extrabold my-2" id="finalPriceDisplayPage3"></div>
                             <p class="text-sm opacity-80 italic" id="discountExplanationPage3"></p>
                         </div>
                     </div>
@@ -1613,10 +1613,7 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         nextPage();
     });
-    document.getElementById('clientForm').addEventListener('input', debounce(() => {
-        validateForm(false);
-        saveDraft();
-    }, 300));
+    document.getElementById('clientForm').addEventListener('input', debounce(() => validateForm(false), 300));
     sliderTokens.addEventListener('input', handleSliderInput);
     tokenInput.addEventListener('input', handleTokenInput);
     document.addEventListener('keydown', (e) => {
