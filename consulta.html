@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Recompensas - Maeoka Engenharia</title>
+    
+    <!-- Fontes e Ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Source+Code+Pro:wght@400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- ESTILOS GERAIS --- */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            margin: 0;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #1a3a52 0%, #2c5282 100%);
+            color: white;
+            text-align: center;
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 50%);
+            animation: rotate 20s linear infinite;
+        }
+        
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .header p {
+            font-size: 1rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .main-content {
+            padding: 40px;
+        }
+        
+        /* --- TELA DE LOGIN --- */
+        .login-screen {
+            text-align: center;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        
+        .login-screen h2 {
+            color: #1a3a52;
+            margin-bottom: 30px;
+            font-size: 1.8rem;
+        }
+        
+        .password-input-group {
+            position: relative;
+            margin-bottom: 30px;
+        }
+        
+        .password-input-group input {
+            width: 100%;
+            padding: 15px 50px 15px 20px;
+            font-size: 1.1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            outline: none;
+            transition: all 0.3s ease;
+            text-align: center;
+            font-family: 'Source Code Pro', monospace;
+            letter-spacing: 2px;
+        }
+        
+        .password-input-group input:focus {
+            border-color: #2c5282;
+            box-shadow: 0 0 0 3px rgba(44, 82, 130, 0.1);
+        }
+        
+        .password-toggle {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #64748b;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #2c5282 0%, #1a3a52 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(44, 82, 130, 0.3);
+        }
+        
+        .btn-primary:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        /* --- FORMULÁRIO PRINCIPAL --- */
+        .form-screen {
+            display: none;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .form-group label {
+            display: block;
+            color: #374151;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            font-size: 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            border-color: #2c5282;
+            box-shadow: 0 0 0 3px rgba(44, 82, 130, 0.1);
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .radio-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 10px;
+        }
+        
+        .radio-option {
+            position: relative;
+            padding: 15px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        
+        .radio-option:hover {
+            border-color: #2c5282;
+            background: #f8fafc;
+        }
+        
+        .radio-option.selected {
+            border-color: #2c5282;
+            background: #eff6ff;
+            color: #1e40af;
+        }
+        
+        .radio-option input[type="radio"] {
+            display: none;
+        }
+        
+        .result-card {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border: 2px solid #0ea5e9;
+            border-radius: 12px;
+            padding: 25px;
+            margin: 25px 0;
+            text-align: center;
+        }
+        
+        .result-card h3 {
+            color: #0c4a6e;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+        
+        .result-amount {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #0ea5e9;
+            margin: 15px 0;
+        }
+        
+        .result-details {
+            color: #0c4a6e;
+            font-size: 0.95rem;
+            margin-top: 15px;
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 20px;
+        }
+        
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(5, 150, 105, 0.3);
+        }
+        
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-right: 15px;
+        }
+        
+        .btn-secondary:hover {
+            background: #4b5563;
+        }
+        
+        /* --- SPINNER --- */
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* --- MODAL --- */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+        
+        .modal-content h3 {
+            color: #1a3a52;
+            margin-bottom: 15px;
+        }
+        
+        /* --- RESPONSIVIDADE --- */
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .radio-group {
+                grid-template-columns: 1fr;
+            }
+            
+            .result-amount {
+                font-size: 2rem;
+            }
+        }
+        
+        /* --- TELA DE SUCESSO --- */
+        .success-screen {
+            display: none;
+            text-align: center;
+        }
+        
+        .success-icon {
+            font-size: 4rem;
+            color: #10b981;
+            margin-bottom: 20px;
+        }
+        
+        .success-card {
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            border: 2px solid #10b981;
+            border-radius: 12px;
+            padding: 25px;
+            margin: 25px 0;
+        }
+        
+        .password-display {
+            background: #1f2937;
+            color: #f9fafb;
+            font-family: 'Source Code Pro', monospace;
+            font-size: 1.5rem;
+            font-weight: 600;
+            letter-spacing: 3px;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-coins"></i> MAEOKA TOKENS</h1>
+            <p>Sistema de Cadastro de Recompensas</p>
+        </div>
+        
+        <div class="main-content">
+            <!-- TELA DE LOGIN -->
+            <div class="login-screen" id="loginScreen">
+                <h2><i class="fas fa-lock"></i> Acesso Restrito</h2>
+                <p style="color: #64748b; margin-bottom: 30px;">Digite a senha para acessar o sistema de cadastro</p>
+                
+                <div class="password-input-group">
+                    <input type="password" id="passwordInput" placeholder="••••••" maxlength="10">
+                    <i class="fas fa-eye password-toggle" id="passwordToggle" onclick="togglePassword()"></i>
+                </div>
+                
+                <button class="btn-primary" id="loginBtn" onclick="checkPassword()">
+                    <i class="fas fa-sign-in-alt"></i> ACESSAR SISTEMA
+                </button>
+            </div>
+            
+            <!-- FORMULÁRIO PRINCIPAL -->
+            <div class="form-screen" id="formScreen">
+                <h2 style="color: #1a3a52; text-align: center; margin-bottom: 30px;">
+                    <i class="fas fa-gift"></i> Cadastrar Nova Recompensa
+                </h2>
+                
+                <form id="rewardForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="obraNumero"><i class="fas fa-hashtag"></i> Número da Obra</label>
+                            <input type="text" id="obraNumero" class="form-control" placeholder="Ex: 2025-123" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="beneficiarioNome"><i class="fas fa-user"></i> Nome do Beneficiário</label>
+                            <input type="text" id="beneficiarioNome" class="form-control" placeholder="Nome completo" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label><i class="fas fa-tags"></i> Tipo de Recompensa</label>
+                        <div class="radio-group">
+                            <div class="radio-option" onclick="selectRewardType('cashback')">
+                                <input type="radio" name="rewardType" value="cashback" id="cashback">
+                                <i class="fas fa-money-bill-wave" style="font-size: 1.5rem; color: #059669; margin-bottom: 8px;"></i>
+                                <div style="font-weight: 600;">CASHBACK</div>
+                                <div style="font-size: 0.85rem; color: #6b7280;">Cliente que fez a obra</div>
+                            </div>
+                            <div class="radio-option" onclick="selectRewardType('indication')">
+                                <input type="radio" name="rewardType" value="indication" id="indication">
+                                <i class="fas fa-handshake" style="font-size: 1.5rem; color: #2563eb; margin-bottom: 8px;"></i>
+                                <div style="font-weight: 600;">INDICAÇÃO</div>
+                                <div style="font-size: 0.85rem; color: #6b7280;">Quem indicou a obra</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="clientHistorySection" class="form-group" style="display: none;">
+                        <label id="clientHistoryLabel"></label>
+                        <div class="radio-group">
+                            <div class="radio-option" onclick="selectClientHistory('new')">
+                                <input type="radio" name="clientHistory" value="new" id="clientNew">
+                                <i class="fas fa-user-plus" style="font-size: 1.5rem; color: #f59e0b; margin-bottom: 8px;"></i>
+                                <div style="font-weight: 600;" id="newClientText"></div>
+                                <div style="font-size: 0.85rem; color: #6b7280;" id="newClientRate"></div>
+                            </div>
+                            <div class="radio-option" onclick="selectClientHistory('returning')">
+                                <input type="radio" name="clientHistory" value="returning" id="clientReturning">
+                                <i class="fas fa-user-check" style="font-size: 1.5rem; color: #10b981; margin-bottom: 8px;"></i>
+                                <div style="font-weight: 600;" id="returningClientText"></div>
+                                <div style="font-size: 0.85rem; color: #6b7280;" id="returningClientRate"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="calculationResult" class="result-card" style="display: none;">
+                        <h3><i class="fas fa-calculator"></i> Recompensa Calculada</h3>
+                        <div class="result-amount" id="tokenAmount">0 MAEOKA</div>
+                        <div class="result-details">
+                            <div>Valor da obra: <strong id="workValue">R$ 0,00</strong></div>
+                            <div>Taxa aplicada: <strong id="appliedRate">0%</strong></div>
+                            <div>Equivalente a: <strong id="equivalentValue">R$ 0,00</strong></div>
+                        </div>
+                    </div>
+                    
+                    <button type="button" class="btn-success" id="calculateBtn" onclick="calculateReward()" disabled>
+                        <i class="fas fa-calculator"></i> CALCULAR RECOMPENSA
+                    </button>
+                    
+                    <button type="button" class="btn-success" id="registerBtn" onclick="registerReward()" style="display: none;">
+                        <span id="registerBtnText"><i class="fas fa-save"></i> REGISTRAR RECOMPENSA</span>
+                    </button>
+                </form>
+                
+                <div style="text-align: center; margin-top: 30px;">
+                    <button class="btn-secondary" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i> Sair
+                    </button>
+                </div>
+            </div>
+            
+            <!-- TELA DE SUCESSO -->
+            <div class="success-screen" id="successScreen">
+                <div class="success-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                
+                <h2 style="color: #10b981; margin-bottom: 20px;">Recompensa Registrada!</h2>
+                
+                <div class="success-card">
+                    <h3 style="color: #047857; margin-bottom: 15px;">Dados da Recompensa</h3>
+                    <div style="text-align: left; margin: 15px 0;">
+                        <div><strong>Beneficiário:</strong> <span id="successBeneficiary"></span></div>
+                        <div><strong>Obra:</strong> <span id="successWork"></span></div>
+                        <div><strong>Tokens:</strong> <span id="successTokens"></span></div>
+                        <div><strong>Tipo:</strong> <span id="successType"></span></div>
+                    </div>
+                    
+                    <h4 style="color: #047857; margin: 20px 0 10px 0;">Senha de Acesso ao Cashback:</h4>
+                    <div class="password-display" id="generatedPassword"></div>
+                    
+                    <p style="color: #047857; font-size: 0.9rem; margin-top: 15px;">
+                        <i class="fas fa-info-circle"></i> 
+                        Entregue esta senha ao beneficiário para resgate no sistema de cashback
+                    </p>
+                </div>
+                
+                <button class="btn-success" onclick="newRegistration()">
+                    <i class="fas fa-plus"></i> NOVA RECOMPENSA
+                </button>
+                
+                <div style="text-align: center; margin-top: 20px;">
+                    <button class="btn-secondary" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i> Sair
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- MODAL -->
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <h3 id="modalTitle"></h3>
+            <p id="modalMessage"></p>
+            <button class="btn-primary" onclick="closeModal()" style="margin-top: 15px;">OK</button>
+        </div>
+    </div>
+
+    <script>
+        // CONSTANTES
+        const ADMIN_PASSWORD = '142857';
+        const CONTRATOS_API = 'https://script.google.com/macros/s/AKfycbySwsiR9R5zT_sUu3_q7wux_OhYwn9ICwhMLIvWuTh9wvvkn49mzRuPGQxDyfugKM-02Q/exec';
+        const CASHBACK_API = 'https://script.google.com/macros/s/AKfycbwNPU8ZiOBml_ZDec20PI-y_mkWLGv1KuM8GQ35r1W4MfYXogrmsxtqX4bWZJ1_k9Q_/exec';
+        
+        // ESTADO DA APLICAÇÃO
+        let currentData = {
+            workValue: 0,
+            rewardType: null,
+            clientHistory: null,
+            rate: 0,
+            tokens: 0
+        };
+        
+        // FUNÇÕES DE AUTENTICAÇÃO
+        function togglePassword() {
+            const input = document.getElementById('passwordInput');
+            const toggle = document.getElementById('passwordToggle');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                toggle.className = 'fas fa-eye-slash password-toggle';
+            } else {
+                input.type = 'password';
+                toggle.className = 'fas fa-eye password-toggle';
+            }
+        }
+        
+        function checkPassword() {
+            const password = document.getElementById('passwordInput').value;
+            const loginBtn = document.getElementById('loginBtn');
+            
+            if (password === ADMIN_PASSWORD) {
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('formScreen').style.display = 'block';
+            } else {
+                showModal('Acesso Negado', 'Senha incorreta. Tente novamente.');
+                document.getElementById('passwordInput').value = '';
+            }
+        }
+        
+        function logout() {
+            document.getElementById('loginScreen').style.display = 'block';
+            document.getElementById('formScreen').style.display = 'none';
+            document.getElementById('successScreen').style.display = 'none';
+            document.getElementById('passwordInput').value = '';
+            resetForm();
+        }
+        
+        // FUNÇÕES DE INTERFACE
+        function selectRewardType(type) {
+            // Limpar seleções anteriores
+            document.querySelectorAll('.radio-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            // Selecionar novo tipo
+            event.currentTarget.classList.add('selected');
+            document.getElementById(type).checked = true;
+            currentData.rewardType = type;
+            
+            // Mostrar opções de histórico do cliente
+            const historySection = document.getElementById('clientHistorySection');
+            const historyLabel = document.getElementById('clientHistoryLabel');
+            
+            historySection.style.display = 'block';
+            
+            if (type === 'cashback') {
+                historyLabel.innerHTML = '<i class="fas fa-history"></i> Histórico do Cliente';
+                document.getElementById('newClientText').textContent = 'PRIMEIRA OBRA';
+                document.getElementById('newClientRate').textContent = '3% de cashback';
+                document.getElementById('returningClientText').textContent = 'CLIENTE RECORRENTE';
+                document.getElementById('returningClientRate').textContent = '5% de cashback';
+            } else {
+                historyLabel.innerHTML = '<i class="fas fa-history"></i> Indicador já foi Cliente?';
+                document.getElementById('newClientText').textContent = 'PARCEIRO COMUM';
+                document.getElementById('newClientRate').textContent = '2% de indicação';
+                document.getElementById('returningClientText').textContent = 'EX-CLIENTE';
+                document.getElementById('returningClientRate').textContent = '4% de indicação';
+            }
+            
+            // Reset client history selection
+            currentData.clientHistory = null;
+            document.querySelectorAll('input[name="clientHistory"]').forEach(input => {
+                input.checked = false;
+            });
+            document.querySelectorAll('#clientHistorySection .radio-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            updateCalculateButton();
+        }
+        
+        function selectClientHistory(history) {
+            // Limpar seleções anteriores do histórico
+            document.querySelectorAll('#clientHistorySection .radio-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            // Selecionar novo histórico
+            event.currentTarget.classList.add('selected');
+            document.getElementById(history === 'new' ? 'clientNew' : 'clientReturning').checked = true;
+            currentData.clientHistory = history;
+            
+            updateCalculateButton();
+        }
+        
+        function updateCalculateButton() {
+            const obraNumero = document.getElementById('obraNumero').value.trim();
+            const beneficiarioNome = document.getElementById('beneficiarioNome').value.trim();
+            const calculateBtn = document.getElementById('calculateBtn');
+            
+            if (obraNumero && beneficiarioNome && currentData.rewardType && currentData.clientHistory) {
+                calculateBtn.disabled = false;
+            } else {
+                calculateBtn.disabled = true;
+            }
+        }
+        
+        // FUNÇÕES DE CÁLCULO
+        async function calculateReward() {
+            const obraNumero = document.getElementById('obraNumero').value.trim();
+            const calculateBtn = document.getElementById('calculateBtn');
+            
+            // Mostrar loading
+            calculateBtn.innerHTML = '<span class="spinner"></span> CONSULTANDO...';
+            calculateBtn.disabled = true;
+            
+            try {
+                // Buscar valor total da obra na planilha de contratos
+                const workValue = await fetchWorkValue(obraNumero);
+                
+                if (workValue === 0) {
+                    showModal('Obra Não Encontrada', 'Não foi possível encontrar esta obra na base de dados. Verifique o número e tente novamente.');
+                    calculateBtn.innerHTML = '<i class="fas fa-calculator"></i> CALCULAR RECOMPENSA';
+                    calculateBtn.disabled = false;
+                    return;
+                }
+                
+                // Calcular taxa e tokens
+                let rate = 0;
+                if (currentData.rewardType === 'cashback') {
+                    rate = currentData.clientHistory === 'new' ? 0.03 : 0.05; // 3% ou 5%
+                } else {
+                    rate = currentData.clientHistory === 'new' ? 0.02 : 0.04; // 2% ou 4%
+                }
+                
+                const tokens = Math.floor(workValue * rate);
+                
+                // Atualizar dados globais
+                currentData.workValue = workValue;
+                currentData.rate = rate;
+                currentData.tokens = tokens;
+                
+                // Mostrar resultado
+                document.getElementById('workValue').textContent = workValue.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'});
+                document.getElementById('appliedRate').textContent = (rate * 100).toFixed(0) + '%';
+                document.getElementById('tokenAmount').textContent = tokens.toLocaleString('pt-BR') + ' MAEOKA';
+                document.getElementById('equivalentValue').textContent = tokens.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'});
+                
+                document.getElementById('calculationResult').style.display = 'block';
+                document.getElementById('registerBtn').style.display = 'block';
+                
+                calculateBtn.style.display = 'none';
+                
+            } catch (error) {
+                showModal('Erro', 'Erro ao consultar dados da obra. Tente novamente.');
+                calculateBtn.innerHTML = '<i class="fas fa-calculator"></i> CALCULAR RECOMPENSA';
+                calculateBtn.disabled = false;
+            }
+        }
+        
+        async function fetchWorkValue(obraNumero) {
+            try {
+                console.log('🔍 Buscando valor real da obra:', obraNumero);
+                
+                // Consultar API real da planilha de contratos
+                const url = `${CONTRATOS_API}?action=buscarObra&obra=${obraNumero}`;
+                console.log('📡 URL da consulta:', url);
+                
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                console.log('📊 Resposta da API:', data);
+                
+                if (data.encontrado && data.valorTotal > 0) {
+                    console.log(`✅ Obra encontrada! Valor total: R$ ${data.valorTotal.toLocaleString('pt-BR')}`);
+                    return data.valorTotal;
+                } else {
+                    console.log('❌ Obra não encontrada ou valor zero');
+                    return 0;
+                }
+                
+            } catch (error) {
+                console.error('❌ Erro ao buscar valor da obra:', error);
+                throw new Error('Erro na comunicação com a planilha de contratos: ' + error.message);
+            }
+        }
+        
+        // FUNÇÕES DE REGISTRO
+        async function registerReward() {
+            const obraNumero = document.getElementById('obraNumero').value.trim();
+            const beneficiarioNome = document.getElementById('beneficiarioNome').value.trim();
+            const registerBtn = document.getElementById('registerBtn');
+            
+            // Mostrar loading
+            registerBtn.innerHTML = '<span class="spinner"></span> REGISTRANDO...';
+            registerBtn.disabled = true;
+            
+            try {
+                // Gerar senha única de 6 dígitos
+                const senha = generatePassword();
+                
+                // Preparar dados para envio
+                const rewardData = {
+                    obra_id: obraNumero,
+                    cliente: currentData.rewardType === 'cashback' ? beneficiarioNome : '',
+                    indicador: currentData.rewardType === 'indication' ? beneficiarioNome : '',
+                    valor: currentData.workValue,
+                    tokens: currentData.tokens,
+                    senha: senha,
+                    claimed: 'FALSE',
+                    data_obra: new Date().toISOString().split('T')[0],
+                    carteira_destino: ''
+                };
+                
+                // Enviar para planilha de cashback
+                await sendToSpreadsheet(rewardData);
+                
+                // Mostrar tela de sucesso
+                showSuccessScreen(beneficiarioNome, obraNumero, currentData.tokens, currentData.rewardType, senha);
+                
+            } catch (error) {
+                showModal('Erro', 'Erro ao registrar recompensa. Tente novamente.');
+                registerBtn.innerHTML = '<i class="fas fa-save"></i> REGISTRAR RECOMPENSA';
+                registerBtn.disabled = false;
+            }
+        }
+        
+        async function sendToSpreadsheet(data) {
+            try {
+                console.log('📤 Enviando dados para planilha de cashback:', data);
+                
+                const response = await fetch(CASHBACK_API, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                console.log('✅ Dados enviados com sucesso para a planilha!');
+                
+                // Simular delay para melhor UX
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                
+            } catch (error) {
+                console.error('❌ Erro ao enviar para planilha:', error);
+                throw new Error('Erro ao registrar recompensa na planilha: ' + error.message);
+            }
+        }
+        
+        function generatePassword() {
+            return Math.floor(100000 + Math.random() * 900000).toString();
+        }
+        
+        function showSuccessScreen(beneficiary, work, tokens, type, password) {
+            document.getElementById('formScreen').style.display = 'none';
+            document.getElementById('successScreen').style.display = 'block';
+            
+            document.getElementById('successBeneficiary').textContent = beneficiary;
+            document.getElementById('successWork').textContent = work;
+            document.getElementById('successTokens').textContent = tokens.toLocaleString('pt-BR') + ' MAEOKA';
+            document.getElementById('successType').textContent = type === 'cashback' ? 'Cashback' : 'Indicação';
+            document.getElementById('generatedPassword').textContent = password;
+        }
+        
+        // FUNÇÕES UTILITÁRIAS
+        function showModal(title, message) {
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalMessage').textContent = message;
+            document.getElementById('modal').style.display = 'flex';
+        }
+        
+        function closeModal() {
+            document.getElementById('modal').style.display = 'none';
+        }
+        
+        function resetForm() {
+            document.getElementById('rewardForm').reset();
+            document.getElementById('clientHistorySection').style.display = 'none';
+            document.getElementById('calculationResult').style.display = 'none';
+            document.getElementById('registerBtn').style.display = 'none';
+            document.getElementById('calculateBtn').style.display = 'block';
+            document.getElementById('calculateBtn').disabled = true;
+            document.getElementById('calculateBtn').innerHTML = '<i class="fas fa-calculator"></i> CALCULAR RECOMPENSA';
+            
+            // Reset selections
+            document.querySelectorAll('.radio-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            currentData = {
+                workValue: 0,
+                rewardType: null,
+                clientHistory: null,
+                rate: 0,
+                tokens: 0
+            };
+        }
+        
+        function newRegistration() {
+            resetForm();
+            document.getElementById('successScreen').style.display = 'none';
+            document.getElementById('formScreen').style.display = 'block';
+        }
+        
+        // EVENT LISTENERS
+        document.addEventListener('DOMContentLoaded', function() {
+            // Enter key para login
+            document.getElementById('passwordInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    checkPassword();
+                }
+            });
+            
+            // Validação em tempo real
+            document.getElementById('obraNumero').addEventListener('input', updateCalculateButton);
+            document.getElementById('beneficiarioNome').addEventListener('input', updateCalculateButton);
+            
+            // Fechar modal com ESC
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    closeModal();
+                }
+            });
+        });
+        
+        // FUNÇÃO PARA TESTAR O SISTEMA COMPLETO
+        function testarSistema() {
+            console.log('🧪 TESTANDO SISTEMA COMPLETO:');
+            console.log('📡 API Contratos:', CONTRATOS_API);
+            console.log('📡 API Cashback:', CASHBACK_API);
+            console.log('🔑 Senha Admin:', ADMIN_PASSWORD);
+        }
+    </script>
+</body>
+</html>
