@@ -1,0 +1,2014 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vistoria Digital Online - Maeoka Engenharia</title>
+    
+    <!-- Ícones e Fontes -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Biblioteca jsPDF para gerar PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
+    <style>
+        /* ... SEUS ESTILOS EXISTENTES ... */
+        :root {
+            --primary-color: #3b82f6;
+            --primary-gradient: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+            --danger-color: #ef4444;
+            --secondary-gradient: linear-gradient(135deg, #1a3a52 0%, #2c5282 100%);
+            --success-gradient: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+            --info-gradient: linear-gradient(135deg, #818cf8 0%, #6366f1 100%);
+            --text-dark: #1f2937;
+            --text-light: #6b7280;
+            --bg-light: #f9fafb;
+            --border-color: #e5e7eb;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 0;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 0;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        /* NOVO: Estilos para Modal de Orçamento */
+        #orcamentoModal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        
+        .orcamento-content {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+        
+        .orcamento-header {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 20px;
+            margin: -30px -30px 30px -30px;
+            border-radius: 20px 20px 0 0;
+            text-align: center;
+        }
+        
+        .orcamento-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        
+        .processing-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .step {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border-left: 4px solid #e5e7eb;
+            transition: all 0.3s ease;
+        }
+        
+        .step.active {
+            border-left-color: var(--primary-color);
+            background: #eff6ff;
+        }
+        
+        .step.completed {
+            border-left-color: #10b981;
+            background: #f0fdf4;
+        }
+        
+        .step-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #e5e7eb;
+            color: #6b7280;
+            font-size: 18px;
+        }
+        
+        .step.active .step-icon {
+            background: var(--primary-color);
+            color: white;
+            animation: pulse 2s infinite;
+        }
+        
+        .step.completed .step-icon {
+            background: #10b981;
+            color: white;
+        }
+        
+        .orcamento-resultado {
+            display: none;
+            animation: slideInUp 0.5s ease-out;
+        }
+        
+        .valor-total {
+            background: var(--success-gradient);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .servicos-orcamento {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+        
+        .servico-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .servico-item:last-child {
+            border-bottom: none;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        /* ... RESTO DOS SEUS ESTILOS EXISTENTES ... */
+        #loadingOverlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(5px);
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-dark);
+            transition: opacity 0.3s;
+        }
+        #loadingOverlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 15px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .header {
+            background: var(--secondary-gradient);
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+            position: relative;
+        }
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+        #mobileHeaderBackBtn {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            margin-right: 15px;
+            cursor: pointer;
+        }
+        .logo { display: flex; align-items: center; gap: 10px; }
+        .logo i { font-size: 28px; color: #60a5fa; }
+        .logo-text h1 { font-size: 18px; font-weight: 700; }
+        .logo-text p { font-size: 10px; opacity: 0.9; text-transform: uppercase; letter-spacing: 1px; }
+        .inspection-id-wrapper { text-align: right; }
+        .inspection-id-wrapper label { font-size: 10px; font-weight: 500; opacity: 0.8; }
+        .inspection-id-display { font-size: 14px; font-weight: 700; background-color: rgba(255,255,255,0.1); padding: 4px 8px; border-radius: 8px; }
+        
+        .inspection-details {
+            background: var(--bg-light);
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .detail-item { flex: 1; min-width: 180px; }
+        .detail-item label { font-size: 11px; font-weight: 600; color: var(--text-light); display: block; margin-bottom: 4px; }
+        .detail-item-value { font-size: 13px; font-weight: 500; }
+        .detail-item-value input { width: 100%; padding: 6px 8px; border-radius: 6px; border: 1px solid var(--border-color); }
+        .btn-edit-details { padding: 8px 12px; font-size: 13px; }
+
+        .main-content {
+            display: flex;
+            flex-grow: 1;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .locations-panel {
+            width: 280px;
+            background: var(--bg-light);
+            border-right: 1px solid var(--border-color);
+            padding: 20px;
+            overflow-y: auto;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+        }
+        .locations-header {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--border-color);
+        }
+        .add-location-form { display: flex; gap: 8px; margin-bottom: 15px; }
+        .add-location-form input { flex-grow: 1; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 14px; }
+        .add-location-form button { padding: 8px 12px; border: none; background: var(--primary-color); color: white; border-radius: 8px; cursor: pointer; font-weight: 600; }
+        
+        .location-list { list-style: none; flex-grow: 1; }
+        .location-item {
+            background: white;
+            border-radius: 10px;
+            margin-bottom: 8px;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .location-item-main {
+            padding: 12px 15px;
+            flex-grow: 1;
+            cursor: pointer;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .location-item:hover { transform: translateX(5px); border-color: #93c5fd; }
+        .location-item.active {
+            background: var(--primary-gradient);
+            color: white;
+            transform: translateX(10px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+        }
+        .location-item-name { font-weight: 600; }
+        .location-item-count { font-size: 12px; background-color: rgba(0,0,0,0.1); padding: 2px 8px; border-radius: 10px; }
+        .location-item.active .location-item-count { background-color: rgba(255,255,255,0.2); }
+        .location-actions { display: flex; align-items: center; }
+        .location-action-btn {
+            background: none; border: none; color: #d1d5db; cursor: pointer;
+            font-size: 14px; padding: 12px; opacity: 0;
+            transition: all 0.2s ease; flex-shrink: 0;
+        }
+        .location-item:hover .location-action-btn { opacity: 1; color: var(--text-light); }
+        .location-item.active .location-action-btn { opacity: 1; color: white; }
+        .location-action-btn.delete-btn:hover { color: var(--danger-color) !important; }
+        .location-action-btn.duplicate-btn:hover { color: var(--primary-color) !important; }
+
+        .workspace-panel {
+            flex-grow: 1;
+            padding: 30px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .workspace-placeholder { text-align: center; margin: auto; color: var(--text-light); }
+        .workspace-placeholder i { font-size: 48px; margin-bottom: 15px; }
+        .workspace-placeholder h2 { font-size: 22px; }
+        .workspace-header { font-size: 24px; font-weight: 700; color: var(--text-dark); }
+        .search-bar-wrapper { position: relative; }
+        .search-bar-wrapper i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-light); }
+        #serviceSearchInput { width: 100%; padding: 10px 15px 10px 40px; border-radius: 8px; border: 1px solid var(--border-color); }
+        
+        .saved-services-list .service-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .service-card-details { flex-grow: 1; }
+        .service-card-title { font-weight: 600; margin-bottom: 8px; }
+        .service-card-title .category-badge { font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 8px; background: #eef2ff; color: #4f46e5; margin-left: 8px; }
+        .service-card-meta { font-size: 13px; color: var(--text-light); }
+        .service-card-meta span { margin-right: 15px; }
+        .service-card-actions button { background: none; border: none; color: var(--text-light); cursor: pointer; font-size: 16px; padding: 5px; }
+        .service-card-actions button:hover { color: var(--primary-color); }
+        .service-card-actions .delete-btn:hover { color: var(--danger-color); }
+
+        .service-category-accordion, .add-category-form { border: 1px solid var(--border-color); border-radius: 12px; margin-bottom: 10px; overflow: hidden; background-color: #fff; }
+        .accordion-header { display: flex; justify-content: space-between; align-items: center; padding: 15px; cursor: pointer; transition: background-color 0.2s ease; }
+        .accordion-header:hover { background-color: var(--bg-light); }
+        .accordion-header .header-left { display: flex; align-items: center; gap: 12px; font-weight: 600; font-size: 16px; }
+        .accordion-header .header-left i { color: var(--primary-color); }
+        .accordion-header .fa-chevron-down { transition: transform 0.3s ease; }
+        .accordion-header.active .fa-chevron-down { transform: rotate(180deg); }
+        .accordion-content { display: none; padding: 15px; border-top: 1px solid var(--border-color); }
+        .accordion-content.active { display: block; }
+        .service-to-add { display: block; width: 100%; text-align: left; padding: 10px; border-radius: 8px; background: #f9fafb; border: 1px solid #f9fafb; margin-bottom: 8px; cursor: pointer; font-weight: 500; }
+        .service-to-add:hover { background: #f3f4f6; border-color: #e5e7eb; }
+        .add-custom-form {
+            display: flex;
+            gap: 8px;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px dashed var(--border-color);
+        }
+        .add-custom-form input {
+            flex-grow: 1;
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        .add-custom-form button {
+            flex-shrink: 0;
+            padding: 8px 12px;
+            border: none;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .add-category-form { padding: 20px; background-color: var(--bg-light); }
+        .add-category-form h4 { font-weight: 600; margin-bottom: 10px; }
+
+        .summary-panel {
+            width: 320px;
+            background: var(--bg-light);
+            border-left: 1px solid var(--border-color);
+            padding: 20px;
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+        .summary-header { font-size: 18px; font-weight: 700; color: var(--text-dark); margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid var(--border-color); }
+        .summary-location-item { background: white; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; margin-bottom: 10px; font-size: 14px; }
+        .summary-location-header { font-weight: 600; color: var(--text-dark); margin-bottom: 6px; }
+        .summary-service-item { color: var(--text-light); font-size: 13px; margin-left: 15px; margin-top: 4px; padding-left: 10px; border-left: 2px solid var(--border-color); }
+
+        .action-footer {
+            padding: 15px 20px;
+            background: white;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            flex-wrap: wrap;
+            flex-shrink: 0;
+            position: relative;
+        }
+        .btn { padding: 10px 18px; border-radius: 10px; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.3s ease; border: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-success { background: var(--success-gradient); color: white; }
+        .btn-success:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(16, 185, 129, 0.25); }
+        .btn-info { background: var(--info-gradient); color: white; }
+        .btn-info:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(99, 102, 241, 0.25); }
+        .btn-secondary { background: #f3f4f6; color: #6b7280; }
+        .btn-secondary:hover { background: #e5e7eb; }
+        
+        #moreOptionsToggle { display: none; }
+        #moreOptionsMenu {
+            position: absolute;
+            bottom: 100%;
+            right: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            display: none;
+            flex-direction: column;
+            width: 200px;
+        }
+        #moreOptionsMenu.active { display: flex; }
+        #moreOptionsMenu .btn {
+            width: 100%;
+            justify-content: flex-start;
+            border-radius: 0;
+            background: white;
+            color: var(--text-dark);
+        }
+        #moreOptionsMenu .btn:hover { background: var(--bg-light); }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        .modal-overlay.visible { opacity: 1; visibility: visible; }
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transform: scale(0.95);
+            transition: all 0.3s ease;
+        }
+        .modal-overlay.visible .modal-content { transform: scale(1); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .modal-title { font-size: 20px; font-weight: 700; color: var(--text-dark); }
+        .modal-close-btn { background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text-light); }
+        .modal-form .form-group { margin-bottom: 15px; }
+        .modal-form label { display: block; font-weight: 600; font-size: 14px; margin-bottom: 6px; }
+        .modal-form input { width: 100%; padding: 10px 12px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 14px; }
+        .modal-footer { margin-top: 25px; display: flex; justify-content: flex-end; gap: 10px; }
+        .btn-danger { background: var(--danger-color); color: white; }
+
+        #photoGalleryModal .modal-content { max-width: 800px; }
+        .photo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 10px;
+            margin-top: 20px;
+            max-height: 40vh;
+            overflow-y: auto;
+            padding: 5px;
+        }
+        .photo-thumbnail {
+            position: relative;
+            width: 100%;
+            padding-bottom: 100%;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .photo-thumbnail img {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            cursor: pointer;
+        }
+        .photo-delete-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(0,0,0,0.6);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .selection-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .selection-card {
+            background: white;
+            border: 2px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            color: var(--text-dark);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+        .selection-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary-color);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        .selection-card .card-icon {
+            font-size: 32px;
+            color: var(--text-light);
+        }
+        .selection-card .card-title {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        @media (min-width: 769px) {
+            body {
+                padding: 20px;
+            }
+            .container {
+                border-radius: 24px;
+                height: calc(100vh - 40px);
+            }
+        }
+        @media (max-width: 768px) {
+            .summary-panel { display: none; }
+            .main-content {
+                flex-direction: row; 
+                width: 200%;
+            }
+            .locations-panel, .workspace-panel {
+                width: 50%;
+                height: 100%;
+                border-right: none;
+                transition: transform 0.3s ease-in-out;
+            }
+            .main-content.workspace-active {
+                transform: translateX(-50%); 
+            }
+            .workspace-panel {
+                padding: 20px;
+            }
+            .inspection-details { flex-direction: column; align-items: stretch; }
+            .action-footer {
+                justify-content: center;
+            }
+            .btn {
+                font-size: 13px;
+                padding: 10px 14px;
+            }
+            .action-footer .btn.desktop-only {
+                display: none;
+            }
+            #moreOptionsToggle {
+                display: inline-flex;
+            }
+            #mobileHeaderBackBtn.visible {
+                display: block;
+            }
+            .header-content.hiding {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <button id="mobileHeaderBackBtn"><i class="fas fa-arrow-left"></i></button>
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-hard-hat"></i>
+                    <div class="logo-text">
+                        <h1>MAEOKA ENGENHARIA</h1>
+                        <p>Vistoria Digital Dinâmica</p>
+                    </div>
+                </div>
+                <div class="inspection-id-wrapper">
+                    <label>ID DA VISTORIA</label>
+                    <div class="inspection-id-display" id="inspectionIdDisplay">NOVA</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Painel de Detalhes da Vistoria -->
+        <div class="inspection-details" id="inspectionDetailsPanel">
+            <!-- Conteúdo gerado por JS -->
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content" id="mainContent">
+            <div id="loadingOverlay">
+                <div class="spinner"></div>
+                <p>Carregando dados da planilha...</p>
+            </div>
+
+            <!-- Painel de Ambientes (Esquerda) -->
+            <div class="locations-panel">
+                <h3 class="locations-header">📍 Ambientes</h3>
+                <div class="add-location-form">
+                    <input type="text" id="newLocationInput" placeholder="Nome ou atalhos...">
+                    <button id="addLocationBtn"><i class="fas fa-plus"></i></button>
+                </div>
+                <ul class="location-list" id="locationList"></ul>
+            </div>
+
+            <!-- Painel de Trabalho (Centro) -->
+            <div class="workspace-panel" id="workspacePanel"></div>
+
+            <!-- Painel de Resumo (Direita) -->
+            <div class="summary-panel">
+                <h3 class="summary-header">📋 Resumo Geral</h3>
+                <div id="summaryContent"></div>
+            </div>
+        </div>
+
+        <!-- Action Footer -->
+        <div class="action-footer">
+            <div id="moreOptionsMenu">
+                 <button class="btn btn-secondary" onclick="startFromTemplate()">
+                    <i class="fas fa-copy"></i> Criar a Partir de Modelo
+                </button>
+                <button class="btn btn-secondary" onclick="document.getElementById('loadFileInput').click()">
+                    <i class="fas fa-upload"></i> Carregar do PC
+                </button>
+                <input type="file" id="loadFileInput" style="display: none;" accept=".json">
+                <button class="btn btn-secondary" onclick="saveInspectionToFile()">
+                    <i class="fas fa-save"></i> Salvar no PC
+                </button>
+            </div>
+            <button class="btn btn-info desktop-only" onclick="openLoadOnlineModal()">
+                <i class="fas fa-cloud-download-alt"></i> Carregar Online
+            </button>
+            <button class="btn btn-info" onclick="saveInspectionOnlineComOrcamento()">
+                <i class="fas fa-robot"></i> 🤖 Salvar + Gerar Orçamento IA
+            </button>
+            <button class="btn btn-success" onclick="generatePDF()">
+                <i class="fas fa-file-pdf"></i> Gerar PDF
+            </button>
+            <button class="btn btn-secondary" id="moreOptionsToggle">
+                <i class="fas fa-ellipsis-v"></i> Mais Opções
+            </button>
+        </div>
+    </div>
+
+    <!-- NOVO: Modal de Orçamento IA -->
+    <div id="orcamentoModal">
+        <div class="orcamento-content">
+            <div class="orcamento-header">
+                <button class="orcamento-close" onclick="closeOrcamentoModal()">&times;</button>
+                <h2><i class="fas fa-robot"></i> Agente Orçamentista IA</h2>
+                <p>Maeoka Engenharia - Processamento Automático</p>
+            </div>
+            
+            <!-- Passos do Processamento -->
+            <div class="processing-steps" id="processingSteps">
+                <div class="step" id="step1">
+                    <div class="step-icon"><i class="fas fa-save"></i></div>
+                    <div>
+                        <h4>Salvando Vistoria</h4>
+                        <p>Armazenando dados na planilha...</p>
+                    </div>
+                </div>
+                <div class="step" id="step2">
+                    <div class="step-icon"><i class="fas fa-brain"></i></div>
+                    <div>
+                        <h4>Analisando Serviços</h4>
+                        <p>IA processando ambientes e serviços...</p>
+                    </div>
+                </div>
+                <div class="step" id="step3">
+                    <div class="step-icon"><i class="fas fa-search-dollar"></i></div>
+                    <div>
+                        <h4>Consultando Preços</h4>
+                        <p>Base Maeoka + SINAPI + Pesquisa online...</p>
+                    </div>
+                </div>
+                <div class="step" id="step4">
+                    <div class="step-icon"><i class="fas fa-calculator"></i></div>
+                    <div>
+                        <h4>Calculando Orçamento</h4>
+                        <p>Aplicando BDI e gerando totais...</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Resultado do Orçamento -->
+            <div class="orcamento-resultado" id="orcamentoResultado">
+                <div class="valor-total">
+                    <h3>💰 Valor Total Estimado</h3>
+                    <div style="font-size: 2.5rem; font-weight: bold; margin: 10px 0;" id="valorTotalDisplay">R$ 0,00</div>
+                    <p id="prazoDisplay">Prazo: X dias úteis</p>
+                </div>
+                
+                <div class="servicos-orcamento">
+                    <h4><i class="fas fa-list"></i> Detalhamento dos Serviços</h4>
+                    <div id="servicosDetalhados"></div>
+                </div>
+                
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin: 15px 0;">
+                    <h4><i class="fas fa-info-circle"></i> Informações Importantes</h4>
+                    <div id="observacoesOrcamento"></div>
+                </div>
+                
+                <div style="display: flex; gap: 15px; margin-top: 25px;">
+                    <button class="btn btn-success" onclick="baixarOrcamentoPDF()" style="flex: 1;">
+                        <i class="fas fa-download"></i> Baixar Orçamento PDF
+                    </button>
+                    <button class="btn btn-info" onclick="gerarContrato()" style="flex: 1;">
+                        <i class="fas fa-file-contract"></i> Gerar Contrato
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modais Existentes -->
+    <div class="modal-overlay" id="serviceModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">Adicionar Serviço</h3>
+                <button class="modal-close-btn" onclick="closeServiceModal()">&times;</button>
+            </div>
+            <div class="modal-form">
+                <input type="hidden" id="editingIndex">
+                <div class="form-group">
+                    <label for="serviceArea">Área (m²) ou Quantidade (un)</label>
+                    <input type="number" id="serviceArea" step="0.01" placeholder="Ex: 15.5 ou 3">
+                </div>
+                <div class="form-group">
+                    <label for="serviceObs">Observações</label>
+                    <input type="text" id="serviceObs" placeholder="Ex: Parede da pia, remover cerâmica antiga">
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" onclick="closeServiceModal()">Cancelar</button>
+                    <button class="btn btn-primary" onclick="saveService()">Salvar Serviço</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="photoGalleryModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="photoGalleryTitle">Galeria de Fotos</h3>
+                <button class="modal-close-btn" onclick="closePhotoGalleryModal()">&times;</button>
+            </div>
+            <div class="photo-grid" id="photoGrid"></div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="document.getElementById('addPhotoInput').click()">
+                    <i class="fas fa-camera"></i> Adicionar Foto
+                </button>
+                <input type="file" id="addPhotoInput" style="display: none;" accept="image/*" multiple>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="locationModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Adicionar Ambiente Comum</h3>
+                <button class="modal-close-btn" onclick="closeLocationModal()">&times;</button>
+            </div>
+            <div id="commonLocationsGrid" class="selection-grid"></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="loadOnlineModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Carregar Vistoria Online</h3>
+                <button class="modal-close-btn" onclick="closeLoadOnlineModal()">&times;</button>
+            </div>
+            <div class="modal-form">
+                <div class="form-group">
+                    <label for="inspectionIdInput">ID da Vistoria</label>
+                    <input type="text" id="inspectionIdInput" placeholder="Digite o ID...">
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" onclick="closeLoadOnlineModal()">Cancelar</button>
+                    <button class="btn btn-primary" id="confirmLoadOnlineBtn">Carregar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="confirmModal">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h3 class="modal-title" id="confirmModalTitle">Confirmar Ação</h3>
+            </div>
+            <p id="confirmModalText" style="margin: 20px 0; color: var(--text-light);"></p>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="confirmCancelBtn">Cancelar</button>
+                <button class="btn btn-danger" id="confirmOkBtn">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // --- CONFIGURAÇÃO DA API ---
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbydwN3L1nOCs2hn9TZqUoEo6aeBzqOlD5eL3w0H6nY3ehB_mvfAs4h4Jtr46nNNkCWyfw/exec";
+    
+    // NOVO: URL da API do Claude (você precisa configurar isso)
+    const CLAUDE_API_URL = "https://api.anthropic.com/v1/messages"; // Placeholder - você precisará configurar
+    const CLAUDE_PROJECT_ID = "seu-projeto-id"; // ID do projeto que criamos
+
+    // --- CONFIGURAÇÃO LOCAL ---
+    const config = {
+        commonLocations: ["Cozinha", "Sala de Estar", "Sala de Jantar", "Banheiro Social", "Banheiro Suíte", "Quarto Principal", "Quarto 2", "Área de Serviço", "Varanda/Sacada", "Garagem", "Área Externa", "Laje"],
+    };
+
+    // --- ESTADO DA APLICAÇÃO ---
+    let state = {
+        inspectionId: null,
+        activeLocation: null,
+        isEditingDetails: false,
+        inspectionData: { 
+            clientInfo: {
+                name: '',
+                address: '',
+                date: new Date().toLocaleDateString('pt-BR')
+            },
+            locations: {},
+            serviceCategories: {}
+        },
+        modalContext: {},
+        onConfirmCallback: null,
+        ultimoOrcamento: null // NOVO: Para armazenar o último orçamento gerado
+    };
+
+    // --- ELEMENTOS DO DOM ---
+    let mainContent, loadingOverlay, inspectionIdDisplay, inspectionDetailsPanel, locationList, newLocationInput, addLocationBtn, workspacePanel, summaryContent, serviceModal, modalTitle, serviceAreaInput, serviceObsInput, editingIndexInput, confirmModal, confirmModalText, confirmCancelBtn, confirmOkBtn, locationModal, loadFileInput, loadOnlineModal, confirmLoadOnlineBtn, inspectionIdInput, photoGalleryModal, photoGalleryTitle, photoGrid, addPhotoInput, mobileHeaderBackBtn, headerContent, moreOptionsToggle, moreOptionsMenu;
+
+    // --- INICIALIZAÇÃO ---
+    document.addEventListener('DOMContentLoaded', () => {
+        // INICIALIZAÇÃO DOS ELEMENTOS DO DOM
+        mainContent = document.getElementById('mainContent');
+        loadingOverlay = document.getElementById('loadingOverlay');
+        inspectionIdDisplay = document.getElementById('inspectionIdDisplay');
+        inspectionDetailsPanel = document.getElementById('inspectionDetailsPanel');
+        locationList = document.getElementById('locationList');
+        newLocationInput = document.getElementById('newLocationInput');
+        addLocationBtn = document.getElementById('addLocationBtn');
+        workspacePanel = document.getElementById('workspacePanel');
+        summaryContent = document.getElementById('summaryContent');
+        serviceModal = document.getElementById('serviceModal');
+        modalTitle = document.getElementById('modalTitle');
+        serviceAreaInput = document.getElementById('serviceArea');
+        serviceObsInput = document.getElementById('serviceObs');
+        editingIndexInput = document.getElementById('editingIndex');
+        confirmModal = document.getElementById('confirmModal');
+        confirmModalText = document.getElementById('confirmModalText');
+        confirmCancelBtn = document.getElementById('confirmCancelBtn');
+        confirmOkBtn = document.getElementById('confirmOkBtn');
+        locationModal = document.getElementById('locationModal');
+        loadFileInput = document.getElementById('loadFileInput');
+        loadOnlineModal = document.getElementById('loadOnlineModal');
+        confirmLoadOnlineBtn = document.getElementById('confirmLoadOnlineBtn');
+        inspectionIdInput = document.getElementById('inspectionIdInput');
+        photoGalleryModal = document.getElementById('photoGalleryModal');
+        photoGalleryTitle = document.getElementById('photoGalleryTitle');
+        photoGrid = document.getElementById('photoGrid');
+        addPhotoInput = document.getElementById('addPhotoInput');
+        mobileHeaderBackBtn = document.getElementById('mobileHeaderBackBtn');
+        headerContent = document.querySelector('.header-content');
+        moreOptionsToggle = document.getElementById('moreOptionsToggle');
+        moreOptionsMenu = document.getElementById('moreOptionsMenu');
+
+        // EVENT LISTENERS
+        addLocationBtn.addEventListener('click', handleAddLocation);
+        newLocationInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') handleAddLocation();
+        });
+        
+        confirmCancelBtn.addEventListener('click', closeConfirmationModal);
+        confirmOkBtn.addEventListener('click', () => {
+            if (state.onConfirmCallback) {
+                state.onConfirmCallback();
+            }
+            closeConfirmationModal();
+        });
+        
+        loadFileInput.addEventListener('change', loadInspectionFromFile);
+        confirmLoadOnlineBtn.addEventListener('click', handleConfirmLoadOnline);
+        addPhotoInput.addEventListener('change', handleAddPhoto);
+        mobileHeaderBackBtn.addEventListener('click', () => showLocationsPanel());
+        moreOptionsToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            moreOptionsMenu.classList.toggle('active');
+        });
+        document.addEventListener('click', () => {
+             if(moreOptionsMenu.classList.contains('active')) {
+                moreOptionsMenu.classList.remove('active');
+             }
+        });
+        
+        // CARREGAMENTO INICIAL DOS DADOS
+        fetchServiceData();
+    });
+
+    // --- NOVA FUNÇÃO: SALVAR + GERAR ORÇAMENTO IA ---
+    async function saveInspectionOnlineComOrcamento() {
+        // Primeiro valida se tem dados para processar
+        if (Object.keys(state.inspectionData.locations).length === 0) {
+            alert('Adicione pelo menos um ambiente com serviços para gerar o orçamento!');
+            return;
+        }
+
+        // Abre o modal de processamento
+        openOrcamentoModal();
+        
+        try {
+            // PASSO 1: Salvar vistoria
+            await executarPasso(1, async () => {
+                await saveInspectionOnline();
+            });
+
+            // PASSO 2: Analisar serviços
+            await executarPasso(2, async () => {
+                // Simula análise (aqui você pode adicionar lógica específica)
+                await sleep(1500);
+            });
+
+            // PASSO 3: Consultar preços e PASSO 4: Calcular orçamento
+            await executarPasso(3, async () => {
+                await sleep(1000);
+            });
+
+            await executarPasso(4, async () => {
+                // AQUI É ONDE CHAMAMOS O AGENTE IA
+                const orcamento = await chamarAgenteOrcamentista();
+                state.ultimoOrcamento = orcamento;
+                mostrarResultadoOrcamento(orcamento);
+            });
+
+        } catch (error) {
+            console.error('Erro no processamento:', error);
+            alert('Erro ao processar orçamento: ' + error.message);
+            closeOrcamentoModal();
+        }
+    }
+
+    // --- NOVA FUNÇÃO: CHAMAR AGENTE ORÇAMENTISTA IA ---
+    async function chamarAgenteOrcamentista() {
+        // Por enquanto, vamos simular a resposta do agente
+        // DEPOIS você vai conectar com o projeto Claude real
+        
+        const dadosParaAgente = {
+            clientInfo: state.inspectionData.clientInfo,
+            locations: state.inspectionData.locations,
+            serviceCategories: state.inspectionData.serviceCategories
+        };
+
+        console.log('📤 Enviando para Agente IA:', dadosParaAgente);
+
+        // SIMULAÇÃO: Cálculo básico (VOCÊ VAI SUBSTITUIR PELA CHAMADA REAL DA API)
+        const orcamentoSimulado = simularCalculoOrcamento(dadosParaAgente);
+        
+        // Simula delay de processamento
+        await sleep(2000);
+        
+        return orcamentoSimulado;
+    }
+
+    // --- FUNÇÃO TEMPORÁRIA: SIMULAR CÁLCULO (SERÁ SUBSTITUÍDA) ---
+    function simularCalculoOrcamento(dados) {
+        const servicosCalculados = [];
+        let totalGeral = 0;
+
+        // Base de preços simulada (baseada na sua planilha)
+        const precos = {
+            'Parede': { material: 5, mo: 30, unidade: 'm²' },
+            'Piso': { material: 5, mo: 25, unidade: 'm²' },
+            'Revestimento Cerâmico': { material: 35, mo: 60, unidade: 'm²' },
+            'Tinta': { material: 8, mo: 15, unidade: 'm²' },
+            'Pintura': { material: 8, mo: 15, unidade: 'm²' }
+        };
+
+        Object.entries(dados.locations).forEach(([ambiente, servicos]) => {
+            servicos.forEach(servico => {
+                const precoBase = precos[servico.service] || { material: 10, mo: 20, unidade: 'm²' };
+                const area = parseFloat(servico.area) || 10; // Default 10m² se não informado
+                const valorUnitario = precoBase.material + precoBase.mo;
+                const valorTotal = area * valorUnitario * 1.3; // Aplica BDI de 30%
+
+                servicosCalculados.push({
+                    ambiente: ambiente,
+                    nome: servico.service,
+                    area: area,
+                    unidade: precoBase.unidade,
+                    valorUnitario: valorUnitario * 1.3,
+                    valorTotal: valorTotal,
+                    obs: servico.obs || ''
+                });
+
+                totalGeral += valorTotal;
+            });
+        });
+
+        return {
+            cliente: dados.clientInfo,
+            servicos: servicosCalculados,
+            resumo: {
+                subtotal: totalGeral,
+                valorTotal: totalGeral,
+                bdiAplicado: '30%',
+                prazoEstimado: calcularPrazo(servicosCalculados)
+            },
+            observacoes: [
+                'Preços baseados na tabela Maeoka + SINAPI Curitiba/PR',
+                'Valores incluem material e mão de obra',
+                'BDI de 30% aplicado conforme porte da obra',
+                'Não inclui taxas de condomínio ou licenças'
+            ]
+        };
+    }
+
+    function calcularPrazo(servicos) {
+        const totalDias = servicos.length * 2; // 2 dias por serviço (simplificado)
+        return `${totalDias}-${totalDias + 5} dias úteis`;
+    }
+
+    // --- FUNÇÕES DO MODAL DE ORÇAMENTO ---
+    function openOrcamentoModal() {
+        document.getElementById('orcamentoModal').style.display = 'flex';
+        // Reset dos passos
+        document.querySelectorAll('.step').forEach(step => {
+            step.classList.remove('active', 'completed');
+        });
+        document.getElementById('orcamentoResultado').style.display = 'none';
+    }
+
+    function closeOrcamentoModal() {
+        document.getElementById('orcamentoModal').style.display = 'none';
+    }
+
+    async function executarPasso(numeroPassso, funcao) {
+        // Marca como ativo
+        document.getElementById(`step${numeroPassso}`).classList.add('active');
+        
+        // Executa a função
+        await funcao();
+        
+        // Marca como completo
+        document.getElementById(`step${numeroPassso}`).classList.remove('active');
+        document.getElementById(`step${numeroPassso}`).classList.add('completed');
+    }
+
+    function mostrarResultadoOrcamento(orcamento) {
+        // Preenche os dados do resultado
+        document.getElementById('valorTotalDisplay').textContent = 
+            orcamento.resumo.valorTotal.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'});
+        
+        document.getElementById('prazoDisplay').textContent = 
+            `Prazo: ${orcamento.resumo.prazoEstimado}`;
+
+        // Preenche serviços detalhados
+        const servicosContainer = document.getElementById('servicosDetalhados');
+        servicosContainer.innerHTML = '';
+        
+        orcamento.servicos.forEach(servico => {
+            const div = document.createElement('div');
+            div.className = 'servico-item';
+            div.innerHTML = `
+                <div>
+                    <strong>${servico.nome}</strong> (${servico.ambiente})
+                    <br><small>${servico.area} ${servico.unidade} × ${servico.valorUnitario.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}/${servico.unidade}</small>
+                    ${servico.obs ? `<br><small style="color: #666;">Obs: ${servico.obs}</small>` : ''}
+                </div>
+                <div style="font-weight: bold;">
+                    ${servico.valorTotal.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}
+                </div>
+            `;
+            servicosContainer.appendChild(div);
+        });
+
+        // Preenche observações
+        const obsContainer = document.getElementById('observacoesOrcamento');
+        obsContainer.innerHTML = orcamento.observacoes.map(obs => `<p>• ${obs}</p>`).join('');
+
+        // Mostra o resultado
+        document.getElementById('orcamentoResultado').style.display = 'block';
+    }
+
+    function baixarOrcamentoPDF() {
+        if (!state.ultimoOrcamento) return;
+        
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        const orcamento = state.ultimoOrcamento;
+        
+        // Cabeçalho
+        doc.setFontSize(18);
+        doc.text("Orçamento - Maeoka Engenharia", 105, 20, { align: 'center' });
+        
+        doc.setFontSize(12);
+        doc.text(`Cliente: ${orcamento.cliente.name || 'Não informado'}`, 20, 40);
+        doc.text(`Endereço: ${orcamento.cliente.address || 'Não informado'}`, 20, 50);
+        doc.text(`Data: ${new Date().toLocaleDateString('pt-BR')}`, 20, 60);
+        
+        // Serviços
+        let y = 80;
+        doc.setFontSize(14);
+        doc.text("Serviços:", 20, y);
+        y += 10;
+        
+        doc.setFontSize(10);
+        orcamento.servicos.forEach(servico => {
+            if (y > 270) {
+                doc.addPage();
+                y = 20;
+            }
+            doc.text(`${servico.nome} (${servico.ambiente})`, 20, y);
+            doc.text(`${servico.area} ${servico.unidade}`, 120, y);
+            doc.text(servico.valorTotal.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'}), 160, y);
+            y += 10;
+        });
+        
+        // Total
+        y += 10;
+        doc.setFontSize(14);
+        doc.text(`TOTAL: ${orcamento.resumo.valorTotal.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}`, 20, y);
+        
+        doc.save(`Orcamento-Maeoka-${new Date().toISOString().split('T')[0]}.pdf`);
+    }
+
+    function gerarContrato() {
+        if (!state.ultimoOrcamento) return;
+        
+        // Prepara dados para o contrato.html
+        const dadosContrato = {
+            cliente: state.ultimoOrcamento.cliente,
+            servicos: state.ultimoOrcamento.servicos,
+            valorTotal: state.ultimoOrcamento.resumo.valorTotal,
+            prazo: state.ultimoOrcamento.resumo.prazoEstimado
+        };
+        
+        // Salva no localStorage para o contrato.html acessar
+        localStorage.setItem('dadosOrcamento', JSON.stringify(dadosContrato));
+        
+        // Redireciona para contrato.html (substitua pela URL correta)
+        window.open('contrato.html', '_blank');
+    }
+
+    function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    // --- RESTO DAS SUAS FUNÇÕES EXISTENTES ---
+    async function fetchServiceData() {
+        showLoading(true, 'Carregando dados mestre...');
+        try {
+            const response = await fetch(SCRIPT_URL);
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            const result = await response.json();
+            if (result.status === 'success') {
+                state.inspectionData.serviceCategories = result.data;
+                renderAll();
+            } else {
+                throw new Error(result.message);
+            }
+        } catch (error) {
+            alert('Falha ao carregar os dados da planilha. Verifique a URL do script e as permissões da planilha.');
+            console.error('Erro ao buscar dados:', error);
+        } finally {
+            showLoading(false);
+        }
+    }
+
+    async function postDataToSheet(action, payload) {
+        showLoading(true, 'Salvando na planilha...');
+        try {
+            const response = await fetch(SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8', },
+                body: JSON.stringify({ action, payload })
+            });
+            setTimeout(fetchServiceData, 2000);
+        } catch (error) {
+            alert('Falha ao salvar os dados na planilha.');
+            console.error('Erro ao postar dados:', error);
+            showLoading(false);
+        }
+    }
+
+    function renderAll() {
+        inspectionIdDisplay.textContent = state.inspectionId || 'NOVA';
+        renderInspectionDetails();
+        renderLocationsPanel();
+        renderWorkspace();
+        renderSummary();
+    }
+
+    function renderInspectionDetails() {
+        const panel = inspectionDetailsPanel;
+        const info = state.inspectionData.clientInfo;
+        const isEditing = state.isEditingDetails;
+        panel.innerHTML = `
+            <div class="detail-item">
+                <label>CLIENTE</label>
+                <div class="detail-item-value" id="detailName">${isEditing ? `<input type="text" value="${info.name}">` : (info.name || 'Não definido')}</div>
+            </div>
+            <div class="detail-item">
+                <label>ENDEREÇO DA OBRA</label>
+                <div class="detail-item-value" id="detailAddress">${isEditing ? `<input type="text" value="${info.address}">` : (info.address || 'Não definido')}</div>
+            </div>
+            <div class="detail-item">
+                <label>DATA DA VISTORIA</label>
+                <div class="detail-item-value" id="detailDate">${isEditing ? `<input type="text" value="${info.date}">` : (info.date || 'Não definido')}</div>
+            </div>
+            <button class="btn btn-secondary btn-edit-details" id="toggleEditDetailsBtn">
+                ${isEditing ? '<i class="fas fa-save"></i> Salvar' : '<i class="fas fa-pen"></i> Editar Detalhes'}
+            </button>
+        `;
+        document.getElementById('toggleEditDetailsBtn').addEventListener('click', toggleEditDetails);
+    }
+
+    function renderLocationsPanel() {
+        locationList.innerHTML = '';
+        Object.keys(state.inspectionData.locations).forEach(locationName => {
+            const itemCount = state.inspectionData.locations[locationName].length;
+            const li = document.createElement('li');
+            li.className = `location-item ${state.activeLocation === locationName ? 'active' : ''}`;
+            li.dataset.location = locationName;
+            
+            li.innerHTML = `
+                <div class="location-item-main">
+                    <span class="location-item-name">${locationName}</span>
+                    <span class="location-item-count">${itemCount}</span>
+                </div>
+                <div class="location-actions">
+                    <button class="location-action-btn duplicate-btn" title="Duplicar Ambiente"><i class="fas fa-copy"></i></button>
+                    <button class="location-action-btn delete-btn" title="Excluir Ambiente"><i class="fas fa-times-circle"></i></button>
+                </div>
+            `;
+
+            li.querySelector('.location-item-main').addEventListener('click', () => {
+                showWorkspacePanel(locationName);
+            });
+
+            li.querySelector('.duplicate-btn').addEventListener('click', (e) => {
+                e.stopPropagation();
+                duplicateLocation(locationName);
+            });
+
+            li.querySelector('.delete-btn').addEventListener('click', (e) => {
+                e.stopPropagation();
+                deleteLocation(locationName);
+            });
+
+            locationList.appendChild(li);
+        });
+    }
+
+    function renderWorkspace(searchTerm = '') {
+        workspacePanel.innerHTML = '';
+        if (!state.activeLocation) {
+            workspacePanel.innerHTML = `
+                <div class="workspace-placeholder">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <h2>Nenhum ambiente selecionado</h2>
+                    <p>Adicione um ambiente à esquerda ou selecione um existente para começar.</p>
+                </div>`;
+            return;
+        }
+
+        const locationData = state.inspectionData.locations[state.activeLocation];
+        
+        workspacePanel.innerHTML = `
+            <h2 class="workspace-header">Serviços para: ${state.activeLocation}</h2>
+            <div class="saved-services-list">
+                <h3>Serviços Adicionados</h3>
+                <div id="savedServicesContainer"></div>
+            </div>
+            <div class="add-services-section">
+                <h3 style="margin-bottom: 15px;">Adicionar Novo Serviço</h3>
+                <div class="search-bar-wrapper">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="serviceSearchInput" placeholder="Buscar serviço..." value="${searchTerm}">
+                </div>
+                <div id="addServicesContainer" style="margin-top: 15px;"></div>
+            </div>
+        `;
+
+        document.getElementById('serviceSearchInput').addEventListener('input', (e) => renderWorkspace(e.target.value));
+
+        const savedServicesContainer = document.getElementById('savedServicesContainer');
+        if (locationData.length === 0) {
+            savedServicesContainer.innerHTML = '<p style="color: var(--text-light); margin-top: 10px;">Nenhum serviço adicionado a este ambiente ainda.</p>';
+        } else {
+            locationData.forEach((service, index) => {
+                const categoryLabel = state.inspectionData.serviceCategories[service.category]?.label || service.category;
+                const card = document.createElement('div');
+                card.className = 'service-card';
+                card.innerHTML = `
+                    <div class="service-card-details">
+                        <div class="service-card-title">
+                            ${service.service}
+                            <span class="category-badge">${categoryLabel}</span>
+                        </div>
+                        <div class="service-card-meta">
+                            <span><i class="fas fa-ruler-combined"></i> ${service.area || 'N/A'}</span>
+                            <span><i class="fas fa-comment"></i> ${service.obs || 'Nenhuma'}</span>
+                        </div>
+                    </div>
+                    <div class="service-card-actions">
+                        <button onclick="openPhotoGalleryModal('${state.activeLocation}', ${index})"><i class="fas fa-camera"></i></button>
+                        <button onclick="editService(${index})"><i class="fas fa-pen"></i></button>
+                        <button class="delete-btn" onclick="deleteService(${index})"><i class="fas fa-trash"></i></button>
+                    </div>
+                `;
+                savedServicesContainer.appendChild(card);
+            });
+        }
+        
+        const addServicesContainer = document.getElementById('addServicesContainer');
+        const lowerSearchTerm = searchTerm.toLowerCase();
+
+        Object.entries(state.inspectionData.serviceCategories).forEach(([catKey, category]) => {
+            const filteredItems = category.items.filter(item => item.toLowerCase().includes(lowerSearchTerm));
+            const categoryMatch = category.label.toLowerCase().includes(lowerSearchTerm);
+
+            if (categoryMatch || filteredItems.length > 0) {
+                addServicesContainer.appendChild(createCategoryAccordion(catKey, category, filteredItems, categoryMatch));
+            }
+        });
+
+        const addCategoryForm = document.createElement('div');
+        addCategoryForm.className = 'add-category-form';
+        addCategoryForm.innerHTML = `
+            <h4>Criar Nova Categoria de Serviço</h4>
+            <div class="add-custom-form">
+                <input type="text" id="newCategoryInput" placeholder="Ex: Documentação, Taxas...">
+                <button id="addCategoryBtn"><i class="fas fa-plus"></i> Adicionar</button>
+            </div>
+        `;
+        addServicesContainer.appendChild(addCategoryForm);
+        document.getElementById('addCategoryBtn').addEventListener('click', addCustomCategory);
+        document.getElementById('newCategoryInput').addEventListener('keypress', e => {
+            if (e.key === 'Enter') addCustomCategory();
+        });
+    }
+
+    function createCategoryAccordion(catKey, category, filteredItems, categoryMatch) {
+        const accordion = document.createElement('div');
+        accordion.className = 'service-category-accordion';
+        
+        const accordionHeader = document.createElement('div');
+        accordionHeader.className = 'accordion-header';
+        accordionHeader.innerHTML = `<div class="header-left"><i class="fas ${category.icon}"></i><h4>${category.label}</h4></div><i class="fas fa-chevron-down"></i>`;
+        accordionHeader.addEventListener('click', (e) => {
+            e.currentTarget.classList.toggle('active');
+            e.currentTarget.nextElementSibling.classList.toggle('active');
+        });
+
+        const accordionContent = document.createElement('div');
+        accordionContent.className = 'accordion-content';
+
+        const itemsToShow = categoryMatch ? category.items : filteredItems;
+        itemsToShow.forEach(item => {
+            const btn = document.createElement('button');
+            btn.className = 'service-to-add';
+            btn.textContent = item;
+            btn.onclick = () => openServiceModal(catKey, item);
+            accordionContent.appendChild(btn);
+        });
+
+        const customAddForm = document.createElement('div');
+        customAddForm.className = 'add-custom-form';
+        customAddForm.innerHTML = `
+            <input type="text" class="custom-service-input" placeholder="Outro serviço...">
+            <button type="button" class="add-custom-btn"><i class="fas fa-plus"></i></button>
+        `;
+        
+        const customInput = customAddForm.querySelector('.custom-service-input');
+        const customBtn = customAddForm.querySelector('.add-custom-btn');
+
+        customBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const customServiceName = customInput.value.trim();
+            if (customServiceName) {
+                postDataToSheet('addService', { categoryKey: catKey, serviceName: customServiceName });
+                customInput.value = '';
+            }
+        });
+
+        customInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                customBtn.click();
+            }
+        });
+
+        accordionContent.appendChild(customAddForm);
+        accordion.appendChild(accordionHeader);
+        accordion.appendChild(accordionContent);
+        return accordion;
+    }
+
+    function renderSummary() {
+        if (!summaryContent) return; 
+        summaryContent.innerHTML = '';
+        const locations = state.inspectionData.locations;
+        if (Object.keys(locations).length === 0) {
+            summaryContent.innerHTML = '<p>Nenhum ambiente adicionado.</p>';
+            return;
+        }
+        Object.entries(locations).forEach(([locationName, services]) => {
+            if (services.length > 0) {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'summary-location-item';
+                let servicesHtml = services.map(s => {
+                    const categoryLabel = state.inspectionData.serviceCategories[s.category]?.label || s.category;
+                    const photoCount = s.photos ? s.photos.length : 0;
+                    const photoIcon = photoCount > 0 ? ` <i class="fas fa-camera" style="color: var(--text-light);"></i> ${photoCount}` : '';
+                    return `<div class="summary-service-item">• ${s.service} <small>(${categoryLabel})${photoIcon}</small></div>`;
+                }).join('');
+                itemDiv.innerHTML = `
+                    <div class="summary-location-header">${locationName} (${services.length})</div>
+                    ${servicesHtml}
+                `;
+                summaryContent.appendChild(itemDiv);
+            }
+        });
+    }
+
+    function toggleEditDetails() {
+        if (state.isEditingDetails) {
+            state.inspectionData.clientInfo.name = document.querySelector('#detailName input').value;
+            state.inspectionData.clientInfo.address = document.querySelector('#detailAddress input').value;
+            state.inspectionData.clientInfo.date = document.querySelector('#detailDate input').value;
+        }
+        state.isEditingDetails = !state.isEditingDetails;
+        renderInspectionDetails();
+    }
+
+    function showWorkspacePanel(locationName) {
+        state.activeLocation = locationName;
+        mainContent.classList.add('workspace-active');
+        mobileHeaderBackBtn.classList.add('visible');
+        headerContent.classList.add('hiding');
+        renderAll();
+    }
+
+    function showLocationsPanel() {
+        mainContent.classList.remove('workspace-active');
+        mobileHeaderBackBtn.classList.remove('visible');
+        headerContent.classList.remove('hiding');
+    }
+
+    function handleAddLocation() {
+        const locationName = newLocationInput.value.trim();
+        if (locationName) {
+            addLocation(locationName);
+            newLocationInput.value = '';
+        } else {
+            openLocationModal();
+        }
+    }
+
+    function addLocation(name) {
+        if (name && !state.inspectionData.locations[name]) {
+            state.inspectionData.locations[name] = [];
+            state.activeLocation = name;
+            renderAll();
+        }
+    }
+
+    function deleteLocation(locationName) {
+        showConfirmationModal(`Tem certeza que deseja excluir o ambiente "${locationName}" e todos os seus serviços?`, () => {
+            delete state.inspectionData.locations[locationName];
+            if (state.activeLocation === locationName) {
+                state.activeLocation = null;
+                showLocationsPanel();
+            }
+            renderAll();
+        });
+    }
+    
+    function duplicateLocation(locationName) {
+        const newName = `${locationName} (cópia)`;
+        if (state.inspectionData.locations[newName]) {
+            alert(`Já existe um ambiente chamado "${newName}". Renomeie antes de duplicar novamente.`);
+            return;
+        }
+        const servicesCopy = JSON.parse(JSON.stringify(state.inspectionData.locations[locationName]));
+        state.inspectionData.locations[newName] = servicesCopy;
+        state.activeLocation = newName;
+        renderAll();
+    }
+
+    function openLocationModal() {
+        const grid = document.getElementById('commonLocationsGrid');
+        grid.innerHTML = config.commonLocations.map(loc => `
+            <button class="selection-card" data-location="${loc}">
+                <i class="fas fa-door-open card-icon"></i>
+                <div class="card-title">${loc}</div>
+            </button>
+        `).join('');
+
+        grid.onclick = function(e) {
+            const card = e.target.closest('.selection-card');
+            if (card) {
+                const locationName = card.dataset.location;
+                addLocation(locationName);
+                closeLocationModal();
+            }
+        };
+        locationModal.classList.add('visible');
+    }
+
+    function closeLocationModal() {
+        locationModal.classList.remove('visible');
+    }
+
+    function addCustomCategory() {
+        const input = document.getElementById('newCategoryInput');
+        const categoryName = input.value.trim();
+        const categoryKey = categoryName.toLowerCase().replace(/\s+/g, '_');
+
+        if (categoryName && !state.inspectionData.serviceCategories[categoryKey]) {
+            const payload = {
+                key: categoryKey,
+                label: categoryName,
+                icon: 'fa-star' 
+            };
+            postDataToSheet('addCategory', payload);
+            input.value = '';
+        }
+    }
+
+    function openServiceModal(category, service, index = null) {
+        state.modalContext = { category, service };
+        editingIndexInput.value = index !== null ? index : '';
+        
+        if (index !== null) {
+            const serviceData = state.inspectionData.locations[state.activeLocation][index];
+            modalTitle.textContent = `Editar: ${serviceData.service}`;
+            serviceAreaInput.value = serviceData.area;
+            serviceObsInput.value = serviceData.obs;
+        } else {
+            modalTitle.textContent = `Adicionar: ${service}`;
+            serviceAreaInput.value = '';
+            serviceObsInput.value = '';
+        }
+        
+        serviceModal.classList.add('visible');
+    }
+
+    function closeServiceModal() {
+        serviceModal.classList.remove('visible');
+    }
+
+    function saveService() {
+        const area = serviceAreaInput.value;
+        const obs = serviceObsInput.value;
+        const index = editingIndexInput.value;
+        const { category, service } = state.modalContext;
+
+        if (index !== '') {
+            const existingService = state.inspectionData.locations[state.activeLocation][parseInt(index, 10)];
+            existingService.area = area;
+            existingService.obs = obs;
+        } else {
+            const serviceData = { category, service, area, obs, photos: [], id: Date.now() };
+            state.inspectionData.locations[state.activeLocation].push(serviceData);
+        }
+
+        closeServiceModal();
+        renderAll();
+    }
+    
+    function editService(index) {
+        const serviceData = state.inspectionData.locations[state.activeLocation][index];
+        openServiceModal(serviceData.category, serviceData.service, index);
+    }
+
+    function deleteService(index) {
+        showConfirmationModal('Tem certeza que deseja excluir este serviço?', () => {
+            state.inspectionData.locations[state.activeLocation].splice(index, 1);
+            renderAll();
+        });
+    }
+    
+    function openPhotoGalleryModal(locationName, serviceIndex) {
+        state.modalContext = { locationName, serviceIndex };
+        const service = state.inspectionData.locations[locationName][serviceIndex];
+        photoGalleryTitle.textContent = `Fotos para: ${service.service}`;
+        renderPhotoGrid();
+        photoGalleryModal.classList.add('visible');
+    }
+
+    function closePhotoGalleryModal() {
+        photoGalleryModal.classList.remove('visible');
+    }
+
+    function renderPhotoGrid() {
+        const { locationName, serviceIndex } = state.modalContext;
+        const service = state.inspectionData.locations[locationName][serviceIndex];
+        photoGrid.innerHTML = '';
+        if (service.photos && service.photos.length > 0) {
+            service.photos.forEach((photoData, index) => {
+                const thumb = document.createElement('div');
+                thumb.className = 'photo-thumbnail';
+                thumb.innerHTML = `
+                    <img src="${photoData}" alt="Foto ${index + 1}">
+                    <button class="photo-delete-btn" onclick="deletePhoto(${index})"><i class="fas fa-times"></i></button>
+                `;
+                photoGrid.appendChild(thumb);
+            });
+        } else {
+            photoGrid.innerHTML = '<p>Nenhuma foto adicionada.</p>';
+        }
+    }
+
+    function handleAddPhoto(event) {
+        const files = event.target.files;
+        if (!files) return;
+
+        showLoading(true, 'Processando fotos...');
+        const { locationName, serviceIndex } = state.modalContext;
+        const service = state.inspectionData.locations[locationName][serviceIndex];
+        if (!service.photos) service.photos = [];
+
+        let filesProcessed = 0;
+        Array.from(files).forEach(file => {
+            resizeImage(file, 1024, 1024, 0.7).then(dataUrl => {
+                service.photos.push(dataUrl);
+                filesProcessed++;
+                if (filesProcessed === files.length) {
+                    showLoading(false);
+                    renderPhotoGrid();
+                    renderSummary();
+                }
+            });
+        });
+        addPhotoInput.value = '';
+    }
+
+    function resizeImage(file, maxWidth, maxHeight, quality) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > height) {
+                        if (width > maxWidth) {
+                            height *= maxWidth / width;
+                            width = maxWidth;
+                        }
+                    } else {
+                        if (height > maxHeight) {
+                            width *= maxHeight / height;
+                            height = maxHeight;
+                        }
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    resolve(canvas.toDataURL('image/jpeg', quality));
+                };
+                img.onerror = reject;
+                img.src = event.target.result;
+            };
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
+    }
+    
+    function deletePhoto(photoIndex) {
+        const { locationName, serviceIndex } = state.modalContext;
+        state.inspectionData.locations[locationName][serviceIndex].photos.splice(photoIndex, 1);
+        renderPhotoGrid();
+        renderSummary();
+    }
+
+    function showConfirmationModal(text, callback) {
+        confirmModalText.textContent = text;
+        state.onConfirmCallback = callback;
+        confirmModal.classList.add('visible');
+    }
+
+    function closeConfirmationModal() {
+        confirmModal.classList.remove('visible');
+        state.onConfirmCallback = null;
+    }
+    
+    function showLoading(show, message = 'Carregando...') {
+        loadingOverlay.querySelector('p').textContent = message;
+        loadingOverlay.classList.toggle('hidden', !show);
+    }
+    
+    function openLoadOnlineModal() {
+        inspectionIdInput.value = '';
+        loadOnlineModal.classList.add('visible');
+    }
+    
+    function closeLoadOnlineModal() {
+        loadOnlineModal.classList.remove('visible');
+    }
+
+    async function saveInspectionOnline() {
+        showLoading(true, 'Salvando vistoria na nuvem...');
+        try {
+            const payload = { id: state.inspectionId, data: state.inspectionData };
+            const response = await fetch(SCRIPT_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8', },
+                body: JSON.stringify({ action: 'saveInspection', payload })
+            });
+            const result = await response.json();
+            if (result.status === 'success') {
+                state.inspectionId = result.newId;
+                renderAll();
+            } else {
+                throw new Error(result.message);
+            }
+        } catch (error) {
+            console.error('Erro ao salvar vistoria:', error);
+            throw error;
+        } finally {
+            showLoading(false);
+        }
+    }
+
+    async function handleConfirmLoadOnline() {
+        const idToLoad = inspectionIdInput.value.trim();
+        if (!idToLoad) return;
+        
+        closeLoadOnlineModal();
+        showLoading(true, `Carregando vistoria ${idToLoad}...`);
+        try {
+            const loadUrl = `${SCRIPT_URL}?action=load&id=${idToLoad}`;
+            const response = await fetch(loadUrl);
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            const result = await response.json();
+
+            if (result.status === 'success') {
+                state.inspectionData = result.data;
+                state.inspectionId = idToLoad.toUpperCase();
+                state.activeLocation = Object.keys(result.data.locations)[0] || null;
+                renderAll();
+            } else {
+                throw new Error(result.message);
+            }
+        } catch (error) {
+            alert(`Falha ao carregar a vistoria: ${error.message}`);
+            console.error('Erro ao carregar vistoria:', error);
+        } finally {
+            showLoading(false);
+        }
+    }
+
+    function saveInspectionToFile() {
+        const dataStr = JSON.stringify({inspectionId: state.inspectionId, inspectionData: state.inspectionData}, null, 2);
+        const blob = new Blob([dataStr], {type: "application/json"});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `vistoria-${state.inspectionId || 'backup'}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+
+    function loadInspectionFromFile(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const loaded = JSON.parse(e.target.result);
+                if (loaded.inspectionData && loaded.inspectionData.clientInfo) {
+                    state.inspectionData = loaded.inspectionData;
+                    state.inspectionId = loaded.inspectionId;
+                    state.activeLocation = Object.keys(loaded.inspectionData.locations)[0] || null;
+                    renderAll();
+                } else {
+                    alert('Arquivo de vistoria inválido ou corrompido.');
+                }
+            } catch (error) {
+                alert('Erro ao carregar o arquivo. Verifique se é um arquivo JSON válido.');
+                console.error("Erro ao parsear JSON:", error);
+            }
+        };
+        reader.readAsText(file);
+    }
+    
+    function startFromTemplate() {
+        if (!state.inspectionId) {
+            alert("Por favor, primeiro carregue uma vistoria para usar como modelo.");
+            return;
+        }
+        
+        showConfirmationModal("Isso criará uma nova vistoria usando a estrutura da atual. Os dados do cliente, ID e detalhes dos serviços serão limpos. Deseja continuar?", () => {
+            state.inspectionId = null;
+            state.inspectionData.clientInfo = { name: '', address: '', date: new Date().toLocaleDateString('pt-BR') };
+            
+            Object.keys(state.inspectionData.locations).forEach(loc => {
+                state.inspectionData.locations[loc].forEach(service => {
+                    service.area = '';
+                    service.obs = '';
+                    service.photos = [];
+                });
+            });
+            
+            state.activeLocation = Object.keys(state.inspectionData.locations)[0] || null;
+            renderAll();
+        });
+    }
+
+    function generatePDF() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        const data = state.inspectionData;
+        let y = 15;
+
+        doc.setFontSize(18);
+        doc.text("Relatório de Vistoria - Maeoka Engenharia", 105, y, { align: 'center' });
+        y += 10;
+        
+        doc.setFontSize(10);
+        doc.text(`ID da Vistoria: ${state.inspectionId || 'N/A'}`, 195, y, { align: 'right' });
+        y += 5;
+
+        doc.setFontSize(12);
+        doc.text(`Cliente: ${data.clientInfo.name || 'Não definido'}`, 15, y);
+        y += 7;
+        doc.text(`Endereço: ${data.clientInfo.address || 'Não definido'}`, 15, y);
+        y += 7;
+        doc.text(`Data: ${data.clientInfo.date || 'Não definido'}`, 15, y);
+        y += 15;
+
+        doc.line(15, y - 5, 195, y - 5);
+
+        Object.entries(data.locations).forEach(([locationName, services]) => {
+            if (services.length > 0) {
+                if (y > 270) {
+                    doc.addPage();
+                    y = 15;
+                }
+                doc.setFontSize(14);
+                doc.setFont(undefined, 'bold');
+                doc.text(`Ambiente: ${locationName}`, 15, y);
+                y += 8;
+                doc.setFont(undefined, 'normal');
+
+                services.forEach(service => {
+                    if (y > 280) {
+                        doc.addPage();
+                        y = 15;
+                    }
+                    doc.setFontSize(11);
+                    const categoryLabel = data.serviceCategories[service.category]?.label || service.category;
+                    let serviceText = `- ${service.service} (${categoryLabel})`;
+                    
+                    let details = [];
+                    if(service.area) details.push(`Área/Qtd: ${service.area}`);
+                    if(service.obs) details.push(`Obs: ${service.obs}`);
+                    
+                    doc.text(serviceText, 20, y);
+                    if(details.length > 0) {
+                        y += 5;
+                        doc.setFontSize(9);
+                        doc.setTextColor(100);
+                        doc.text(details.join(' | '), 25, y);
+                        doc.setTextColor(0);
+                    }
+                    y += 7;
+                });
+                y += 5;
+            }
+        });
+
+        Object.entries(data.locations).forEach(([locationName, services]) => {
+            services.forEach(service => {
+                if (service.photos && service.photos.length > 0) {
+                    doc.addPage();
+                    y = 15;
+                    doc.setFontSize(14);
+                    doc.setFont(undefined, 'bold');
+                    doc.text(`Fotos para: ${service.service} (${locationName})`, 15, y);
+                    y += 10;
+                    
+                    let x = 15;
+                    service.photos.forEach((photoData, index) => {
+                        if (y > 240) {
+                            doc.addPage();
+                            y = 15;
+                            x = 15;
+                        }
+                        try {
+                            doc.addImage(photoData, 'JPEG', x, y, 80, 80);
+                            x += 90;
+                            if (x > 105) {
+                                x = 15;
+                                y += 90;
+                            }
+                        } catch (e) {
+                            console.error("Erro ao adicionar imagem ao PDF:", e);
+                            doc.text("Erro ao carregar imagem.", x, y);
+                        }
+                    });
+                }
+            });
+        });
+
+        doc.save(`Vistoria - ${data.clientInfo.name || 'Relatorio'}.pdf`);
+    }
+
+    </script>
+</body>
+</html>
