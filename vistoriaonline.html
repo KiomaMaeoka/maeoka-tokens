@@ -441,7 +441,7 @@
 
         <!-- Action Footer -->
         <div class="action-footer">
-            <button class="btn btn-info" onclick="loadInspectionOnline()">
+            <button class="btn btn-info" onclick="openLoadOnlineModal()">
                 <i class="fas fa-cloud-download-alt"></i> Carregar Online
             </button>
             <button class="btn btn-info" onclick="saveInspectionOnline()">
@@ -494,6 +494,26 @@
             </div>
             <div id="commonLocationsGrid" class="selection-grid">
                 <!-- Botões de ambiente comum serão gerados aqui -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Carregar Vistoria Online -->
+    <div class="modal-overlay" id="loadOnlineModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Carregar Vistoria Online</h3>
+                <button class="modal-close-btn" onclick="closeLoadOnlineModal()">&times;</button>
+            </div>
+            <div class="modal-form">
+                <div class="form-group">
+                    <label for="inspectionIdInput">ID da Vistoria</label>
+                    <input type="text" id="inspectionIdInput" placeholder="Digite o ID...">
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" onclick="closeLoadOnlineModal()">Cancelar</button>
+                    <button class="btn btn-primary" id="confirmLoadOnlineBtn">Carregar</button>
+                </div>
             </div>
         </div>
     </div>
@@ -559,6 +579,9 @@
     const confirmOkBtn = document.getElementById('confirmOkBtn');
     const locationModal = document.getElementById('locationModal');
     const loadFileInput = document.getElementById('loadFileInput');
+    const loadOnlineModal = document.getElementById('loadOnlineModal');
+    const confirmLoadOnlineBtn = document.getElementById('confirmLoadOnlineBtn');
+    const inspectionIdInput = document.getElementById('inspectionIdInput');
 
     // --- INICIALIZAÇÃO ---
     document.addEventListener('DOMContentLoaded', () => {
@@ -576,6 +599,7 @@
         });
         
         loadFileInput.addEventListener('change', loadInspectionFromFile);
+        confirmLoadOnlineBtn.addEventListener('click', handleConfirmLoadOnline);
         
         fetchServiceData();
     });
@@ -1020,13 +1044,21 @@
         loadingOverlay.querySelector('p').textContent = message;
         loadingOverlay.classList.toggle('hidden', !show);
     }
+    
+    function openLoadOnlineModal() {
+        inspectionIdInput.value = '';
+        loadOnlineModal.classList.add('visible');
+    }
+    
+    function closeLoadOnlineModal() {
+        loadOnlineModal.classList.remove('visible');
+    }
 
     // --- ONLINE/OFFLINE SAVE/LOAD ACTIONS ---
     async function saveInspectionOnline() {
         showLoading(true, 'Salvando vistoria na nuvem...');
         try {
             const payload = { id: state.inspectionId, data: state.inspectionData };
-            // Para salvar, precisamos de uma resposta, então não usamos 'no-cors'
             const response = await fetch(SCRIPT_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'text/plain;charset=utf-8', },
@@ -1048,10 +1080,11 @@
         }
     }
 
-    async function loadInspectionOnline() {
-        const idToLoad = prompt("Digite o ID da vistoria que deseja carregar:");
+    async function handleConfirmLoadOnline() {
+        const idToLoad = inspectionIdInput.value.trim();
         if (!idToLoad) return;
-
+        
+        closeLoadOnlineModal();
         showLoading(true, `Carregando vistoria ${idToLoad}...`);
         try {
             const loadUrl = `${SCRIPT_URL}?action=load&id=${idToLoad}`;
