@@ -1,0 +1,1123 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vistoria Digital Online - Maeoka Engenharia</title>
+    
+    <!-- Ícones e Fontes -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Biblioteca jsPDF para gerar PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
+    <style>
+        /* Estilos gerais e de layout */
+        :root {
+            --primary-color: #3b82f6;
+            --primary-gradient: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+            --danger-color: #ef4444;
+            --secondary-gradient: linear-gradient(135deg, #1a3a52 0%, #2c5282 100%);
+            --success-gradient: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+            --info-gradient: linear-gradient(135deg, #818cf8 0%, #6366f1 100%);
+            --text-dark: #1f2937;
+            --text-light: #6b7280;
+            --bg-light: #f9fafb;
+            --border-color: #e5e7eb;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 24px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 40px);
+        }
+
+        /* Loading Overlay */
+        #loadingOverlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(5px);
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-dark);
+            transition: opacity 0.3s;
+        }
+        #loadingOverlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 15px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Header */
+        .header {
+            background: var(--secondary-gradient);
+            color: white;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+        .logo { display: flex; align-items: center; gap: 15px; }
+        .logo i { font-size: 32px; color: #60a5fa; }
+        .logo-text h1 { font-size: 22px; font-weight: 700; }
+        .logo-text p { font-size: 12px; opacity: 0.9; text-transform: uppercase; letter-spacing: 1px; }
+        
+        /* Painel de Detalhes da Vistoria */
+        .inspection-details {
+            background: var(--bg-light);
+            padding: 15px 30px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .detail-item { flex: 1; min-width: 200px; }
+        .detail-item label { font-size: 12px; font-weight: 600; color: var(--text-light); display: block; margin-bottom: 4px; }
+        .detail-item-value { font-size: 14px; font-weight: 500; }
+        .detail-item-value input { width: 100%; padding: 6px 8px; border-radius: 6px; border: 1px solid var(--border-color); }
+        .btn-edit-details { padding: 8px 12px; }
+
+        /* Main Content Layout */
+        .main-content {
+            display: flex;
+            flex-grow: 1;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Painel de Ambientes (Esquerda) */
+        .locations-panel {
+            width: 280px;
+            background: var(--bg-light);
+            border-right: 1px solid var(--border-color);
+            padding: 20px;
+            overflow-y: auto;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+        }
+        .locations-header {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--border-color);
+        }
+        .add-location-form { display: flex; gap: 8px; margin-bottom: 15px; }
+        .add-location-form input { flex-grow: 1; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 14px; }
+        .add-location-form button { padding: 8px 12px; border: none; background: var(--primary-color); color: white; border-radius: 8px; cursor: pointer; font-weight: 600; }
+        
+        .location-list { list-style: none; flex-grow: 1; }
+        .location-item {
+            background: white;
+            border-radius: 10px;
+            margin-bottom: 8px;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .location-item-main {
+            padding: 12px 15px;
+            flex-grow: 1;
+            cursor: pointer;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .location-item:hover { transform: translateX(5px); border-color: #93c5fd; }
+        .location-item.active {
+            background: var(--primary-gradient);
+            color: white;
+            transform: translateX(10px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+        }
+        .location-item-name { font-weight: 600; }
+        .location-item-count { font-size: 12px; background-color: rgba(0,0,0,0.1); padding: 2px 8px; border-radius: 10px; }
+        .location-item.active .location-item-count { background-color: rgba(255,255,255,0.2); }
+        .location-actions { display: flex; align-items: center; }
+        .location-action-btn {
+            background: none; border: none; color: #d1d5db; cursor: pointer;
+            font-size: 14px; padding: 12px; opacity: 0;
+            transition: all 0.2s ease; flex-shrink: 0;
+        }
+        .location-item:hover .location-action-btn { opacity: 1; color: var(--text-light); }
+        .location-item.active .location-action-btn { opacity: 1; color: white; }
+        .location-action-btn.delete-btn:hover { color: var(--danger-color) !important; }
+        .location-action-btn.duplicate-btn:hover { color: var(--primary-color) !important; }
+
+        /* Painel de Trabalho (Centro) */
+        .workspace-panel {
+            flex-grow: 1;
+            padding: 30px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .workspace-placeholder { text-align: center; margin: auto; color: var(--text-light); }
+        .workspace-placeholder i { font-size: 48px; margin-bottom: 15px; }
+        .workspace-placeholder h2 { font-size: 22px; }
+        .workspace-header { font-size: 24px; font-weight: 700; color: var(--text-dark); }
+        .search-bar-wrapper { position: relative; }
+        .search-bar-wrapper i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-light); }
+        #serviceSearchInput { width: 100%; padding: 10px 15px 10px 40px; border-radius: 8px; border: 1px solid var(--border-color); }
+        
+        /* Seção de Serviços Salvos */
+        .saved-services-list .service-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .service-card-details { flex-grow: 1; }
+        .service-card-title { font-weight: 600; margin-bottom: 8px; }
+        .service-card-title .category-badge { font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 8px; background: #eef2ff; color: #4f46e5; margin-left: 8px; }
+        .service-card-meta { font-size: 13px; color: var(--text-light); }
+        .service-card-meta span { margin-right: 15px; }
+        .service-card-actions button { background: none; border: none; color: var(--text-light); cursor: pointer; font-size: 16px; padding: 5px; }
+        .service-card-actions button:hover { color: var(--primary-color); }
+        .service-card-actions .delete-btn:hover { color: var(--danger-color); }
+
+        /* Accordion para adicionar serviços */
+        .service-category-accordion, .add-category-form { border: 1px solid var(--border-color); border-radius: 12px; margin-bottom: 10px; overflow: hidden; background-color: #fff; }
+        .accordion-header { display: flex; justify-content: space-between; align-items: center; padding: 15px; cursor: pointer; transition: background-color 0.2s ease; }
+        .accordion-header:hover { background-color: var(--bg-light); }
+        .accordion-header .header-left { display: flex; align-items: center; gap: 12px; font-weight: 600; font-size: 16px; }
+        .accordion-header .header-left i { color: var(--primary-color); }
+        .accordion-header .fa-chevron-down { transition: transform 0.3s ease; }
+        .accordion-header.active .fa-chevron-down { transform: rotate(180deg); }
+        .accordion-content { display: none; padding: 15px; border-top: 1px solid var(--border-color); }
+        .accordion-content.active { display: block; }
+        .service-to-add { display: block; width: 100%; text-align: left; padding: 10px; border-radius: 8px; background: #f9fafb; border: 1px solid #f9fafb; margin-bottom: 8px; cursor: pointer; font-weight: 500; }
+        .service-to-add:hover { background: #f3f4f6; border-color: #e5e7eb; }
+        .add-custom-form {
+            display: flex;
+            gap: 8px;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px dashed var(--border-color);
+        }
+        .add-custom-form input {
+            flex-grow: 1;
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        .add-custom-form button {
+            flex-shrink: 0;
+            padding: 8px 12px;
+            border: none;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .add-category-form { padding: 20px; background-color: var(--bg-light); }
+        .add-category-form h4 { font-weight: 600; margin-bottom: 10px; }
+
+        /* Painel de Resumo (Direita) */
+        .summary-panel {
+            width: 320px;
+            background: var(--bg-light);
+            border-left: 1px solid var(--border-color);
+            padding: 20px;
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+        .summary-header { font-size: 18px; font-weight: 700; color: var(--text-dark); margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid var(--border-color); }
+        .summary-location-item { background: white; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; margin-bottom: 10px; font-size: 14px; }
+        .summary-location-header { font-weight: 600; color: var(--text-dark); margin-bottom: 6px; }
+        .summary-service-item { color: var(--text-light); font-size: 13px; margin-left: 15px; margin-top: 4px; padding-left: 10px; border-left: 2px solid var(--border-color); }
+
+        /* Botão de Ação Final */
+        .action-footer {
+            padding: 20px 30px;
+            background: white;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            flex-shrink: 0;
+        }
+        .btn { padding: 12px 24px; border-radius: 10px; font-weight: 600; font-size: 15px; cursor: pointer; transition: all 0.3s ease; border: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-success { background: var(--success-gradient); color: white; }
+        .btn-success:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(16, 185, 129, 0.25); }
+        .btn-info { background: var(--info-gradient); color: white; }
+        .btn-info:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(99, 102, 241, 0.25); }
+
+
+        /* Modal Genérico */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        .modal-overlay.visible { opacity: 1; visibility: visible; }
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transform: scale(0.95);
+            transition: all 0.3s ease;
+        }
+        .modal-overlay.visible .modal-content { transform: scale(1); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .modal-title { font-size: 20px; font-weight: 700; color: var(--text-dark); }
+        .modal-close-btn { background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text-light); }
+        .modal-form .form-group { margin-bottom: 15px; }
+        .modal-form label { display: block; font-weight: 600; font-size: 14px; margin-bottom: 6px; }
+        .modal-form input { width: 100%; padding: 10px 12px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 14px; }
+        .modal-footer { margin-top: 25px; display: flex; justify-content: flex-end; gap: 10px; }
+        .btn-secondary { background: #f3f4f6; color: #6b7280; }
+        .btn-secondary:hover { background: #e5e7eb; }
+        .btn-primary { background: var(--primary-gradient); color: white; }
+        .btn-danger { background: var(--danger-color); color: white; }
+
+        /* Grade de Seleção para Modal */
+        .selection-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .selection-card {
+            background: white;
+            border: 2px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            color: var(--text-dark);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+        .selection-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary-color);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        .selection-card .card-icon {
+            font-size: 32px;
+            color: var(--text-light);
+        }
+        .selection-card .card-title {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .summary-panel { display: none; }
+        }
+        @media (max-width: 768px) {
+            body { padding: 0; }
+            .container { height: 100vh; border-radius: 0; }
+            .main-content { flex-direction: column; }
+            .locations-panel { width: 100%; border-right: none; border-bottom: 1px solid var(--border-color); max-height: 40vh; }
+            .workspace-panel { padding: 20px; }
+            .inspection-details { flex-direction: column; align-items: stretch; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">
+                <i class="fas fa-hard-hat"></i>
+                <div class="logo-text">
+                    <h1>MAEOKA ENGENHARIA</h1>
+                    <p>Vistoria Digital Dinâmica</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Painel de Detalhes da Vistoria -->
+        <div class="inspection-details" id="inspectionDetailsPanel">
+            <!-- Conteúdo gerado por JS -->
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div id="loadingOverlay">
+                <div class="spinner"></div>
+                <p>Carregando dados da planilha...</p>
+            </div>
+
+            <!-- Painel de Ambientes (Esquerda) -->
+            <div class="locations-panel">
+                <h3 class="locations-header">📍 Ambientes</h3>
+                <div class="add-location-form">
+                    <input type="text" id="newLocationInput" placeholder="Nome ou atalhos...">
+                    <button id="addLocationBtn"><i class="fas fa-plus"></i></button>
+                </div>
+                <ul class="location-list" id="locationList"></ul>
+            </div>
+
+            <!-- Painel de Trabalho (Centro) -->
+            <div class="workspace-panel" id="workspacePanel"></div>
+
+            <!-- Painel de Resumo (Direita) -->
+            <div class="summary-panel">
+                <h3 class="summary-header">📋 Resumo Geral</h3>
+                <div id="summaryContent"></div>
+            </div>
+        </div>
+
+        <!-- Action Footer -->
+        <div class="action-footer">
+            <button class="btn btn-info" onclick="document.getElementById('loadFileInput').click()">
+                <i class="fas fa-upload"></i> Carregar Vistoria
+            </button>
+            <input type="file" id="loadFileInput" style="display: none;" accept=".json">
+            <button class="btn btn-info" onclick="saveInspection()">
+                <i class="fas fa-save"></i> Salvar Vistoria
+            </button>
+            <button class="btn btn-success" onclick="generatePDF()">
+                <i class="fas fa-file-pdf"></i> Gerar PDF
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal para Adicionar/Editar Serviço -->
+    <div class="modal-overlay" id="serviceModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">Adicionar Serviço</h3>
+                <button class="modal-close-btn" onclick="closeServiceModal()">&times;</button>
+            </div>
+            <div class="modal-form">
+                <input type="hidden" id="editingIndex">
+                <div class="form-group">
+                    <label for="serviceArea">Área (m²) ou Quantidade (un)</label>
+                    <input type="number" id="serviceArea" step="0.01" placeholder="Ex: 15.5 ou 3">
+                </div>
+                <div class="form-group">
+                    <label for="serviceObs">Observações</label>
+                    <input type="text" id="serviceObs" placeholder="Ex: Parede da pia, remover cerâmica antiga">
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" onclick="closeServiceModal()">Cancelar</button>
+                    <button class="btn btn-primary" onclick="saveService()">Salvar Serviço</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Adicionar Ambiente Comum -->
+    <div class="modal-overlay" id="locationModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Adicionar Ambiente Comum</h3>
+                <button class="modal-close-btn" onclick="closeLocationModal()">&times;</button>
+            </div>
+            <div id="commonLocationsGrid" class="selection-grid">
+                <!-- Botões de ambiente comum serão gerados aqui -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmação -->
+    <div class="modal-overlay" id="confirmModal">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h3 class="modal-title" id="confirmModalTitle">Confirmar Ação</h3>
+            </div>
+            <p id="confirmModalText" style="margin: 20px 0; color: var(--text-light);"></p>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="confirmCancelBtn">Cancelar</button>
+                <button class="btn btn-danger" id="confirmOkBtn">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // --- CONFIGURAÇÃO DA API ---
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbydwN3L1nOCs2hn9TZqUoEo6aeBzqOlD5eL3w0H6nY3ehB_mvfAs4h4Jtr46nNNkCWyfw/exec";
+
+    // --- CONFIGURAÇÃO LOCAL ---
+    const config = {
+        commonLocations: ["Cozinha", "Sala de Estar", "Sala de Jantar", "Banheiro Social", "Banheiro Suíte", "Quarto Principal", "Quarto 2", "Área de Serviço", "Varanda/Sacada", "Garagem", "Área Externa", "Laje"],
+    };
+
+    // --- ESTADO DA APLICAÇÃO ---
+    let state = {
+        activeLocation: null,
+        isEditingDetails: false,
+        inspectionData: { 
+            clientInfo: {
+                name: '',
+                address: '',
+                date: new Date().toLocaleDateString('pt-BR')
+            },
+            locations: {},
+            serviceCategories: {} // Será preenchido pela API
+        },
+        modalContext: {},
+        onConfirmCallback: null
+    };
+
+    // --- ELEMENTOS DO DOM ---
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    const inspectionDetailsPanel = document.getElementById('inspectionDetailsPanel');
+    const locationList = document.getElementById('locationList');
+    const newLocationInput = document.getElementById('newLocationInput');
+    const addLocationBtn = document.getElementById('addLocationBtn');
+    const workspacePanel = document.getElementById('workspacePanel');
+    const summaryContent = document.getElementById('summaryContent');
+    const serviceModal = document.getElementById('serviceModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const serviceAreaInput = document.getElementById('serviceArea');
+    const serviceObsInput = document.getElementById('serviceObs');
+    const editingIndexInput = document.getElementById('editingIndex');
+    const confirmModal = document.getElementById('confirmModal');
+    const confirmModalText = document.getElementById('confirmModalText');
+    const confirmCancelBtn = document.getElementById('confirmCancelBtn');
+    const confirmOkBtn = document.getElementById('confirmOkBtn');
+    const locationModal = document.getElementById('locationModal');
+    const loadFileInput = document.getElementById('loadFileInput');
+
+    // --- INICIALIZAÇÃO ---
+    document.addEventListener('DOMContentLoaded', () => {
+        addLocationBtn.addEventListener('click', handleAddLocation);
+        newLocationInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') handleAddLocation();
+        });
+        
+        confirmCancelBtn.addEventListener('click', closeConfirmationModal);
+        confirmOkBtn.addEventListener('click', () => {
+            if (state.onConfirmCallback) {
+                state.onConfirmCallback();
+            }
+            closeConfirmationModal();
+        });
+        
+        loadFileInput.addEventListener('change', loadInspectionFromFile);
+        
+        // Inicia o carregamento dos dados da planilha
+        fetchServiceData();
+    });
+    
+    // --- COMUNICAÇÃO COM A API (GOOGLE SHEETS) ---
+    async function fetchServiceData() {
+        showLoading(true, 'Carregando dados da planilha...');
+        try {
+            const response = await fetch(SCRIPT_URL);
+            const result = await response.json();
+            if (result.status === 'success') {
+                state.inspectionData.serviceCategories = result.data;
+                renderAll();
+            } else {
+                throw new Error(result.message);
+            }
+        } catch (error) {
+            alert('Falha ao carregar os dados da planilha. Verifique a URL do script e as permissões da planilha.');
+            console.error('Erro ao buscar dados:', error);
+        } finally {
+            showLoading(false);
+        }
+    }
+
+    async function postDataToSheet(action, payload) {
+        showLoading(true, 'Salvando na planilha...');
+        try {
+            // Usamos 'fetch' com 'mode: "no-cors"' para evitar um erro de CORS que o Apps Script pode causar.
+            // A desvantagem é que não podemos ler a resposta, então apenas esperamos um pouco e recarregamos os dados.
+            await fetch(SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors', 
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ action, payload })
+            });
+            
+            // Espera um pouco para o Google Sheets processar a escrita antes de buscar os dados atualizados.
+            setTimeout(() => {
+                fetchServiceData();
+            }, 2000); // 2 segundos de espera
+
+        } catch (error) {
+            alert('Falha ao salvar os dados na planilha.');
+            console.error('Erro ao postar dados:', error);
+            showLoading(false);
+        }
+    }
+
+    // --- RENDERIZAÇÃO PRINCIPAL ---
+    function renderAll() {
+        renderInspectionDetails();
+        renderLocationsPanel();
+        renderWorkspace();
+        renderSummary();
+    }
+
+    function renderInspectionDetails() {
+        const panel = inspectionDetailsPanel;
+        const info = state.inspectionData.clientInfo;
+        const isEditing = state.isEditingDetails;
+        panel.innerHTML = `
+            <div class="detail-item">
+                <label>CLIENTE</label>
+                <div class="detail-item-value" id="detailName">${isEditing ? `<input type="text" value="${info.name}">` : (info.name || 'Não definido')}</div>
+            </div>
+            <div class="detail-item">
+                <label>ENDEREÇO DA OBRA</label>
+                <div class="detail-item-value" id="detailAddress">${isEditing ? `<input type="text" value="${info.address}">` : (info.address || 'Não definido')}</div>
+            </div>
+            <div class="detail-item">
+                <label>DATA DA VISTORIA</label>
+                <div class="detail-item-value" id="detailDate">${isEditing ? `<input type="text" value="${info.date}">` : (info.date || 'Não definido')}</div>
+            </div>
+            <button class="btn btn-secondary btn-edit-details" id="toggleEditDetailsBtn">
+                ${isEditing ? '<i class="fas fa-save"></i> Salvar' : '<i class="fas fa-pen"></i> Editar Detalhes'}
+            </button>
+        `;
+        document.getElementById('toggleEditDetailsBtn').addEventListener('click', toggleEditDetails);
+    }
+
+    function renderLocationsPanel() {
+        locationList.innerHTML = '';
+        Object.keys(state.inspectionData.locations).forEach(locationName => {
+            const itemCount = state.inspectionData.locations[locationName].length;
+            const li = document.createElement('li');
+            li.className = `location-item ${state.activeLocation === locationName ? 'active' : ''}`;
+            li.dataset.location = locationName;
+            
+            li.innerHTML = `
+                <div class="location-item-main">
+                    <span class="location-item-name">${locationName}</span>
+                    <span class="location-item-count">${itemCount}</span>
+                </div>
+                <div class="location-actions">
+                    <button class="location-action-btn duplicate-btn" title="Duplicar Ambiente"><i class="fas fa-copy"></i></button>
+                    <button class="location-action-btn delete-btn" title="Excluir Ambiente"><i class="fas fa-times-circle"></i></button>
+                </div>
+            `;
+
+            li.querySelector('.location-item-main').addEventListener('click', () => {
+                state.activeLocation = locationName;
+                renderAll();
+            });
+
+            li.querySelector('.duplicate-btn').addEventListener('click', (e) => {
+                e.stopPropagation();
+                duplicateLocation(locationName);
+            });
+
+            li.querySelector('.delete-btn').addEventListener('click', (e) => {
+                e.stopPropagation();
+                deleteLocation(locationName);
+            });
+
+            locationList.appendChild(li);
+        });
+    }
+
+    function renderWorkspace(searchTerm = '') {
+        workspacePanel.innerHTML = '';
+        if (!state.activeLocation) {
+            workspacePanel.innerHTML = `
+                <div class="workspace-placeholder">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <h2>Nenhum ambiente selecionado</h2>
+                    <p>Adicione um ambiente à esquerda ou selecione um existente para começar.</p>
+                </div>`;
+            return;
+        }
+
+        const locationData = state.inspectionData.locations[state.activeLocation];
+        
+        workspacePanel.innerHTML = `
+            <h2 class="workspace-header">Serviços para: ${state.activeLocation}</h2>
+            <div class="saved-services-list">
+                <h3>Serviços Adicionados</h3>
+                <div id="savedServicesContainer"></div>
+            </div>
+            <div class="add-services-section">
+                <h3 style="margin-bottom: 15px;">Adicionar Novo Serviço</h3>
+                <div class="search-bar-wrapper">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="serviceSearchInput" placeholder="Buscar serviço..." value="${searchTerm}">
+                </div>
+                <div id="addServicesContainer" style="margin-top: 15px;"></div>
+            </div>
+        `;
+
+        document.getElementById('serviceSearchInput').addEventListener('input', (e) => renderWorkspace(e.target.value));
+
+        const savedServicesContainer = document.getElementById('savedServicesContainer');
+        if (locationData.length === 0) {
+            savedServicesContainer.innerHTML = '<p style="color: var(--text-light); margin-top: 10px;">Nenhum serviço adicionado a este ambiente ainda.</p>';
+        } else {
+            locationData.forEach((service, index) => {
+                const categoryLabel = state.inspectionData.serviceCategories[service.category]?.label || service.category;
+                const card = document.createElement('div');
+                card.className = 'service-card';
+                card.innerHTML = `
+                    <div class="service-card-details">
+                        <div class="service-card-title">
+                            ${service.service}
+                            <span class="category-badge">${categoryLabel}</span>
+                        </div>
+                        <div class="service-card-meta">
+                            <span><i class="fas fa-ruler-combined"></i> ${service.area || 'N/A'}</span>
+                            <span><i class="fas fa-comment"></i> ${service.obs || 'Nenhuma'}</span>
+                        </div>
+                    </div>
+                    <div class="service-card-actions">
+                        <button onclick="editService(${index})"><i class="fas fa-pen"></i></button>
+                        <button class="delete-btn" onclick="deleteService(${index})"><i class="fas fa-trash"></i></button>
+                    </div>
+                `;
+                savedServicesContainer.appendChild(card);
+            });
+        }
+        
+        const addServicesContainer = document.getElementById('addServicesContainer');
+        const lowerSearchTerm = searchTerm.toLowerCase();
+
+        Object.entries(state.inspectionData.serviceCategories).forEach(([catKey, category]) => {
+            const filteredItems = category.items.filter(item => item.toLowerCase().includes(lowerSearchTerm));
+            const categoryMatch = category.label.toLowerCase().includes(lowerSearchTerm);
+
+            if (categoryMatch || filteredItems.length > 0) {
+                addServicesContainer.appendChild(createCategoryAccordion(catKey, category, filteredItems, categoryMatch));
+            }
+        });
+
+        const addCategoryForm = document.createElement('div');
+        addCategoryForm.className = 'add-category-form';
+        addCategoryForm.innerHTML = `
+            <h4>Criar Nova Categoria de Serviço</h4>
+            <div class="add-custom-form">
+                <input type="text" id="newCategoryInput" placeholder="Ex: Documentação, Taxas...">
+                <button id="addCategoryBtn"><i class="fas fa-plus"></i> Adicionar</button>
+            </div>
+        `;
+        addServicesContainer.appendChild(addCategoryForm);
+        document.getElementById('addCategoryBtn').addEventListener('click', addCustomCategory);
+        document.getElementById('newCategoryInput').addEventListener('keypress', e => {
+            if (e.key === 'Enter') addCustomCategory();
+        });
+    }
+
+    function createCategoryAccordion(catKey, category, filteredItems, categoryMatch) {
+        const accordion = document.createElement('div');
+        accordion.className = 'service-category-accordion';
+        
+        const accordionHeader = document.createElement('div');
+        accordionHeader.className = 'accordion-header';
+        accordionHeader.innerHTML = `<div class="header-left"><i class="fas ${category.icon}"></i><h4>${category.label}</h4></div><i class="fas fa-chevron-down"></i>`;
+        accordionHeader.addEventListener('click', (e) => {
+            e.currentTarget.classList.toggle('active');
+            e.currentTarget.nextElementSibling.classList.toggle('active');
+        });
+
+        const accordionContent = document.createElement('div');
+        accordionContent.className = 'accordion-content';
+
+        const itemsToShow = categoryMatch ? category.items : filteredItems;
+        itemsToShow.forEach(item => {
+            const btn = document.createElement('button');
+            btn.className = 'service-to-add';
+            btn.textContent = item;
+            btn.onclick = () => openServiceModal(catKey, item);
+            accordionContent.appendChild(btn);
+        });
+
+        const customAddForm = document.createElement('div');
+        customAddForm.className = 'add-custom-form';
+        customAddForm.innerHTML = `
+            <input type="text" class="custom-service-input" placeholder="Outro serviço...">
+            <button type="button" class="add-custom-btn"><i class="fas fa-plus"></i></button>
+        `;
+        
+        const customInput = customAddForm.querySelector('.custom-service-input');
+        const customBtn = customAddForm.querySelector('.add-custom-btn');
+
+        customBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const customServiceName = customInput.value.trim();
+            if (customServiceName) {
+                postDataToSheet('addService', { categoryKey: catKey, serviceName: customServiceName });
+                customInput.value = '';
+            }
+        });
+
+        customInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                customBtn.click();
+            }
+        });
+
+        accordionContent.appendChild(customAddForm);
+        accordion.appendChild(accordionHeader);
+        accordion.appendChild(accordionContent);
+        return accordion;
+    }
+
+    function renderSummary() {
+        summaryContent.innerHTML = '';
+        const locations = state.inspectionData.locations;
+        if (Object.keys(locations).length === 0) {
+            summaryContent.innerHTML = '<p>Nenhum ambiente adicionado.</p>';
+            return;
+        }
+        Object.entries(locations).forEach(([locationName, services]) => {
+            if (services.length > 0) {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'summary-location-item';
+                let servicesHtml = services.map(s => {
+                    const categoryLabel = state.inspectionData.serviceCategories[s.category]?.label || s.category;
+                    return `<div class="summary-service-item">• ${s.service} <small>(${categoryLabel})</small></div>`;
+                }).join('');
+                itemDiv.innerHTML = `
+                    <div class="summary-location-header">${locationName} (${services.length})</div>
+                    ${servicesHtml}
+                `;
+                summaryContent.appendChild(itemDiv);
+            }
+        });
+    }
+
+    // --- DETAILS HANDLING ---
+    function toggleEditDetails() {
+        if (state.isEditingDetails) {
+            // Save
+            state.inspectionData.clientInfo.name = document.querySelector('#detailName input').value;
+            state.inspectionData.clientInfo.address = document.querySelector('#detailAddress input').value;
+            state.inspectionData.clientInfo.date = document.querySelector('#detailDate input').value;
+        }
+        state.isEditingDetails = !state.isEditingDetails;
+        renderInspectionDetails();
+    }
+
+    // --- LOCATION HANDLING ---
+    function handleAddLocation() {
+        const locationName = newLocationInput.value.trim();
+        if (locationName) {
+            addLocation(locationName);
+            newLocationInput.value = '';
+        } else {
+            openLocationModal();
+        }
+    }
+
+    function addLocation(name) {
+        if (name && !state.inspectionData.locations[name]) {
+            state.inspectionData.locations[name] = [];
+            state.activeLocation = name;
+            renderAll();
+        }
+    }
+
+    function deleteLocation(locationName) {
+        showConfirmationModal(`Tem certeza que deseja excluir o ambiente "${locationName}" e todos os seus serviços?`, () => {
+            delete state.inspectionData.locations[locationName];
+            if (state.activeLocation === locationName) {
+                state.activeLocation = null;
+            }
+            renderAll();
+        });
+    }
+    
+    function duplicateLocation(locationName) {
+        const newName = `${locationName} (cópia)`;
+        if (state.inspectionData.locations[newName]) {
+            alert(`Já existe um ambiente chamado "${newName}". Renomeie antes de duplicar novamente.`);
+            return;
+        }
+        // Deep copy of services
+        const servicesCopy = JSON.parse(JSON.stringify(state.inspectionData.locations[locationName]));
+        state.inspectionData.locations[newName] = servicesCopy;
+        state.activeLocation = newName;
+        renderAll();
+    }
+
+    function openLocationModal() {
+        const grid = document.getElementById('commonLocationsGrid');
+        grid.innerHTML = config.commonLocations.map(loc => `
+            <button class="selection-card" data-location="${loc}">
+                <i class="fas fa-door-open card-icon"></i>
+                <div class="card-title">${loc}</div>
+            </button>
+        `).join('');
+
+        grid.onclick = function(e) {
+            const card = e.target.closest('.selection-card');
+            if (card) {
+                const locationName = card.dataset.location;
+                addLocation(locationName);
+                closeLocationModal();
+            }
+        };
+        locationModal.classList.add('visible');
+    }
+
+    function closeLocationModal() {
+        locationModal.classList.remove('visible');
+    }
+
+    // --- SERVICE & CATEGORY HANDLING ---
+    function addCustomCategory() {
+        const input = document.getElementById('newCategoryInput');
+        const categoryName = input.value.trim();
+        const categoryKey = categoryName.toLowerCase().replace(/\s+/g, '_');
+
+        if (categoryName && !state.inspectionData.serviceCategories[categoryKey]) {
+            const payload = {
+                key: categoryKey,
+                label: categoryName,
+                icon: 'fa-star' // Ícone padrão para novas categorias
+            };
+            postDataToSheet('addCategory', payload);
+            input.value = '';
+        }
+    }
+
+    function openServiceModal(category, service, index = null) {
+        state.modalContext = { category, service };
+        editingIndexInput.value = index !== null ? index : '';
+        
+        if (index !== null) { // Editing
+            const serviceData = state.inspectionData.locations[state.activeLocation][index];
+            modalTitle.textContent = `Editar: ${serviceData.service}`;
+            serviceAreaInput.value = serviceData.area;
+            serviceObsInput.value = serviceData.obs;
+        } else { // Adding new
+            modalTitle.textContent = `Adicionar: ${service}`;
+            serviceAreaInput.value = '';
+            serviceObsInput.value = '';
+        }
+        
+        serviceModal.classList.add('visible');
+    }
+
+    function closeServiceModal() {
+        serviceModal.classList.remove('visible');
+    }
+
+    function saveService() {
+        const area = serviceAreaInput.value;
+        const obs = serviceObsInput.value;
+        const index = editingIndexInput.value;
+        const { category, service } = state.modalContext;
+
+        const serviceData = { category, service, area, obs, id: Date.now() };
+
+        if (index !== '') { // Update existing service
+            state.inspectionData.locations[state.activeLocation][parseInt(index, 10)] = serviceData;
+        } else { // Add new service
+            state.inspectionData.locations[state.activeLocation].push(serviceData);
+        }
+
+        closeServiceModal();
+        renderAll();
+    }
+    
+    function editService(index) {
+        const serviceData = state.inspectionData.locations[state.activeLocation][index];
+        openServiceModal(serviceData.category, serviceData.service, index);
+    }
+
+    function deleteService(index) {
+        showConfirmationModal('Tem certeza que deseja excluir este serviço?', () => {
+            state.inspectionData.locations[state.activeLocation].splice(index, 1);
+            renderAll();
+        });
+    }
+
+    // --- GENERIC MODAL & UI HANDLING ---
+    function showConfirmationModal(text, callback) {
+        confirmModalText.textContent = text;
+        state.onConfirmCallback = callback;
+        confirmModal.classList.add('visible');
+    }
+
+    function closeConfirmationModal() {
+        confirmModal.classList.remove('visible');
+        state.onConfirmCallback = null;
+    }
+    
+    function showLoading(show, message = 'Carregando...') {
+        loadingOverlay.querySelector('p').textContent = message;
+        loadingOverlay.classList.toggle('hidden', !show);
+    }
+
+    // --- FILE & REPORT ACTIONS ---
+    function saveInspection() {
+        const dataStr = JSON.stringify(state.inspectionData, null, 2);
+        const blob = new Blob([dataStr], {type: "application/json"});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `vistoria-${state.inspectionData.clientInfo.name || 'backup'}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+
+    function loadInspectionFromFile(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const loadedData = JSON.parse(e.target.result);
+                // Basic validation
+                if (loadedData.clientInfo && loadedData.locations && loadedData.serviceCategories) {
+                    state.inspectionData = loadedData;
+                    state.activeLocation = Object.keys(loadedData.locations)[0] || null;
+                    renderAll();
+                } else {
+                    alert('Arquivo de vistoria inválido ou corrompido.');
+                }
+            } catch (error) {
+                alert('Erro ao carregar o arquivo. Verifique se é um arquivo JSON válido.');
+                console.error("Erro ao parsear JSON:", error);
+            }
+        };
+        reader.readAsText(file);
+    }
+
+    function generatePDF() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        const data = state.inspectionData;
+        let y = 15; // Posição vertical inicial
+
+        // Título
+        doc.setFontSize(18);
+        doc.text("Relatório de Vistoria - Maeoka Engenharia", 105, y, { align: 'center' });
+        y += 10;
+
+        // Detalhes do Cliente
+        doc.setFontSize(12);
+        doc.text(`Cliente: ${data.clientInfo.name || 'Não definido'}`, 15, y);
+        y += 7;
+        doc.text(`Endereço: ${data.clientInfo.address || 'Não definido'}`, 15, y);
+        y += 7;
+        doc.text(`Data: ${data.clientInfo.date || 'Não definido'}`, 15, y);
+        y += 15;
+
+        // Linha separadora
+        doc.line(15, y - 5, 195, y - 5);
+
+        // Ambientes e Serviços
+        Object.entries(data.locations).forEach(([locationName, services]) => {
+            if (services.length > 0) {
+                if (y > 270) { // Adiciona nova página se o conteúdo estiver no final
+                    doc.addPage();
+                    y = 15;
+                }
+                doc.setFontSize(14);
+                doc.setFont(undefined, 'bold');
+                doc.text(`Ambiente: ${locationName}`, 15, y);
+                y += 8;
+                doc.setFont(undefined, 'normal');
+
+                services.forEach(service => {
+                    if (y > 280) {
+                        doc.addPage();
+                        y = 15;
+                    }
+                    doc.setFontSize(11);
+                    const categoryLabel = data.serviceCategories[service.category]?.label || service.category;
+                    let serviceText = `- ${service.service} (${categoryLabel})`;
+                    
+                    let details = [];
+                    if(service.area) details.push(`Área/Qtd: ${service.area}`);
+                    if(service.obs) details.push(`Obs: ${service.obs}`);
+                    
+                    doc.text(serviceText, 20, y);
+                    if(details.length > 0) {
+                        y += 5;
+                        doc.setFontSize(9);
+                        doc.setTextColor(100);
+                        doc.text(details.join(' | '), 25, y);
+                        doc.setTextColor(0);
+                    }
+                    y += 7;
+                });
+                y += 5; // Espaço extra entre ambientes
+            }
+        });
+
+        doc.save(`Vistoria - ${data.clientInfo.name || 'Relatorio'}.pdf`);
+    }
+
+    </script>
+</body>
+</html>
