@@ -98,6 +98,22 @@
             justify-content: space-between;
             align-items: center;
             flex-shrink: 0;
+            position: relative;
+        }
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+        #mobileHeaderBackBtn {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            margin-right: 15px;
+            cursor: pointer;
         }
         .logo { display: flex; align-items: center; gap: 10px; }
         .logo i { font-size: 28px; color: #60a5fa; }
@@ -295,6 +311,7 @@
             gap: 10px;
             flex-wrap: wrap;
             flex-shrink: 0;
+            position: relative;
         }
         .btn { padding: 10px 18px; border-radius: 10px; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.3s ease; border: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
         .btn-success { background: var(--success-gradient); color: white; }
@@ -303,6 +320,30 @@
         .btn-info:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(99, 102, 241, 0.25); }
         .btn-secondary { background: #f3f4f6; color: #6b7280; }
         .btn-secondary:hover { background: #e5e7eb; }
+        
+        #moreOptionsToggle { display: none; }
+        #moreOptionsMenu {
+            position: absolute;
+            bottom: 100%;
+            right: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            display: none;
+            flex-direction: column;
+            width: 200px;
+        }
+        #moreOptionsMenu.active { display: flex; }
+        #moreOptionsMenu .btn {
+            width: 100%;
+            justify-content: flex-start;
+            border-radius: 0;
+            background: white;
+            color: var(--text-dark);
+        }
+        #moreOptionsMenu .btn:hover { background: var(--bg-light); }
 
 
         /* Modal Genérico */
@@ -421,12 +462,6 @@
             font-weight: 600;
             font-size: 14px;
         }
-        
-        /* Botão de voltar para mobile */
-        #mobileBackButton {
-            display: none; /* Oculto por padrão */
-            margin-bottom: 15px;
-        }
 
         /* Responsive */
         @media (min-width: 769px) {
@@ -441,17 +476,17 @@
         @media (max-width: 768px) {
             .summary-panel { display: none; }
             .main-content {
-                flex-direction: row; /* Mantém a direção mas vamos controlar com transform */
-                width: 200%; /* Dobro da largura para conter os dois painéis */
+                flex-direction: row; 
+                width: 200%;
             }
             .locations-panel, .workspace-panel {
-                width: 50%; /* Cada painel ocupa metade */
+                width: 50%;
                 height: 100%;
                 border-right: none;
                 transition: transform 0.3s ease-in-out;
             }
             .main-content.workspace-active {
-                transform: translateX(-50%); /* Desliza para a esquerda */
+                transform: translateX(-50%); 
             }
             .workspace-panel {
                 padding: 20px;
@@ -464,8 +499,17 @@
                 font-size: 13px;
                 padding: 10px 14px;
             }
-            #mobileBackButton {
-                display: flex;
+            .action-footer .btn-secondary, .action-footer .btn.desktop-only {
+                display: none;
+            }
+            #moreOptionsToggle {
+                display: inline-flex;
+            }
+            #mobileHeaderBackBtn.visible {
+                display: block;
+            }
+            .header-content.hiding {
+                display: none;
             }
         }
     </style>
@@ -474,16 +518,19 @@
     <div class="container">
         <!-- Header -->
         <div class="header">
-            <div class="logo">
-                <i class="fas fa-hard-hat"></i>
-                <div class="logo-text">
-                    <h1>MAEOKA ENGENHARIA</h1>
-                    <p>Vistoria Digital Dinâmica</p>
+            <button id="mobileHeaderBackBtn"><i class="fas fa-arrow-left"></i></button>
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-hard-hat"></i>
+                    <div class="logo-text">
+                        <h1>MAEOKA ENGENHARIA</h1>
+                        <p>Vistoria Digital Dinâmica</p>
+                    </div>
                 </div>
-            </div>
-            <div class="inspection-id-wrapper">
-                <label>ID DA VISTORIA</label>
-                <div class="inspection-id-display" id="inspectionIdDisplay">NOVA</div>
+                <div class="inspection-id-wrapper">
+                    <label>ID DA VISTORIA</label>
+                    <div class="inspection-id-display" id="inspectionIdDisplay">NOVA</div>
+                </div>
             </div>
         </div>
 
@@ -521,24 +568,29 @@
 
         <!-- Action Footer -->
         <div class="action-footer">
-            <button class="btn btn-secondary" onclick="startFromTemplate()">
-                <i class="fas fa-copy"></i> Criar a Partir de Modelo
-            </button>
-            <button class="btn btn-info" onclick="openLoadOnlineModal()">
+            <div id="moreOptionsMenu">
+                 <button class="btn btn-secondary" onclick="startFromTemplate()">
+                    <i class="fas fa-copy"></i> Criar a Partir de Modelo
+                </button>
+                <button class="btn btn-secondary" onclick="document.getElementById('loadFileInput').click()">
+                    <i class="fas fa-upload"></i> Carregar do PC
+                </button>
+                <input type="file" id="loadFileInput" style="display: none;" accept=".json">
+                <button class="btn btn-secondary" onclick="saveInspectionToFile()">
+                    <i class="fas fa-save"></i> Salvar no PC
+                </button>
+            </div>
+            <button class="btn btn-info desktop-only" onclick="openLoadOnlineModal()">
                 <i class="fas fa-cloud-download-alt"></i> Carregar Online
             </button>
             <button class="btn btn-info" onclick="saveInspectionOnline()">
                 <i class="fas fa-cloud-upload-alt"></i> Salvar Online
             </button>
-            <button class="btn btn-secondary" onclick="document.getElementById('loadFileInput').click()">
-                <i class="fas fa-upload"></i> Carregar do PC
-            </button>
-            <input type="file" id="loadFileInput" style="display: none;" accept=".json">
-            <button class="btn btn-secondary" onclick="saveInspectionToFile()">
-                <i class="fas fa-save"></i> Salvar no PC
-            </button>
             <button class="btn btn-success" onclick="generatePDF()">
                 <i class="fas fa-file-pdf"></i> Gerar PDF
+            </button>
+            <button class="btn btn-secondary" id="moreOptionsToggle">
+                <i class="fas fa-ellipsis-v"></i> Mais Opções
             </button>
         </div>
     </div>
@@ -660,7 +712,7 @@
     };
 
     // --- ELEMENTOS DO DOM (DECLARAÇÃO) ---
-    let mainContent, loadingOverlay, inspectionIdDisplay, inspectionDetailsPanel, locationList, newLocationInput, addLocationBtn, workspacePanel, summaryContent, serviceModal, modalTitle, serviceAreaInput, serviceObsInput, editingIndexInput, confirmModal, confirmModalText, confirmCancelBtn, confirmOkBtn, locationModal, loadFileInput, loadOnlineModal, confirmLoadOnlineBtn, inspectionIdInput, photoGalleryModal, photoGalleryTitle, photoGrid, addPhotoInput;
+    let mainContent, loadingOverlay, inspectionIdDisplay, inspectionDetailsPanel, locationList, newLocationInput, addLocationBtn, workspacePanel, summaryContent, serviceModal, modalTitle, serviceAreaInput, serviceObsInput, editingIndexInput, confirmModal, confirmModalText, confirmCancelBtn, confirmOkBtn, locationModal, loadFileInput, loadOnlineModal, confirmLoadOnlineBtn, inspectionIdInput, photoGalleryModal, photoGalleryTitle, photoGrid, addPhotoInput, mobileHeaderBackBtn, headerContent, moreOptionsToggle, moreOptionsMenu;
 
     // --- INICIALIZAÇÃO ---
     document.addEventListener('DOMContentLoaded', () => {
@@ -692,6 +744,10 @@
         photoGalleryTitle = document.getElementById('photoGalleryTitle');
         photoGrid = document.getElementById('photoGrid');
         addPhotoInput = document.getElementById('addPhotoInput');
+        mobileHeaderBackBtn = document.getElementById('mobileHeaderBackBtn');
+        headerContent = document.querySelector('.header-content');
+        moreOptionsToggle = document.getElementById('moreOptionsToggle');
+        moreOptionsMenu = document.getElementById('moreOptionsMenu');
 
         // ADIÇÃO DOS EVENT LISTENERS
         addLocationBtn.addEventListener('click', handleAddLocation);
@@ -710,6 +766,16 @@
         loadFileInput.addEventListener('change', loadInspectionFromFile);
         confirmLoadOnlineBtn.addEventListener('click', handleConfirmLoadOnline);
         addPhotoInput.addEventListener('change', handleAddPhoto);
+        mobileHeaderBackBtn.addEventListener('click', () => showLocationsPanel());
+        moreOptionsToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            moreOptionsMenu.classList.toggle('active');
+        });
+        document.addEventListener('click', () => {
+             if(moreOptionsMenu.classList.contains('active')) {
+                moreOptionsMenu.classList.remove('active');
+             }
+        });
         
         // CARREGAMENTO INICIAL DOS DADOS
         fetchServiceData();
@@ -806,9 +872,7 @@
             `;
 
             li.querySelector('.location-item-main').addEventListener('click', () => {
-                state.activeLocation = locationName;
-                mainContent.classList.add('workspace-active');
-                renderAll();
+                showWorkspacePanel(locationName);
             });
 
             li.querySelector('.duplicate-btn').addEventListener('click', (e) => {
@@ -840,9 +904,6 @@
         const locationData = state.inspectionData.locations[state.activeLocation];
         
         workspacePanel.innerHTML = `
-            <button class="btn btn-secondary" id="mobileBackButton" onclick="mainContent.classList.remove('workspace-active')">
-                <i class="fas fa-arrow-left"></i> Voltar para Ambientes
-            </button>
             <h2 class="workspace-header">Serviços para: ${state.activeLocation}</h2>
             <div class="saved-services-list">
                 <h3>Serviços Adicionados</h3>
@@ -974,7 +1035,7 @@
     }
 
     function renderSummary() {
-        if (!summaryContent) return; // Adicionado para segurança
+        if (!summaryContent) return; 
         summaryContent.innerHTML = '';
         const locations = state.inspectionData.locations;
         if (Object.keys(locations).length === 0) {
@@ -1012,7 +1073,21 @@
         renderInspectionDetails();
     }
 
-    // --- LOCATION HANDLING ---
+    // --- LOCATION & MOBILE NAVIGATION HANDLING ---
+    function showWorkspacePanel(locationName) {
+        state.activeLocation = locationName;
+        mainContent.classList.add('workspace-active');
+        mobileHeaderBackBtn.classList.add('visible');
+        headerContent.classList.add('hiding');
+        renderAll();
+    }
+
+    function showLocationsPanel() {
+        mainContent.classList.remove('workspace-active');
+        mobileHeaderBackBtn.classList.remove('visible');
+        headerContent.classList.remove('hiding');
+    }
+
     function handleAddLocation() {
         const locationName = newLocationInput.value.trim();
         if (locationName) {
@@ -1036,7 +1111,7 @@
             delete state.inspectionData.locations[locationName];
             if (state.activeLocation === locationName) {
                 state.activeLocation = null;
-                mainContent.classList.remove('workspace-active');
+                showLocationsPanel();
             }
             renderAll();
         });
