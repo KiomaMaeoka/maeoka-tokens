@@ -89,7 +89,7 @@
         .header {
             background: var(--secondary-gradient);
             color: white;
-            padding: 20px 30px;
+            padding: 15px 30px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -99,6 +99,9 @@
         .logo i { font-size: 32px; color: #60a5fa; }
         .logo-text h1 { font-size: 22px; font-weight: 700; }
         .logo-text p { font-size: 12px; opacity: 0.9; text-transform: uppercase; letter-spacing: 1px; }
+        .inspection-id-wrapper { text-align: right; }
+        .inspection-id-wrapper label { font-size: 11px; font-weight: 500; opacity: 0.8; }
+        .inspection-id-display { font-size: 16px; font-weight: 700; background-color: rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 8px; }
         
         /* Painel de Detalhes da Vistoria */
         .inspection-details {
@@ -286,6 +289,7 @@
             display: flex;
             justify-content: flex-end;
             gap: 15px;
+            flex-wrap: wrap;
             flex-shrink: 0;
         }
         .btn { padding: 12px 24px; border-radius: 10px; font-weight: 600; font-size: 15px; cursor: pointer; transition: all 0.3s ease; border: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
@@ -293,6 +297,8 @@
         .btn-success:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(16, 185, 129, 0.25); }
         .btn-info { background: var(--info-gradient); color: white; }
         .btn-info:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(99, 102, 241, 0.25); }
+        .btn-secondary { background: #f3f4f6; color: #6b7280; }
+        .btn-secondary:hover { background: #e5e7eb; }
 
 
         /* Modal Genérico */
@@ -331,9 +337,6 @@
         .modal-form label { display: block; font-weight: 600; font-size: 14px; margin-bottom: 6px; }
         .modal-form input { width: 100%; padding: 10px 12px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 14px; }
         .modal-footer { margin-top: 25px; display: flex; justify-content: flex-end; gap: 10px; }
-        .btn-secondary { background: #f3f4f6; color: #6b7280; }
-        .btn-secondary:hover { background: #e5e7eb; }
-        .btn-primary { background: var(--primary-gradient); color: white; }
         .btn-danger { background: var(--danger-color); color: white; }
 
         /* Grade de Seleção para Modal */
@@ -398,6 +401,10 @@
                     <p>Vistoria Digital Dinâmica</p>
                 </div>
             </div>
+            <div class="inspection-id-wrapper">
+                <label>ID DA VISTORIA</label>
+                <div class="inspection-id-display" id="inspectionIdDisplay">NOVA</div>
+            </div>
         </div>
 
         <!-- Painel de Detalhes da Vistoria -->
@@ -434,12 +441,18 @@
 
         <!-- Action Footer -->
         <div class="action-footer">
-            <button class="btn btn-info" onclick="document.getElementById('loadFileInput').click()">
-                <i class="fas fa-upload"></i> Carregar Vistoria
+            <button class="btn btn-info" onclick="loadInspectionOnline()">
+                <i class="fas fa-cloud-download-alt"></i> Carregar Online
+            </button>
+            <button class="btn btn-info" onclick="saveInspectionOnline()">
+                <i class="fas fa-cloud-upload-alt"></i> Salvar Online
+            </button>
+            <button class="btn btn-secondary" onclick="document.getElementById('loadFileInput').click()">
+                <i class="fas fa-upload"></i> Carregar do PC
             </button>
             <input type="file" id="loadFileInput" style="display: none;" accept=".json">
-            <button class="btn btn-info" onclick="saveInspection()">
-                <i class="fas fa-save"></i> Salvar Vistoria
+            <button class="btn btn-secondary" onclick="saveInspectionToFile()">
+                <i class="fas fa-save"></i> Salvar no PC
             </button>
             <button class="btn btn-success" onclick="generatePDF()">
                 <i class="fas fa-file-pdf"></i> Gerar PDF
@@ -510,6 +523,7 @@
 
     // --- ESTADO DA APLICAÇÃO ---
     let state = {
+        inspectionId: null,
         activeLocation: null,
         isEditingDetails: false,
         inspectionData: { 
@@ -527,6 +541,7 @@
 
     // --- ELEMENTOS DO DOM ---
     const loadingOverlay = document.getElementById('loadingOverlay');
+    const inspectionIdDisplay = document.getElementById('inspectionIdDisplay');
     const inspectionDetailsPanel = document.getElementById('inspectionDetailsPanel');
     const locationList = document.getElementById('locationList');
     const newLocationInput = document.getElementById('newLocationInput');
@@ -562,15 +577,15 @@
         
         loadFileInput.addEventListener('change', loadInspectionFromFile);
         
-        // Inicia o carregamento dos dados da planilha
         fetchServiceData();
     });
     
     // --- COMUNICAÇÃO COM A API (GOOGLE SHEETS) ---
     async function fetchServiceData() {
-        showLoading(true, 'Carregando dados da planilha...');
+        showLoading(true, 'Carregando dados mestre...');
         try {
             const response = await fetch(SCRIPT_URL);
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
             const result = await response.json();
             if (result.status === 'success') {
                 state.inspectionData.serviceCategories = result.data;
@@ -589,22 +604,13 @@
     async function postDataToSheet(action, payload) {
         showLoading(true, 'Salvando na planilha...');
         try {
-            // Usamos 'fetch' com 'mode: "no-cors"' para evitar um erro de CORS que o Apps Script pode causar.
-            // A desvantagem é que não podemos ler a resposta, então apenas esperamos um pouco e recarregamos os dados.
-            await fetch(SCRIPT_URL, {
+            const response = await fetch(SCRIPT_URL, {
                 method: 'POST',
-                mode: 'no-cors', 
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8', },
                 body: JSON.stringify({ action, payload })
             });
-            
-            // Espera um pouco para o Google Sheets processar a escrita antes de buscar os dados atualizados.
-            setTimeout(() => {
-                fetchServiceData();
-            }, 2000); // 2 segundos de espera
-
+            setTimeout(fetchServiceData, 2000);
         } catch (error) {
             alert('Falha ao salvar os dados na planilha.');
             console.error('Erro ao postar dados:', error);
@@ -614,6 +620,7 @@
 
     // --- RENDERIZAÇÃO PRINCIPAL ---
     function renderAll() {
+        inspectionIdDisplay.textContent = state.inspectionId || 'NOVA';
         renderInspectionDetails();
         renderLocationsPanel();
         renderWorkspace();
@@ -1014,14 +1021,67 @@
         loadingOverlay.classList.toggle('hidden', !show);
     }
 
-    // --- FILE & REPORT ACTIONS ---
-    function saveInspection() {
-        const dataStr = JSON.stringify(state.inspectionData, null, 2);
+    // --- ONLINE/OFFLINE SAVE/LOAD ACTIONS ---
+    async function saveInspectionOnline() {
+        showLoading(true, 'Salvando vistoria na nuvem...');
+        try {
+            const payload = { id: state.inspectionId, data: state.inspectionData };
+            // Para salvar, precisamos de uma resposta, então não usamos 'no-cors'
+            const response = await fetch(SCRIPT_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8', },
+                body: JSON.stringify({ action: 'saveInspection', payload })
+            });
+            const result = await response.json();
+            if (result.status === 'success') {
+                state.inspectionId = result.newId;
+                alert(`Vistoria salva com sucesso! ID: ${state.inspectionId}`);
+                renderAll();
+            } else {
+                throw new Error(result.message);
+            }
+        } catch (error) {
+            alert('Falha ao salvar a vistoria online.');
+            console.error('Erro ao salvar vistoria:', error);
+        } finally {
+            showLoading(false);
+        }
+    }
+
+    async function loadInspectionOnline() {
+        const idToLoad = prompt("Digite o ID da vistoria que deseja carregar:");
+        if (!idToLoad) return;
+
+        showLoading(true, `Carregando vistoria ${idToLoad}...`);
+        try {
+            const loadUrl = `${SCRIPT_URL}?action=load&id=${idToLoad}`;
+            const response = await fetch(loadUrl);
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            const result = await response.json();
+
+            if (result.status === 'success') {
+                state.inspectionData = result.data;
+                state.inspectionId = idToLoad.toUpperCase();
+                state.activeLocation = Object.keys(result.data.locations)[0] || null;
+                renderAll();
+            } else {
+                throw new Error(result.message);
+            }
+        } catch (error) {
+            alert(`Falha ao carregar a vistoria: ${error.message}`);
+            console.error('Erro ao carregar vistoria:', error);
+        } finally {
+            showLoading(false);
+        }
+    }
+
+    function saveInspectionToFile() {
+        const dataStr = JSON.stringify({inspectionId: state.inspectionId, inspectionData: state.inspectionData}, null, 2);
         const blob = new Blob([dataStr], {type: "application/json"});
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `vistoria-${state.inspectionData.clientInfo.name || 'backup'}.json`;
+        a.download = `vistoria-${state.inspectionId || 'backup'}.json`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -1035,11 +1095,11 @@
         const reader = new FileReader();
         reader.onload = function(e) {
             try {
-                const loadedData = JSON.parse(e.target.result);
-                // Basic validation
-                if (loadedData.clientInfo && loadedData.locations && loadedData.serviceCategories) {
-                    state.inspectionData = loadedData;
-                    state.activeLocation = Object.keys(loadedData.locations)[0] || null;
+                const loaded = JSON.parse(e.target.result);
+                if (loaded.inspectionData && loaded.inspectionData.clientInfo) {
+                    state.inspectionData = loaded.inspectionData;
+                    state.inspectionId = loaded.inspectionId;
+                    state.activeLocation = Object.keys(loaded.inspectionData.locations)[0] || null;
                     renderAll();
                 } else {
                     alert('Arquivo de vistoria inválido ou corrompido.');
@@ -1052,6 +1112,7 @@
         reader.readAsText(file);
     }
 
+    // --- PDF REPORT ACTION ---
     function generatePDF() {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
@@ -1062,6 +1123,11 @@
         doc.setFontSize(18);
         doc.text("Relatório de Vistoria - Maeoka Engenharia", 105, y, { align: 'center' });
         y += 10;
+        
+        doc.setFontSize(10);
+        doc.text(`ID da Vistoria: ${state.inspectionId || 'N/A'}`, 195, y, { align: 'right' });
+        y += 5;
+
 
         // Detalhes do Cliente
         doc.setFontSize(12);
@@ -1078,7 +1144,7 @@
         // Ambientes e Serviços
         Object.entries(data.locations).forEach(([locationName, services]) => {
             if (services.length > 0) {
-                if (y > 270) { // Adiciona nova página se o conteúdo estiver no final
+                if (y > 270) {
                     doc.addPage();
                     y = 15;
                 }
@@ -1111,7 +1177,7 @@
                     }
                     y += 7;
                 });
-                y += 5; // Espaço extra entre ambientes
+                y += 5;
             }
         });
 
