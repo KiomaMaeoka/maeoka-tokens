@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Vistoria Digital Online - Maeoka Engenharia</title>
     
     <!-- Ícones e Fontes -->
@@ -158,6 +158,7 @@
             flex-shrink: 0;
             display: flex;
             flex-direction: column;
+            position: relative; /* Para o FAB */
         }
         .locations-header {
             font-size: 18px;
@@ -167,9 +168,6 @@
             padding-bottom: 15px;
             border-bottom: 2px solid var(--border-color);
         }
-        .add-location-form { display: flex; gap: 8px; margin-bottom: 15px; }
-        .add-location-form input { flex-grow: 1; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 14px; }
-        .add-location-form button { padding: 8px 12px; border: none; background: var(--primary-color); color: white; border-radius: 8px; cursor: pointer; font-weight: 600; }
         
         .location-list { list-style: none; flex-grow: 1; }
         .location-item {
@@ -322,28 +320,47 @@
         .btn-secondary:hover { background: #e5e7eb; }
         
         #moreOptionsToggle { display: none; }
-        #moreOptionsMenu {
-            position: absolute;
-            bottom: 100%;
-            right: 20px;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
-            border: 1px solid var(--border-color);
-            overflow: hidden;
-            display: none;
-            flex-direction: column;
-            width: 200px;
+        
+        /* Bottom Sheet para Mobile */
+        #bottomSheetOverlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.4);
+            z-index: 1500;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease;
         }
-        #moreOptionsMenu.active { display: flex; }
-        #moreOptionsMenu .btn {
+        #bottomSheetOverlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        #bottomSheet {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: white;
+            border-top-left-radius: 16px;
+            border-top-right-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 -5px 25px rgba(0,0,0,0.1);
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+            z-index: 1501;
+        }
+        #bottomSheetOverlay.active #bottomSheet {
+            transform: translateY(0);
+        }
+        #bottomSheet .btn {
             width: 100%;
             justify-content: flex-start;
-            border-radius: 0;
             background: white;
             color: var(--text-dark);
+            padding: 15px;
+            font-size: 16px;
         }
-        #moreOptionsMenu .btn:hover { background: var(--bg-light); }
+        #bottomSheet .btn:hover { background: var(--bg-light); }
 
 
         /* Modal Genérico */
@@ -568,32 +585,49 @@
 
         <!-- Action Footer -->
         <div class="action-footer">
-            <div id="moreOptionsMenu">
-                 <button class="btn btn-secondary" onclick="startFromTemplate()">
-                    <i class="fas fa-copy"></i> Criar a Partir de Modelo
-                </button>
-                <button class="btn btn-secondary" onclick="document.getElementById('loadFileInput').click()">
-                    <i class="fas fa-upload"></i> Carregar do PC
-                </button>
-                <input type="file" id="loadFileInput" style="display: none;" accept=".json">
-                <button class="btn btn-secondary" onclick="saveInspectionToFile()">
-                    <i class="fas fa-save"></i> Salvar no PC
-                </button>
-            </div>
+            <button class="btn btn-secondary desktop-only" onclick="startFromTemplate()">
+                <i class="fas fa-copy"></i> Criar a Partir de Modelo
+            </button>
             <button class="btn btn-info desktop-only" onclick="openLoadOnlineModal()">
                 <i class="fas fa-cloud-download-alt"></i> Carregar Online
             </button>
             <button class="btn btn-info" onclick="saveInspectionOnline()">
                 <i class="fas fa-cloud-upload-alt"></i> Salvar Online
             </button>
+             <button class="btn btn-secondary desktop-only" onclick="document.getElementById('loadFileInput').click()">
+                <i class="fas fa-upload"></i> Carregar do PC
+            </button>
+            <input type="file" id="loadFileInput" style="display: none;" accept=".json">
+            <button class="btn btn-secondary desktop-only" onclick="saveInspectionToFile()">
+                <i class="fas fa-save"></i> Salvar no PC
+            </button>
             <button class="btn btn-success" onclick="generatePDF()">
                 <i class="fas fa-file-pdf"></i> Gerar PDF
             </button>
             <button class="btn btn-secondary" id="moreOptionsToggle">
-                <i class="fas fa-ellipsis-v"></i> Mais Opções
+                <i class="fas fa-ellipsis-v"></i>
             </button>
         </div>
     </div>
+    
+    <!-- Bottom Sheet para Mobile -->
+    <div id="bottomSheetOverlay">
+        <div id="bottomSheet">
+            <button class="btn" onclick="openLoadOnlineModal()">
+                <i class="fas fa-cloud-download-alt"></i> Carregar Online
+            </button>
+            <button class="btn" onclick="startFromTemplate()">
+                <i class="fas fa-copy"></i> Criar a Partir de Modelo
+            </button>
+            <button class="btn" onclick="document.getElementById('loadFileInput').click()">
+                <i class="fas fa-upload"></i> Carregar do PC
+            </button>
+            <button class="btn" onclick="saveInspectionToFile()">
+                <i class="fas fa-save"></i> Salvar no PC
+            </button>
+        </div>
+    </div>
+
 
     <!-- Modal para Adicionar/Editar Serviço -->
     <div class="modal-overlay" id="serviceModal">
@@ -712,7 +746,7 @@
     };
 
     // --- ELEMENTOS DO DOM (DECLARAÇÃO) ---
-    let mainContent, loadingOverlay, inspectionIdDisplay, inspectionDetailsPanel, locationList, newLocationInput, addLocationBtn, workspacePanel, summaryContent, serviceModal, modalTitle, serviceAreaInput, serviceObsInput, editingIndexInput, confirmModal, confirmModalText, confirmCancelBtn, confirmOkBtn, locationModal, loadFileInput, loadOnlineModal, confirmLoadOnlineBtn, inspectionIdInput, photoGalleryModal, photoGalleryTitle, photoGrid, addPhotoInput, mobileHeaderBackBtn, headerContent, moreOptionsToggle, moreOptionsMenu;
+    let mainContent, loadingOverlay, inspectionIdDisplay, inspectionDetailsPanel, locationList, newLocationInput, addLocationBtn, workspacePanel, summaryContent, serviceModal, modalTitle, serviceAreaInput, serviceObsInput, editingIndexInput, confirmModal, confirmModalText, confirmCancelBtn, confirmOkBtn, locationModal, loadFileInput, loadOnlineModal, confirmLoadOnlineBtn, inspectionIdInput, photoGalleryModal, photoGalleryTitle, photoGrid, addPhotoInput, mobileHeaderBackBtn, headerContent, moreOptionsToggle, bottomSheet, bottomSheetOverlay;
 
     // --- INICIALIZAÇÃO ---
     document.addEventListener('DOMContentLoaded', () => {
@@ -747,7 +781,8 @@
         mobileHeaderBackBtn = document.getElementById('mobileHeaderBackBtn');
         headerContent = document.querySelector('.header-content');
         moreOptionsToggle = document.getElementById('moreOptionsToggle');
-        moreOptionsMenu = document.getElementById('moreOptionsMenu');
+        bottomSheet = document.getElementById('bottomSheet');
+        bottomSheetOverlay = document.getElementById('bottomSheetOverlay');
 
         // ADIÇÃO DOS EVENT LISTENERS
         addLocationBtn.addEventListener('click', handleAddLocation);
@@ -769,12 +804,10 @@
         mobileHeaderBackBtn.addEventListener('click', () => showLocationsPanel());
         moreOptionsToggle.addEventListener('click', (e) => {
             e.stopPropagation();
-            moreOptionsMenu.classList.toggle('active');
+            bottomSheetOverlay.classList.add('active');
         });
-        document.addEventListener('click', () => {
-             if(moreOptionsMenu.classList.contains('active')) {
-                moreOptionsMenu.classList.remove('active');
-             }
+        bottomSheetOverlay.addEventListener('click', () => {
+             bottomSheetOverlay.classList.remove('active');
         });
         
         // CARREGAMENTO INICIAL DOS DADOS
