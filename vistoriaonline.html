@@ -288,11 +288,11 @@
             border-top: 1px solid var(--border-color);
             display: flex;
             justify-content: flex-end;
-            gap: 15px;
+            gap: 10px;
             flex-wrap: wrap;
             flex-shrink: 0;
         }
-        .btn { padding: 12px 24px; border-radius: 10px; font-weight: 600; font-size: 15px; cursor: pointer; transition: all 0.3s ease; border: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn { padding: 10px 18px; border-radius: 10px; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.3s ease; border: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
         .btn-success { background: var(--success-gradient); color: white; }
         .btn-success:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(16, 185, 129, 0.25); }
         .btn-info { background: var(--info-gradient); color: white; }
@@ -338,6 +338,48 @@
         .modal-form input { width: 100%; padding: 10px 12px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 14px; }
         .modal-footer { margin-top: 25px; display: flex; justify-content: flex-end; gap: 10px; }
         .btn-danger { background: var(--danger-color); color: white; }
+
+        /* Modal de Galeria de Fotos */
+        #photoGalleryModal .modal-content { max-width: 800px; }
+        .photo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 10px;
+            margin-top: 20px;
+            max-height: 40vh;
+            overflow-y: auto;
+            padding: 5px;
+        }
+        .photo-thumbnail {
+            position: relative;
+            width: 100%;
+            padding-bottom: 100%; /* Aspect ratio 1:1 */
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .photo-thumbnail img {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            cursor: pointer;
+        }
+        .photo-delete-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(0,0,0,0.6);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
         /* Grade de Seleção para Modal */
         .selection-grid {
@@ -441,6 +483,9 @@
 
         <!-- Action Footer -->
         <div class="action-footer">
+            <button class="btn btn-secondary" onclick="startFromTemplate()">
+                <i class="fas fa-copy"></i> Criar a Partir de Modelo
+            </button>
             <button class="btn btn-info" onclick="openLoadOnlineModal()">
                 <i class="fas fa-cloud-download-alt"></i> Carregar Online
             </button>
@@ -481,6 +526,23 @@
                     <button class="btn btn-secondary" onclick="closeServiceModal()">Cancelar</button>
                     <button class="btn btn-primary" onclick="saveService()">Salvar Serviço</button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Galeria de Fotos -->
+    <div class="modal-overlay" id="photoGalleryModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="photoGalleryTitle">Galeria de Fotos</h3>
+                <button class="modal-close-btn" onclick="closePhotoGalleryModal()">&times;</button>
+            </div>
+            <div class="photo-grid" id="photoGrid"></div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="document.getElementById('addPhotoInput').click()">
+                    <i class="fas fa-camera"></i> Adicionar Foto
+                </button>
+                <input type="file" id="addPhotoInput" style="display: none;" accept="image/*" multiple>
             </div>
         </div>
     </div>
@@ -582,6 +644,10 @@
     const loadOnlineModal = document.getElementById('loadOnlineModal');
     const confirmLoadOnlineBtn = document.getElementById('confirmLoadOnlineBtn');
     const inspectionIdInput = document.getElementById('inspectionIdInput');
+    const photoGalleryModal = document.getElementById('photoGalleryModal');
+    const photoGalleryTitle = document.getElementById('photoGalleryTitle');
+    const photoGrid = document.getElementById('photoGrid');
+    const addPhotoInput = document.getElementById('addPhotoInput');
 
     // --- INICIALIZAÇÃO ---
     document.addEventListener('DOMContentLoaded', () => {
@@ -600,6 +666,7 @@
         
         loadFileInput.addEventListener('change', loadInspectionFromFile);
         confirmLoadOnlineBtn.addEventListener('click', handleConfirmLoadOnline);
+        addPhotoInput.addEventListener('change', handleAddPhoto);
         
         fetchServiceData();
     });
@@ -765,6 +832,7 @@
                         </div>
                     </div>
                     <div class="service-card-actions">
+                        <button onclick="openPhotoGalleryModal('${state.activeLocation}', ${index})"><i class="fas fa-camera"></i></button>
                         <button onclick="editService(${index})"><i class="fas fa-pen"></i></button>
                         <button class="delete-btn" onclick="deleteService(${index})"><i class="fas fa-trash"></i></button>
                     </div>
@@ -870,7 +938,9 @@
                 itemDiv.className = 'summary-location-item';
                 let servicesHtml = services.map(s => {
                     const categoryLabel = state.inspectionData.serviceCategories[s.category]?.label || s.category;
-                    return `<div class="summary-service-item">• ${s.service} <small>(${categoryLabel})</small></div>`;
+                    const photoCount = s.photos ? s.photos.length : 0;
+                    const photoIcon = photoCount > 0 ? ` <i class="fas fa-camera" style="color: var(--text-light);"></i> ${photoCount}` : '';
+                    return `<div class="summary-service-item">• ${s.service} <small>(${categoryLabel})${photoIcon}</small></div>`;
                 }).join('');
                 itemDiv.innerHTML = `
                     <div class="summary-location-header">${locationName} (${services.length})</div>
@@ -928,7 +998,6 @@
             alert(`Já existe um ambiente chamado "${newName}". Renomeie antes de duplicar novamente.`);
             return;
         }
-        // Deep copy of services
         const servicesCopy = JSON.parse(JSON.stringify(state.inspectionData.locations[locationName]));
         state.inspectionData.locations[newName] = servicesCopy;
         state.activeLocation = newName;
@@ -969,7 +1038,7 @@
             const payload = {
                 key: categoryKey,
                 label: categoryName,
-                icon: 'fa-star' // Ícone padrão para novas categorias
+                icon: 'fa-star' 
             };
             postDataToSheet('addCategory', payload);
             input.value = '';
@@ -1004,11 +1073,12 @@
         const index = editingIndexInput.value;
         const { category, service } = state.modalContext;
 
-        const serviceData = { category, service, area, obs, id: Date.now() };
-
         if (index !== '') { // Update existing service
-            state.inspectionData.locations[state.activeLocation][parseInt(index, 10)] = serviceData;
+            const existingService = state.inspectionData.locations[state.activeLocation][parseInt(index, 10)];
+            existingService.area = area;
+            existingService.obs = obs;
         } else { // Add new service
+            const serviceData = { category, service, area, obs, photos: [], id: Date.now() };
             state.inspectionData.locations[state.activeLocation].push(serviceData);
         }
 
@@ -1027,6 +1097,72 @@
             renderAll();
         });
     }
+    
+    // --- PHOTO HANDLING ---
+    function openPhotoGalleryModal(locationName, serviceIndex) {
+        state.modalContext = { locationName, serviceIndex };
+        const service = state.inspectionData.locations[locationName][serviceIndex];
+        photoGalleryTitle.textContent = `Fotos para: ${service.service}`;
+        renderPhotoGrid();
+        photoGalleryModal.classList.add('visible');
+    }
+
+    function closePhotoGalleryModal() {
+        photoGalleryModal.classList.remove('visible');
+    }
+
+    function renderPhotoGrid() {
+        const { locationName, serviceIndex } = state.modalContext;
+        const service = state.inspectionData.locations[locationName][serviceIndex];
+        photoGrid.innerHTML = '';
+        if (service.photos && service.photos.length > 0) {
+            service.photos.forEach((photoData, index) => {
+                const thumb = document.createElement('div');
+                thumb.className = 'photo-thumbnail';
+                thumb.innerHTML = `
+                    <img src="${photoData}" alt="Foto ${index + 1}">
+                    <button class="photo-delete-btn" onclick="deletePhoto(${index})"><i class="fas fa-times"></i></button>
+                `;
+                photoGrid.appendChild(thumb);
+            });
+        } else {
+            photoGrid.innerHTML = '<p>Nenhuma foto adicionada.</p>';
+        }
+    }
+
+    function handleAddPhoto(event) {
+        const files = event.target.files;
+        if (!files) return;
+
+        showLoading(true, 'Processando fotos...');
+        const { locationName, serviceIndex } = state.modalContext;
+        const service = state.inspectionData.locations[locationName][serviceIndex];
+        if (!service.photos) service.photos = [];
+
+        let filesProcessed = 0;
+        for (let i = 0; i < files.length; i++) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                service.photos.push(e.target.result);
+                filesProcessed++;
+                if (filesProcessed === files.length) {
+                    showLoading(false);
+                    renderPhotoGrid();
+                    renderSummary();
+                }
+            };
+            reader.readAsDataURL(files[i]);
+        }
+        addPhotoInput.value = ''; // Reset input
+    }
+    
+    function deletePhoto(photoIndex) {
+        const { locationName, serviceIndex } = state.modalContext;
+        state.inspectionData.locations[locationName][serviceIndex].photos.splice(photoIndex, 1);
+        renderPhotoGrid();
+        renderSummary();
+    }
+
 
     // --- GENERIC MODAL & UI HANDLING ---
     function showConfirmationModal(text, callback) {
@@ -1054,7 +1190,7 @@
         loadOnlineModal.classList.remove('visible');
     }
 
-    // --- ONLINE/OFFLINE SAVE/LOAD ACTIONS ---
+    // --- ONLINE/OFFLINE SAVE/LOAD & TEMPLATE ACTIONS ---
     async function saveInspectionOnline() {
         showLoading(true, 'Salvando vistoria na nuvem...');
         try {
@@ -1144,6 +1280,29 @@
         };
         reader.readAsText(file);
     }
+    
+    function startFromTemplate() {
+        if (!state.inspectionId) {
+            alert("Por favor, primeiro carregue uma vistoria para usar como modelo.");
+            return;
+        }
+        
+        showConfirmationModal("Isso criará uma nova vistoria usando a estrutura da atual. Os dados do cliente, ID e detalhes dos serviços serão limpos. Deseja continuar?", () => {
+            state.inspectionId = null;
+            state.inspectionData.clientInfo = { name: '', address: '', date: new Date().toLocaleDateString('pt-BR') };
+            
+            Object.keys(state.inspectionData.locations).forEach(loc => {
+                state.inspectionData.locations[loc].forEach(service => {
+                    service.area = '';
+                    service.obs = '';
+                    service.photos = [];
+                });
+            });
+            
+            state.activeLocation = Object.keys(state.inspectionData.locations)[0] || null;
+            renderAll();
+        });
+    }
 
     // --- PDF REPORT ACTION ---
     function generatePDF() {
@@ -1213,6 +1372,41 @@
                 y += 5;
             }
         });
+
+        // Adicionar fotos em páginas separadas
+        Object.entries(data.locations).forEach(([locationName, services]) => {
+            services.forEach(service => {
+                if (service.photos && service.photos.length > 0) {
+                    doc.addPage();
+                    y = 15;
+                    doc.setFontSize(14);
+                    doc.setFont(undefined, 'bold');
+                    doc.text(`Fotos para: ${service.service} (${locationName})`, 15, y);
+                    y += 10;
+                    
+                    let x = 15;
+                    service.photos.forEach((photoData, index) => {
+                        if (y > 240) { // Verifica se cabe na página
+                            doc.addPage();
+                            y = 15;
+                            x = 15;
+                        }
+                        try {
+                            doc.addImage(photoData, 'JPEG', x, y, 80, 80);
+                            x += 90; // Move para a direita para a próxima foto
+                            if (x > 105) { // Se não couber mais na linha, quebra
+                                x = 15;
+                                y += 90;
+                            }
+                        } catch (e) {
+                            console.error("Erro ao adicionar imagem ao PDF:", e);
+                            doc.text("Erro ao carregar imagem.", x, y);
+                        }
+                    });
+                }
+            });
+        });
+
 
         doc.save(`Vistoria - ${data.clientInfo.name || 'Relatorio'}.pdf`);
     }
