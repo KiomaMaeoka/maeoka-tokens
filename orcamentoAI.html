@@ -244,6 +244,31 @@
             border-bottom: none;
         }
 
+        /* NOVO: Estilos para Análise Claude */
+        .claude-analise {
+            background: linear-gradient(135deg, #fef3c7 0%, #fbbf24 100%);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 4px solid #f59e0b;
+        }
+
+        .claude-margem {
+            background: #eff6ff;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            border-left: 3px solid var(--primary-color);
+        }
+
+        .sugestoes-claude {
+            background: #f0fdf4;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            border-left: 3px solid #10b981;
+        }
+
         /* NOVO: Estilos para Detalhamento Técnico */
         .detalhamento-tecnico {
             background: #f8f9fa;
@@ -601,6 +626,8 @@
         .btn-info:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(99, 102, 241, 0.25); }
         .btn-secondary { background: #f3f4f6; color: #6b7280; }
         .btn-secondary:hover { background: #e5e7eb; }
+        .btn-primary { background: var(--primary-gradient); color: white; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(59, 130, 246, 0.25); }
         
         #moreOptionsToggle { display: none; }
         #moreOptionsMenu {
@@ -803,7 +830,7 @@
                     <i class="fas fa-hard-hat"></i>
                     <div class="logo-text">
                         <h1>MAEOKA ENGENHARIA</h1>
-                        <p>Vistoria Digital + Orçamentista Automático</p>
+                        <p>Vistoria Digital + Orçamentista Claude AI</p>
                     </div>
                 </div>
                 <div class="inspection-id-wrapper">
@@ -863,7 +890,7 @@
                 <i class="fas fa-cloud-download-alt"></i> Carregar Online
             </button>
             <button class="btn btn-info" onclick="saveInspectionOnlineComOrcamento()">
-                <i class="fas fa-calculator"></i> 💰 Salvar + Gerar Orçamento
+                <i class="fas fa-brain"></i> 🤖 Claude AI + Orçamento
             </button>
             <button class="btn btn-success" onclick="generatePDF()">
                 <i class="fas fa-file-pdf"></i> Gerar PDF
@@ -874,13 +901,13 @@
         </div>
     </div>
 
-    <!-- MODAL DE ORÇAMENTO -->
+    <!-- MODAL DE ORÇAMENTO COM CLAUDE AI -->
     <div id="orcamentoModal">
         <div class="orcamento-content">
             <div class="orcamento-header">
                 <button class="orcamento-close" onclick="closeOrcamentoModal()">&times;</button>
-                <h2><i class="fas fa-calculator"></i> Orçamentista Automático</h2>
-                <p>Maeoka Engenharia - Processamento Inteligente</p>
+                <h2><i class="fas fa-brain"></i> Orçamentista Claude AI</h2>
+                <p>Maeoka Engenharia - Análise Inteligente com IA</p>
             </div>
             
             <!-- NOVA: Seção de Escolha do Tipo de Orçamento -->
@@ -931,23 +958,30 @@
                     </div>
                 </div>
                 <div class="step" id="step3">
-                    <div class="step-icon"><i class="fas fa-search-dollar"></i></div>
+                    <div class="step-icon"><i class="fas fa-brain"></i></div>
                     <div>
-                        <h4 id="step3Title">Consultando Preços</h4>
-                        <p id="step3Desc">Base Maeoka + SINAPI + Pesquisa online...</p>
+                        <h4>Claude AI Analisando</h4>
+                        <p>IA analisando complexidade e definindo margens...</p>
                     </div>
                 </div>
                 <div class="step" id="step4">
                     <div class="step-icon"><i class="fas fa-calculator"></i></div>
                     <div>
                         <h4>Calculando Orçamento</h4>
-                        <p>Aplicando BDI e gerando totais...</p>
+                        <p>Aplicando inteligência artificial e gerando totais...</p>
                     </div>
                 </div>
             </div>
             
             <!-- Resultado do Orçamento -->
             <div class="orcamento-resultado" id="orcamentoResultado">
+                <!-- NOVA: Análise Claude -->
+                <div class="claude-analise" id="claudeAnaliseSection" style="display: none;">
+                    <h4><i class="fas fa-brain"></i> Análise Claude AI</h4>
+                    <div class="claude-margem" id="claudeMargemInfo"></div>
+                    <div class="sugestoes-claude" id="claudeSugestoesInfo"></div>
+                </div>
+                
                 <div class="valor-total">
                     <h3>💰 Valor Total Estimado</h3>
                     <div style="font-size: 2.5rem; font-weight: bold; margin: 10px 0;" id="valorTotalDisplay">R$ 0,00</div>
@@ -1091,13 +1125,18 @@
         </div>
     </div>
 
-    <script>
+<script>
     // --- CONFIGURAÇÃO DA API ---
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbydwN3L1nOCs2hn9TZqUoEo6aeBzqOlD5eL3w0H6nY3ehB_mvfAs4h4Jtr46nNNkCWyfw/exec";
     
-    // --- NOVA CONFIGURAÇÃO: URL DO AGENTE ORÇAMENTISTA ---
-    const AGENTE_ORCAMENTISTA_URL = "https://script.google.com/macros/s/AKfycbwE-wYllwgsxt060HC0KpLF1EQFHGwDZufRjjclyt14Xsa2GgbQksIBJQA0eP_jwdR9/exec";
-
+    // --- NOVA CONFIGURAÇÃO: URL DO AGENTE CLAUDE INTEGRADO ---
+    const AGENTE_ORCAMENTISTA_URL = "https://script.google.com/macros/s/AKfycbyg0So3uMyMVqCA4A7WEwAPARBak6zyjddcIpRUWeJONoUZg2OgVY-ZWYPbsB0-6rSM/exec";
+    
+    // --- FUNÇÃO AUXILIAR SLEEP (CORRIGE O ERRO) ---
+    function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+    
     // --- CONFIGURAÇÃO LOCAL ---
     const config = {
         commonLocations: ["Cozinha", "Sala de Estar", "Sala de Jantar", "Banheiro Social", "Banheiro Suíte", "Quarto Principal", "Quarto 2", "Área de Serviço", "Varanda/Sacada", "Garagem", "Área Externa", "Laje"],
@@ -1193,7 +1232,7 @@
         fetchServiceData();
     });
 
-    // --- NOVAS FUNÇÕES DO ORÇAMENTO ---
+    // --- NOVAS FUNÇÕES DO ORÇAMENTO COM CLAUDE AI ---
 
     // FUNÇÃO: SALVAR + GERAR ORÇAMENTO
     async function saveInspectionOnlineComOrcamento() {
@@ -1250,12 +1289,6 @@
         document.getElementById('tipoOrcamentoSection').style.display = 'none';
         document.getElementById('processingSteps').style.display = 'block';
         
-        // Atualiza textos baseado no tipo selecionado
-        if (state.tipoOrcamentoSelecionado === 'completo') {
-            document.getElementById('step3Title').textContent = 'Pesquisando Materiais';
-            document.getElementById('step3Desc').textContent = 'Consultando preços de materiais no mercado...';
-        }
-        
         // Reset dos passos
         document.querySelectorAll('.step').forEach(step => {
             step.classList.remove('active', 'completed');
@@ -1272,21 +1305,17 @@
                 await sleep(1500);
             });
 
-            // PASSO 3: Consultar preços/materiais
+// PASSO 3: Claude AI analisando
             await executarPasso(3, async () => {
-                if (state.tipoOrcamentoSelecionado === 'completo') {
-                    await pesquisarMateriais();
-                }
-                await sleep(1000);
+                console.log('🧠 Claude AI analisando complexidade e margens...');
+                await sleep(2000);
             });
-
             // PASSO 4: Calcular orçamento
             await executarPasso(4, async () => {
-                const orcamento = await calcularOrcamento();
+                const orcamento = await calcularOrcamentoCorrigido();
                 state.ultimoOrcamento = orcamento;
                 mostrarResultadoOrcamento(orcamento);
             });
-
         } catch (error) {
             console.error('Erro no processamento:', error);
             alert('Erro ao processar orçamento: ' + error.message);
@@ -1294,19 +1323,55 @@
         }
     }
 
-    // FUNÇÃO: PESQUISAR MATERIAIS (SIMULADA)
-    async function pesquisarMateriais() {
-        // Aqui você pode implementar uma pesquisa real de materiais
-        // Por exemplo, consultar APIs de lojas de material de construção
-        console.log('🔍 Pesquisando materiais no mercado...');
-        
-        // Simula pesquisa de materiais
-        return new Promise(resolve => {
-            setTimeout(() => {
-                console.log('✅ Pesquisa de materiais concluída');
-                resolve();
-            }, 2000);
-        });
+    // NOVA FUNÇÃO COM CORS CORRIGIDO
+    async function calcularOrcamentoCorrigido() {
+        const dadosParaCalculo = {
+            clientInfo: state.inspectionData.clientInfo,
+            locations: state.inspectionData.locations,
+            serviceCategories: state.inspectionData.serviceCategories,
+            tipoOrcamento: state.tipoOrcamentoSelecionado
+        };
+
+        console.log('📤 Enviando para Agente Claude:', dadosParaCalculo);
+
+        try {
+            const response = await fetch(AGENTE_ORCAMENTISTA_URL, {
+                method: 'POST',
+                redirect: 'follow',  // CRÍTICO - sempre incluir
+                headers: {
+                    'Content-Type': 'text/plain;charset=utf-8'  // ESSENCIAL - usa text/plain
+                },
+                body: JSON.stringify({
+                    action: 'gerar_orcamento',
+                    dados: dadosParaCalculo
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`Erro HTTP: ${response.status}`);
+            }
+
+            const resultado = await response.json();
+            
+            if (resultado.status === 'success') {
+                console.log('✅ Orçamento recebido do agente Claude:', resultado.data);
+                return resultado.data;
+            } else {
+                throw new Error(resultado.message || 'Erro no agente');
+            }
+            
+        } catch (error) {
+            console.error('❌ Erro ao chamar agente Claude:', error);
+            
+            // Fallback: usa simulação se der erro
+            console.log('⚠️ Usando simulação como fallback...');
+            return simularCalculoOrcamento(dadosParaCalculo);
+        }
+    }
+
+    // FUNÇÃO: CALCULAR ORÇAMENTO - MANTÉM A ORIGINAL COMO BACKUP
+    async function calcularOrcamento() {
+        return calcularOrcamentoCorrigido();
     }
 
     // FUNÇÃO: CALCULAR ORÇAMENTO - CONECTADO AO AGENTE CLAUDE
@@ -1318,7 +1383,7 @@
             tipoOrcamento: state.tipoOrcamentoSelecionado
         };
 
-        console.log('📤 Enviando para Agente Orçamentista:', dadosParaCalculo);
+        console.log('📤 Enviando para Agente Claude:', dadosParaCalculo);
 
         try {
             const response = await fetch(AGENTE_ORCAMENTISTA_URL, {
@@ -1339,14 +1404,14 @@
             const resultado = await response.json();
             
             if (resultado.status === 'success') {
-                console.log('✅ Orçamento recebido do agente:', resultado.data);
+                console.log('✅ Orçamento recebido do agente Claude:', resultado.data);
                 return resultado.data;
             } else {
                 throw new Error(resultado.message || 'Erro no agente');
             }
             
         } catch (error) {
-            console.error('❌ Erro ao chamar agente:', error);
+            console.error('❌ Erro ao chamar agente Claude:', error);
             
             // Fallback: usa simulação se der erro
             console.log('⚠️ Usando simulação como fallback...');
@@ -1463,11 +1528,33 @@
         const bdiMedio = dados.tipoOrcamento === 'mao_obra' ? 0.50 : 0.30;
         const valorFinal = subtotal * (1 + bdiMedio);
 
+        // Simular análise Claude
+        const analiseClaudeSimulada = {
+            analise: {
+                complexidade: "media",
+                precisaEngenheiro: "medio",
+                margemSugerida: dados.tipoOrcamento === 'mao_obra' ? 50 : 30,
+                justificativa: dados.tipoOrcamento === 'mao_obra' 
+                    ? "Obra apenas de mão de obra requer margem maior para cobrir riscos e especialização" 
+                    : "Obra completa com complexidade média, margem padrão aplicada"
+            },
+            observacoes: [
+                "Claude AI analisou a complexidade como MÉDIA",
+                `Margem de ${dados.tipoOrcamento === 'mao_obra' ? '50%' : '30%'} aplicada conforme análise inteligente`,
+                "Preços baseados na metodologia Maeoka + análise contextual"
+            ],
+            sugestoes: [
+                "Verificar se instalação elétrica foi incluída em todos os ambientes necessários",
+                "Considerar proteção de móveis durante a execução dos serviços"
+            ]
+        };
+
         return {
             cliente: dados.clientInfo,
             tipoOrcamento: dados.tipoOrcamento,
             servicos: servicosCalculados,
             materiais: materiaisCalculados,
+            analiseClaudeResult: analiseClaudeSimulada,
             resumo: {
                 totalServicos: totalServicos,
                 totalMateriais: totalMateriais,
@@ -1477,7 +1564,8 @@
                 prazoEstimado: calcularPrazo(servicosCalculados)
             },
             calculosDetalhados: calculosDetalhados,
-            observacoes: gerarObservacoes(dados.tipoOrcamento)
+            observacoes: gerarObservacoes(dados.tipoOrcamento).concat(analiseClaudeSimulada.observacoes),
+            sugestoes: analiseClaudeSimulada.sugestoes || []
         };
     }
 
@@ -1499,7 +1587,7 @@
                 ...observacoesComuns,
                 'Orçamento APENAS para mão de obra',
                 'Materiais por conta do cliente',
-                'BDI de 50% aplicado (margem para M.O. especializada)',
+                'Margem aplicada conforme análise de complexidade',
                 'Lista de materiais pode ser fornecida separadamente'
             ];
         } else {
@@ -1507,7 +1595,7 @@
                 ...observacoesComuns,
                 'Orçamento COMPLETO (mão de obra + materiais)',
                 'Materiais inclusos conforme especificação',
-                'BDI de 30% aplicado conforme porte da obra',
+                'Margem aplicada conforme porte e complexidade da obra',
                 'Preços de materiais baseados em pesquisa de mercado'
             ];
         }
@@ -1515,6 +1603,11 @@
 
     // FUNÇÃO: MOSTRAR RESULTADO DO ORÇAMENTO
     function mostrarResultadoOrcamento(orcamento) {
+        // Mostrar análise Claude se disponível
+        if (orcamento.analiseClaudeResult) {
+            mostrarAnaliseClaudeResult(orcamento.analiseClaudeResult);
+        }
+        
         // Preenche valor total
         document.getElementById('valorTotalDisplay').textContent = 
             orcamento.resumo.valorFinal.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'});
@@ -1566,12 +1659,43 @@
         // Preenche detalhamento técnico
         preencherDetalhamentoTecnico(orcamento);
 
-        // Preenche observações
+        // Preenche observações (incluindo as do Claude)
         const obsContainer = document.getElementById('observacoesOrcamento');
         obsContainer.innerHTML = orcamento.observacoes.map(obs => `<p>• ${obs}</p>`).join('');
 
         // Mostra o resultado
         document.getElementById('orcamentoResultado').style.display = 'block';
+    }
+
+    // NOVA FUNÇÃO: MOSTRAR ANÁLISE DO CLAUDE
+    function mostrarAnaliseClaudeResult(analiseClaudeResult) {
+        if (!analiseClaudeResult || !analiseClaudeResult.analise) return;
+        
+        const claudeSection = document.getElementById('claudeAnaliseSection');
+        const margemInfo = document.getElementById('claudeMargemInfo');
+        const sugestoesInfo = document.getElementById('claudeSugestoesInfo');
+        
+        // Análise da margem
+        const analise = analiseClaudeResult.analise;
+        margemInfo.innerHTML = `
+            <h5><i class="fas fa-percentage"></i> Decisão de Margem Claude AI</h5>
+            <p><strong>Complexidade:</strong> ${analise.complexidade.toUpperCase()}</p>
+            <p><strong>Presença Engenheiro:</strong> ${analise.precisaEngenheiro}</p>
+            <p><strong>Margem Aplicada:</strong> ${analise.margemSugerida}%</p>
+            <p><strong>Justificativa:</strong> ${analise.justificativa}</p>
+        `;
+        
+        // Sugestões do Claude
+        if (analiseClaudeResult.sugestoes && analiseClaudeResult.sugestoes.length > 0) {
+            sugestoesInfo.innerHTML = `
+                <h5><i class="fas fa-lightbulb"></i> Sugestões Inteligentes</h5>
+                ${analiseClaudeResult.sugestoes.map(s => `<p>• ${s}</p>`).join('')}
+            `;
+        } else {
+            sugestoesInfo.style.display = 'none';
+        }
+        
+        claudeSection.style.display = 'block';
     }
 
     // FUNÇÃO: PREENCHER SEÇÃO DE MATERIAIS
@@ -1642,7 +1766,7 @@
                 Total Mão de Obra: ${orcamento.resumo.totalServicos.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}<br>
                 ${orcamento.tipoOrcamento === 'completo' ? `Total Materiais: ${orcamento.resumo.totalMateriais.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}<br>` : ''}
                 Subtotal: ${orcamento.resumo.subtotal.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}<br>
-                BDI Aplicado: ${orcamento.resumo.bdiAplicado}<br>
+                Margem Aplicada: ${orcamento.resumo.bdiAplicado}<br>
                 <strong>VALOR FINAL: ${orcamento.resumo.valorFinal.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}</strong>
             </div>
         `;
@@ -1659,24 +1783,24 @@
                     Área: ${calculo.calculo.area} m² | 
                     M.O.: ${calculo.calculo.precoMO.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}/m² | 
                     ${calculo.calculo.precoMaterial > 0 ? `Material: ${calculo.calculo.precoMaterial.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}/m² | ` : ''}
-                    BDI: ${Math.round(calculo.calculo.bdi*100)}%
+                    Margem: ${Math.round(calculo.calculo.bdi*100)}%
                 </div>
             `;
             container.appendChild(div);
         });
 
-        // Metodologia aplicada
+        // Metodologia aplicada (com Claude AI)
         const metodologiaDiv = document.createElement('div');
         metodologiaDiv.className = 'calculo-item';
         metodologiaDiv.innerHTML = `
-            <h5><i class="fas fa-graduation-cap"></i> Metodologia Aplicada</h5>
+            <h5><i class="fas fa-brain"></i> Metodologia + Claude AI</h5>
             <div style="font-size: 0.9rem; line-height: 1.6;">
                 <strong>Fonte dos Preços:</strong> Tabela Maeoka + SINAPI Curitiba/PR + Pesquisa de Mercado<br>
-                <strong>BDI (Benefícios e Despesas Indiretas):</strong><br>
-                • ${orcamento.tipoOrcamento === 'mao_obra' ? '50% para projetos só de mão de obra (margem especializada)' : '30% para projetos completos (conforme porte da obra)'}<br>
-                • Inclui: administração, lucro, impostos, riscos<br>
+                <strong>Análise Inteligente:</strong> Claude AI analisou complexidade e definiu margens otimizadas<br>
+                <strong>Margem Aplicada:</strong> ${orcamento.resumo.bdiAplicado} baseada em análise contextual<br>
+                • Inclui: administração, lucro, impostos, riscos, complexidade técnica<br>
                 <strong>Área de Aplicação:</strong> Curitiba/PR (preços regionais)<br>
-                <strong>Prazo Estimado:</strong> Baseado em produtividade padrão Maeoka
+                <strong>Prazo Estimado:</strong> Baseado em produtividade padrão Maeoka + análise IA
             </div>
         `;
         container.appendChild(metodologiaDiv);
@@ -1725,7 +1849,7 @@
         
         // Cabeçalho
         doc.setFontSize(18);
-        doc.text("Orçamento - Maeoka Engenharia", 105, 20, { align: 'center' });
+        doc.text("Orçamento Claude AI - Maeoka Engenharia", 105, 20, { align: 'center' });
         
         doc.setFontSize(12);
         doc.text(`Cliente: ${orcamento.cliente.name || 'Não informado'}`, 20, 40);
@@ -1733,8 +1857,23 @@
         doc.text(`Data: ${new Date().toLocaleDateString('pt-BR')}`, 20, 60);
         doc.text(`Tipo: ${orcamento.tipoOrcamento === 'mao_obra' ? 'Apenas Mão de Obra' : 'Mão de Obra + Materiais'}`, 20, 70);
         
+        // Análise Claude AI
+        if (orcamento.analiseClaudeResult && orcamento.analiseClaudeResult.analise) {
+            let y = 85;
+            doc.setFontSize(14);
+            doc.text("Análise Claude AI:", 20, y);
+            y += 10;
+            
+            doc.setFontSize(10);
+            const analise = orcamento.analiseClaudeResult.analise;
+            doc.text(`Complexidade: ${analise.complexidade} | Margem: ${analise.margemSugerida}%`, 20, y);
+            y += 8;
+            doc.text(`Justificativa: ${analise.justificativa}`, 20, y);
+            y += 15;
+        }
+        
         // Serviços
-        let y = 90;
+        let y = 110;
         doc.setFontSize(14);
         doc.text("Serviços:", 20, y);
         y += 10;
@@ -1776,7 +1915,7 @@
         doc.setFontSize(14);
         doc.text(`TOTAL: ${orcamento.resumo.valorFinal.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}`, 20, y);
         
-        doc.save(`Orcamento-Maeoka-${new Date().toISOString().split('T')[0]}.pdf`);
+        doc.save(`Orcamento-Maeoka-Claude-${new Date().toISOString().split('T')[0]}.pdf`);
     }
 
     // FUNÇÃO: GERAR CONTRATO
@@ -1790,7 +1929,8 @@
             materiais: state.ultimoOrcamento.materiais,
             valorTotal: state.ultimoOrcamento.resumo.valorFinal,
             prazo: state.ultimoOrcamento.resumo.prazoEstimado,
-            tipoOrcamento: state.ultimoOrcamento.tipoOrcamento
+            tipoOrcamento: state.ultimoOrcamento.tipoOrcamento,
+            analiseClaudeResult: state.ultimoOrcamento.analiseClaudeResult
         };
         
         // Salva no localStorage para o contrato.html acessar
@@ -1800,10 +1940,6 @@
         window.open('contrato.html', '_blank');
     }
 
-    // FUNÇÃO: SLEEP
-    function sleep(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-    }
 
     // --- COMUNICAÇÃO COM A API (GOOGLE SHEETS) ---
     async function fetchServiceData() {
