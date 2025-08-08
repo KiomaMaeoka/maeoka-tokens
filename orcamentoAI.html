@@ -1094,6 +1094,9 @@
     <script>
     // --- CONFIGURAÇÃO DA API ---
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbydwN3L1nOCs2hn9TZqUoEo6aeBzqOlD5eL3w0H6nY3ehB_mvfAs4h4Jtr46nNNkCWyfw/exec";
+    
+    // --- NOVA CONFIGURAÇÃO: URL DO AGENTE ORÇAMENTISTA ---
+    const AGENTE_ORCAMENTISTA_URL = "https://script.google.com/macros/s/AKfycbwE-wYllwgsxt060HC0KpLF1EQFHGwDZufRjjclyt14Xsa2GgbQksIBJQA0eP_jwdR9/exec";
 
     // --- CONFIGURAÇÃO LOCAL ---
     const config = {
@@ -1306,7 +1309,7 @@
         });
     }
 
-    // FUNÇÃO: CALCULAR ORÇAMENTO
+    // FUNÇÃO: CALCULAR ORÇAMENTO - CONECTADO AO AGENTE CLAUDE
     async function calcularOrcamento() {
         const dadosParaCalculo = {
             clientInfo: state.inspectionData.clientInfo,
@@ -1315,18 +1318,43 @@
             tipoOrcamento: state.tipoOrcamentoSelecionado
         };
 
-        console.log('📤 Calculando orçamento:', dadosParaCalculo);
+        console.log('📤 Enviando para Agente Orçamentista:', dadosParaCalculo);
 
-        // AQUI VOCÊ VAI CHAMAR O AGENTE CLAUDE REAL
-        // Por enquanto usando simulação
-        const orcamento = simularCalculoOrcamento(dadosParaCalculo);
-        
-        await sleep(2000);
-        
-        return orcamento;
+        try {
+            const response = await fetch(AGENTE_ORCAMENTISTA_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    action: 'gerar_orcamento',
+                    dados: dadosParaCalculo
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`Erro HTTP: ${response.status}`);
+            }
+
+            const resultado = await response.json();
+            
+            if (resultado.status === 'success') {
+                console.log('✅ Orçamento recebido do agente:', resultado.data);
+                return resultado.data;
+            } else {
+                throw new Error(resultado.message || 'Erro no agente');
+            }
+            
+        } catch (error) {
+            console.error('❌ Erro ao chamar agente:', error);
+            
+            // Fallback: usa simulação se der erro
+            console.log('⚠️ Usando simulação como fallback...');
+            return simularCalculoOrcamento(dadosParaCalculo);
+        }
     }
 
-    // FUNÇÃO: SIMULAR CÁLCULO (SERÁ SUBSTITUÍDA PELO AGENTE CLAUDE)
+    // FUNÇÃO: SIMULAR CÁLCULO (FALLBACK PARA TESTES)
     function simularCalculoOrcamento(dados) {
         const servicosCalculados = [];
         const materiaisCalculados = [];
