@@ -1342,13 +1342,6 @@
                     'Content-Type': 'text/plain;charset=utf-8'  // ESSENCIAL - usa text/plain
                 },
                 body: JSON.stringify({
-                    const resultado = await response.text(); // Mudou de .json() para .text()
-
-if (resultado === 'Accepted' || response.ok) {
-    console.log('✅ Webhook recebeu os dados');
-    // Usa simulação por enquanto
-    return simularCalculoOrcamento(dadosParaCalculo);
-}
                     action: 'gerar_orcamento',
                     dados: dadosParaCalculo
                 })
