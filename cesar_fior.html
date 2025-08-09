@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proposta Comercial - Maeoka Engenharia</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+            color: #2d3748;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #1a3a52 0%, #2c5282 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .client-info-section {
+            background: rgba(255,255,255,0.1); 
+            padding: 20px; 
+            margin-top: 25px; 
+            border-radius: 8px; 
+            text-align: left;
+        }
+
+        .client-info-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .client-info-grid h3 {
+            margin: 0 0 8px 0; 
+            font-size: 16px; 
+            color: #ffffff; 
+            opacity: 0.9;
+        }
+
+        .client-info-grid p {
+            margin: 0; 
+            font-size: 18px; 
+            font-weight: bold; 
+            color: #ffffff;
+        }
+
+        .toggle-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            padding: 30px;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        
+        .toggle-btn {
+            padding: 15px 35px;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .toggle-btn.active {
+            background: #38a169;
+            color: white;
+            box-shadow: 0 4px 12px rgba(56, 161, 105, 0.3);
+        }
+        
+        .toggle-btn.inactive {
+            background: #e2e8f0;
+            color: #718096;
+        }
+        
+        .toggle-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .info-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 30px;
+            background: #f8f9fa;
+        }
+        
+        .info-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+            text-align: center;
+        }
+        
+        .info-card i {
+            font-size: 32px;
+            color: #3182ce;
+            margin-bottom: 10px;
+        }
+        
+        .info-card h3 {
+            font-size: 14px;
+            color: #718096;
+            margin-bottom: 5px;
+        }
+        
+        .info-card .value {
+            font-size: 22px;
+            font-weight: bold;
+            color: #2d3748;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .price-summary {
+            background: white;
+            border: 2px solid #38a169;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .price-summary h2 {
+            color: #2d3748;
+            font-size: 20px;
+            margin-bottom: 15px;
+        }
+        
+        .price-value {
+            font-size: 36px;
+            font-weight: bold;
+            color: #38a169;
+            margin: 10px 0;
+        }
+        
+        .services-container {
+            margin-top: 30px;
+        }
+        
+        .services-title {
+            color: #2d3748;
+            font-size: 22px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .service-item {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .service-item:hover {
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+        
+        .service-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background: #f7fafc;
+            cursor: pointer;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .service-info {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            min-width: 250px;
+        }
+        
+        .service-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 35px;
+            height: 35px;
+            background: #3182ce;
+            color: white;
+            border-radius: 50%;
+            font-weight: bold;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        
+        .service-title-text {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2d3748;
+        }
+        
+        .service-price {
+            text-align: right;
+        }
+        
+        .price-label {
+            font-size: 12px;
+            color: #718096;
+            margin-bottom: 5px;
+        }
+        
+        .price-amount {
+            font-size: 22px;
+            font-weight: bold;
+            color: #38a169;
+        }
+        
+        .material-price {
+            font-size: 14px;
+            color: #3182ce;
+            margin-top: 5px;
+        }
+        
+        .service-expand-btn {
+            background: #3182ce;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            margin-left: 20px;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .service-expand-btn:hover {
+            background: #2c5282;
+        }
+        
+        .service-details {
+            display: none;
+            padding: 25px;
+            background: #fafbfc;
+            border-top: 1px solid #e2e8f0;
+        }
+        
+        .service-details.active {
+            display: block;
+        }
+        
+        .detail-section {
+            margin-bottom: 20px;
+        }
+        
+        .detail-title {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 12px;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .detail-title i {
+            color: #3182ce;
+        }
+        
+        .detail-content ul {
+            list-style: none;
+            padding: 0;
+            padding-left: 30px;
+            color: #4a5568;
+            font-size: 14px;
+            line-height: 1.8;
+        }
+        
+        .detail-content li {
+            padding: 8px 0;
+            padding-left: 25px;
+            position: relative;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .detail-content li:last-child {
+            border-bottom: none;
+        }
+        
+        .detail-content li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #38a169;
+            font-weight: bold;
+        }
+        
+        .material-breakdown {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .material-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 5px;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 14px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .material-item:last-child {
+            border-bottom: none;
+        }
+        
+        .material-name {
+            color: #4a5568;
+        }
+        
+        .material-value {
+            font-weight: 600;
+            color: #2d3748;
+        }
+        
+        .note-section {
+            background: #e6fffa;
+            border-left: 4px solid #38a169;
+            padding: 20px;
+            margin-top: 30px;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .note-title {
+            font-weight: 600;
+            color: #22543d;
+            margin-bottom: 10px;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .note-content {
+            color: #2f855a;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        .cta-section {
+            padding: 40px 30px;
+            text-align: center;
+            background: white;
+            border-top: 1px solid #e2e8f0;
+        }
+        
+        .cta-title {
+            font-size: 24px;
+            color: #2d3748;
+            margin-bottom: 10px;
+        }
+        
+        .cta-subtitle {
+            color: #718096;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+        
+        .cta-btn {
+            padding: 15px 40px;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: #38a169;
+            color: white;
+        }
+        
+        .cta-btn:hover {
+            background: #2f855a;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(56, 161, 105, 0.3);
+        }
+        
+        .footer {
+            background: #2d3748;
+            color: white;
+            padding: 30px;
+            text-align: center;
+            font-size: 14px;
+        }
+        
+        .footer p {
+            margin: 5px 0;
+            opacity: 0.9;
+        }
+        
+        @media (min-width: 768px) {
+            .client-info-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            .container {
+                border-radius: 0;
+            }
+            .header {
+                padding: 30px 20px;
+            }
+            .logo {
+                font-size: 24px;
+            }
+            .content {
+                padding: 20px;
+            }
+            .toggle-container {
+                flex-direction: column;
+                gap: 10px;
+                padding: 20px;
+            }
+            .toggle-btn {
+                width: 100%;
+                justify-content: center;
+            }
+            .price-value {
+                font-size: 28px;
+            }
+            .service-header {
+                flex-direction: column;
+                align-items: flex-start;
+                text-align: left;
+            }
+            .service-price {
+                text-align: left;
+                width: 100%;
+                margin-top: 10px;
+            }
+            .service-expand-btn {
+                margin-left: 0;
+                margin-top: 10px;
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">
+                <i class="fas fa-hard-hat"></i> MAEOKA ENGENHARIA
+            </div>
+            <div class="subtitle">
+                CNPJ: 19.924.627/0001-67 | Eng. Kioma Maeoka (CREA 159.328/D-PR)<br>
+                Especialistas em Reformas e Construção Civil
+            </div>
+            
+            <!-- Client Info Section -->
+            <div class="client-info-section">
+                <div class="client-info-grid">
+                    <div>
+                        <h3><i class="fas fa-users"></i> CLIENTES</h3>
+                        <p>Ana Lucia e César Fior</p>
+                    </div>
+                    <div>
+                        <h3><i class="fas fa-map-marker-alt"></i> ENDEREÇO DA OBRA</h3>
+                        <p>
+                            Rua Vereador Antônio Giacomassi, 68<br>
+                            Alto Boqueirão
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toggle Options -->
+        <div class="toggle-container">
+            <button class="toggle-btn active" onclick="toggleOption('maoDeObra')">
+                <i class="fas fa-hammer"></i> Somente Mão de Obra
+            </button>
+            <button class="toggle-btn inactive" onclick="toggleOption('completo')">
+                <i class="fas fa-tools"></i> Mão de Obra + Material
+            </button>
+        </div>
+
+        <!-- Info Cards -->
+        <div class="info-cards">
+            <div class="info-card">
+                <i class="fas fa-ruler-combined"></i>
+                <h3>Área Total</h3>
+                <div class="value">13,74 m²</div>
+            </div>
+            <div class="info-card">
+                <i class="fas fa-calendar-alt"></i>
+                <h3>Prazo Estimado</h3>
+                <div class="value">18 dias úteis</div>
+            </div>
+            <div class="info-card">
+                <i class="fas fa-fire"></i>
+                <h3>Tipo de Obra</h3>
+                <div class="value">Área Gourmet</div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="content">
+
+            <!-- Price Summary -->
+            <div class="price-summary">
+                <h2 id="priceTitle">Valor Total do Serviço</h2>
+                <div class="price-value" style="text-decoration: line-through; color: #718096; font-size: 28px; margin-bottom: 10px;" id="originalPrice">R$ 11.518,00</div>
+                <div style="color: #38a169; font-size: 16px; margin-bottom: 15px;">
+                    <i class="fas fa-tag"></i> Desconto de 5% para pagamento via PIX
+                </div>
+                <div style="color: #2d3748; font-size: 18px; margin-bottom: 10px;">Valor Total do Investimento</div>
+                <div class="price-value" id="totalPrice">R$ 10.942,00</div>
+                
+                <div style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+                    <h3 style="color: #2d3748; font-size: 16px; margin-bottom: 15px;">
+                        <i class="fas fa-credit-card"></i> Condições de Pagamento
+                    </h3>
+                    <div style="display: flex; justify-content: space-around; flex-wrap: wrap; gap: 15px; margin-bottom: 15px;">
+                        <div style="text-align: center; flex: 1; min-width: 100px;">
+                            <div style="font-size: 24px; font-weight: bold; color: #3182ce;">40%</div>
+                            <div style="font-size: 14px; color: #718096;">Entrada</div>
+                        </div>
+                        <div style="text-align: center; flex: 1; min-width: 100px;">
+                            <div style="font-size: 24px; font-weight: bold; color: #3182ce;">30%</div>
+                            <div style="font-size: 14px; color: #718096;">Durante a obra</div>
+                        </div>
+                        <div style="text-align: center; flex: 1; min-width: 100px;">
+                            <div style="font-size: 24px; font-weight: bold; color: #3182ce;">30%</div>
+                            <div style="font-size: 14px; color: #718096;">Entrega</div>
+                        </div>
+                    </div>
+                    <div style="background: #fff5f5; padding: 12px; border-radius: 6px; border-left: 3px solid #e53e3e;">
+                        <p style="margin: 0; font-size: 13px; color: #742a2a;">
+                            <i class="fas fa-info-circle"></i> <strong>Importante:</strong> Pagamento no cartão de crédito está sujeito a taxa da operadora.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Services List -->
+            <div class="services-container">
+                <h2 class="services-title">
+                    <i class="fas fa-clipboard-list"></i> Detalhamento dos Serviços
+                </h2>
+
+                <!-- Service 1 -->
+                <div class="service-item">
+                    <div class="service-header" onclick="toggleDetails(this)">
+                        <div class="service-info">
+                            <span class="service-number">1</span>
+                            <span class="service-title-text">Demolição e Requadramento</span>
+                        </div>
+                        <div class="service-price">
+                            <div class="price-label">Valor do Serviço</div>
+                            <div class="price-amount">R$ 785,00</div>
+                        </div>
+                        <button class="service-expand-btn">
+                            <i class="fas fa-chevron-down"></i> Detalhes
+                        </button>
+                    </div>
+                    <div class="service-details">
+                        <div class="detail-section">
+                            <div class="detail-title"><i class="fas fa-tasks"></i> Escopo do Serviço</div>
+                            <div class="detail-content">
+                                <ul>
+                                    <li>Demolição controlada de peitoril de janela existente (0,96 m²)</li>
+                                    <li>Análise estrutural prévia para preservar integridade da parede</li>
+                                    <li>Requadramento preciso para instalação de porta</li>
+                                    <li>Acabamento nivelado com esquadrejamento perfeito</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Service 2 -->
+                <div class="service-item">
+                    <div class="service-header" onclick="toggleDetails(this)">
+                        <div class="service-info">
+                            <span class="service-number">2</span>
+                            <span class="service-title-text">Área Externa - Preparo e Piso</span>
+                        </div>
+                        <div class="service-price">
+                            <div class="price-label">Valor do Serviço</div>
+                            <div class="price-amount">R$ 3.400,00</div>
+                            <div class="material-price" style="display: none;">+ Material: R$ 2.173,00</div>
+                        </div>
+                        <button class="service-expand-btn">
+                            <i class="fas fa-chevron-down"></i> Detalhes
+                        </button>
+                    </div>
+                    <div class="service-details">
+                        <div class="detail-section">
+                            <div class="detail-title"><i class="fas fa-tasks"></i> Escopo do Serviço</div>
+                            <div class="detail-content">
+                                <ul>
+                                    <li>Remoção completa de grama em área de 10,17 m²</li>
+                                    <li>Remoção de piso existente em área de 3,57 m²</li>
+                                    <li>Regularização e compactação de terreno (área total: 13,74 m²)</li>
+                                    <li>Execução de contrapiso estrutural armado com malha de ferro</li>
+                                    <li>Assentamento de porcelanato antiderrapante 60x60cm</li>
+                                    <li>Rejuntamento com material específico para áreas externas</li>
+                                    <li>Caimento adequado para escoamento de água</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="detail-section material-section" style="display: none;">
+                            <div class="detail-title"><i class="fas fa-box"></i> Materiais Inclusos</div>
+                            <div class="material-breakdown">
+                                <div class="material-item"><span class="material-name">Porcelanato Antiderrapante 60x60cm (15,80 m²)</span><span class="material-value">R$ 1.027,00</span></div>
+                                <div class="material-item"><span class="material-name">Argamassa Colante AC-II (4 sacos)</span><span class="material-value">R$ 96,00</span></div>
+                                <div class="material-item"><span class="material-name">Rejunte Especial Porcelanato (4 kg)</span><span class="material-value">R$ 72,00</span></div>
+                                <div class="material-item"><span class="material-name">Cimento CP32 (5 sacos)</span><span class="material-value">R$ 150,00</span></div>
+                                <div class="material-item"><span class="material-name">Areia Média (1 m³)</span><span class="material-value">R$ 120,00</span></div>
+                                <div class="material-item"><span class="material-name">Brita nº 1 (1 m³)</span><span class="material-value">R$ 135,00</span></div>
+                                <div class="material-item"><span class="material-name">Ferro CA-50 para armação</span><span class="material-value">R$ 200,00</span></div>
+                                <div class="material-item"><span class="material-name">Tela soldada Q92</span><span class="material-value">R$ 373,00</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Service 3 - Churrasqueira Completa -->
+                <div class="service-item">
+                    <div class="service-header" onclick="toggleDetails(this)">
+                        <div class="service-info">
+                            <span class="service-number">3</span>
+                            <span class="service-title-text">Churrasqueira Completa</span>
+                        </div>
+                        <div class="service-price">
+                            <div class="price-label">Valor do Serviço</div>
+                            <div class="price-amount">R$ 6.077,00</div>
+                            <div class="material-price" style="display: none;">+ Material: R$ 2.614,00</div>
+                        </div>
+                        <button class="service-expand-btn">
+                            <i class="fas fa-chevron-down"></i> Detalhes
+                        </button>
+                    </div>
+                    <div class="service-details">
+                        <div class="detail-section">
+                            <div class="detail-title"><i class="fas fa-tasks"></i> Escopo do Serviço</div>
+                            <div class="detail-content">
+                                <ul>
+                                    <li>Fundação com 4 estacas e viga de travamento</li>
+                                    <li>Alvenaria estrutural com tijolos cerâmicos e refratários</li>
+                                    <li>Formato otimizado para tiragem perfeita da fumaça</li>
+                                    <li>Reboco, revestimento externo e vedação completa</li>
+                                    <li>Limpeza final e remoção de resíduos</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="detail-section material-section" style="display: none;">
+                            <div class="detail-title"><i class="fas fa-box"></i> Materiais Inclusos</div>
+                            <div class="material-breakdown">
+                                <div class="material-item"><span class="material-name">Cimento, Areia, Brita, Ferro, Madeira</span><span class="material-value">R$ 895,00</span></div>
+                                <div class="material-item"><span class="material-name">Tijolo Cerâmico (600 unidades)</span><span class="material-value">R$ 480,00</span></div>
+                                <div class="material-item"><span class="material-name">Tijolo Refratário Especial (120 unidades)</span><span class="material-value">R$ 540,00</span></div>
+                                <div class="material-item"><span class="material-name">Argamassa Refratária (3 sacos)</span><span class="material-value">R$ 84,00</span></div>
+                                <div class="material-item"><span class="material-name">Kit Grelha Inox + Acessórios</span><span class="material-value">R$ 350,00</span></div>
+                                <div class="material-item"><span class="material-name">Material para Revestimento Externo</span><span class="material-value">R$ 265,00</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Service 4 - Instalações -->
+                <div class="service-item">
+                    <div class="service-header" onclick="toggleDetails(this)">
+                        <div class="service-info">
+                            <span class="service-number">4</span>
+                            <span class="service-title-text">Instalações Hidráulicas e Elétricas</span>
+                        </div>
+                        <div class="service-price">
+                            <div class="price-label">Valor do Serviço</div>
+                            <div class="price-amount">R$ 680,00</div>
+                            <div class="material-price" style="display: none;">+ Material: R$ 567,00</div>
+                        </div>
+                        <button class="service-expand-btn">
+                            <i class="fas fa-chevron-down"></i> Detalhes
+                        </button>
+                    </div>
+                    <div class="service-details">
+                        <div class="detail-section">
+                            <div class="detail-title"><i class="fas fa-tasks"></i> Escopo do Serviço</div>
+                            <div class="detail-content">
+                                <ul>
+                                    <li>Execução de 4 pontos hidráulicos e 2 elétricos</li>
+                                    <li>Instalação de tubulação de água fria e esgoto</li>
+                                    <li>Instalação de eletrodutos e caixas de passagem</li>
+                                    <li>Recomposição completa dos rasgos com acabamento</li>
+                                    <li>Testes de funcionamento e estanqueidade</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="detail-section material-section" style="display: none;">
+                            <div class="detail-title"><i class="fas fa-box"></i> Materiais Inclusos</div>
+                            <div class="material-breakdown">
+                                <div class="material-item"><span class="material-name">Kit Hidráulico Completo</span><span class="material-value">R$ 380,00</span></div>
+                                <div class="material-item"><span class="material-name">Kit Elétrico Completo</span><span class="material-value">R$ 180,00</span></div>
+                                <div class="material-item"><span class="material-name">Argamassa para Fechamento</span><span class="material-value">R$ 7,00</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Note Section -->
+            <div class="note-section">
+                <div class="note-title">
+                    <i class="fas fa-shield-alt"></i> Garantia e Qualidade
+                </div>
+                <div class="note-content">
+                    Todos os serviços executados pela Maeoka Engenharia possuem garantia de 5 anos para estrutura e 2 anos para acabamentos, conforme normas técnicas vigentes. Trabalhamos com equipe especializada e materiais de primeira qualidade, garantindo durabilidade e segurança para sua obra.
+                </div>
+            </div>
+        </div>
+
+        <!-- CTA Section -->
+        <div class="cta-section">
+            <h2 class="cta-title">Pronto para Transformar seu Espaço?</h2>
+            <p class="cta-subtitle">Estrutura reforçada com estacas e viga de travamento para máxima durabilidade.</p>
+            <a href="https://wa.me/5541988391153?text=Ol%C3%A1!%20Gostaria%20de%20aceitar%20a%20proposta%20para%20a%20obra%20da%20%C3%A1rea%20gourmet." target="_blank" class="cta-btn">
+                <i class="fab fa-whatsapp"></i> Aceitar Proposta via WhatsApp
+            </a>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p><strong>Maeoka Engenharia</strong></p>
+            <p>CNPJ: 19.924.627/0001-67 | CREA: 159.328/D-PR</p>
+            <p>WhatsApp: (41) 98839-1153 | E-mail: contato@maeokaengenharia.com.br</p>
+            <p>Validade da Proposta: 15 dias | Data: <span id="currentDate"></span></p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('currentDate').textContent = new Date().toLocaleDateString('pt-BR');
+
+        function toggleOption(option) {
+            const maoDeObraBtn = document.querySelector('.toggle-btn[onclick*="maoDeObra"]');
+            const completoBtn = document.querySelector('.toggle-btn[onclick*="completo"]');
+            
+            const originalPriceEl = document.getElementById('originalPrice');
+            const totalPriceEl = document.getElementById('totalPrice');
+            const materialPriceEls = document.querySelectorAll('.material-price');
+            const materialSectionEls = document.querySelectorAll('.material-section');
+
+            const maoDeObraTotal = 10942.00;
+            const maoDeObraOriginal = 11518.00;
+            const completoTotal = 16296.00;
+            const completoOriginal = 17154.00;
+
+            const formatCurrency = (value) => value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+            if (option === 'maoDeObra') {
+                maoDeObraBtn.classList.add('active');
+                maoDeObraBtn.classList.remove('inactive');
+                completoBtn.classList.add('inactive');
+                completoBtn.classList.remove('active');
+                
+                originalPriceEl.textContent = formatCurrency(maoDeObraOriginal);
+                totalPriceEl.textContent = formatCurrency(maoDeObraTotal);
+                
+                materialPriceEls.forEach(el => el.style.display = 'none');
+                materialSectionEls.forEach(el => el.style.display = 'none');
+            } else {
+                completoBtn.classList.add('active');
+                completoBtn.classList.remove('inactive');
+                maoDeObraBtn.classList.add('inactive');
+                maoDeObraBtn.classList.remove('active');
+                
+                originalPriceEl.textContent = formatCurrency(completoOriginal);
+                totalPriceEl.textContent = formatCurrency(completoTotal);
+                
+                materialPriceEls.forEach(el => el.style.display = 'block');
+                const isCompleto = completoBtn.classList.contains('active');
+                if (isCompleto) {
+                    document.querySelectorAll('.service-details.active .material-section').forEach(el => el.style.display = 'block');
+                }
+            }
+        }
+
+        function toggleDetails(headerElement) {
+            const serviceItem = headerElement.closest('.service-item');
+            const details = serviceItem.querySelector('.service-details');
+            const button = serviceItem.querySelector('.service-expand-btn');
+            const icon = button.querySelector('i');
+            const isActive = details.classList.contains('active');
+
+            // Close all other details first
+            document.querySelectorAll('.service-details.active').forEach(d => {
+                if (d !== details) {
+                    d.classList.remove('active');
+                    const otherIcon = d.closest('.service-item').querySelector('.service-expand-btn i');
+                    otherIcon.classList.remove('fa-chevron-up');
+                    otherIcon.classList.add('fa-chevron-down');
+                }
+            });
+
+            if (isActive) {
+                details.classList.remove('active');
+                icon.classList.remove('fa-chevron-up');
+                icon.classList.add('fa-chevron-down');
+            } else {
+                details.classList.add('active');
+                icon.classList.remove('fa-chevron-down');
+                icon.classList.add('fa-chevron-up');
+                
+                // If "Completo" is active, show material section inside the opened details
+                const isCompleto = document.querySelector('.toggle-btn[onclick*="completo"]').classList.contains('active');
+                const materialSection = details.querySelector('.material-section');
+                if (materialSection) {
+                    materialSection.style.display = isCompleto ? 'block' : 'none';
+                }
+                
+                // The problematic scrollIntoView has been removed to improve mobile scrolling.
+            }
+        }
+    </script>
+</body>
+</html>
