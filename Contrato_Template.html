@@ -5,13 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contrato Digital - Maeoka Engenharia</title>
     
-    <!-- Bibliotecas e Scripts -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" xintegrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@tonconnect/ui@2.0.9/dist/tonconnect-ui.min.js"></script>
     <script src="https://unpkg.com/tonweb/dist/tonweb.js"></script>
     
-    <!-- Novas Fontes -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -341,7 +339,7 @@
                     <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 md:p-6 mt-8 shadow-sm">
                         <h4 class="text-lg md:text-xl font-semibold text-yellow-800 mb-4">Observações Importantes</h4>
                         <ul id="listaObservacoes" class="list-disc list-inside text-sm text-gray-600 space-y-1">
-                            <!-- OBSERVAÇÕES SERÃO INJETADOS AQUI VIA JS -->
+                            <!-- OBSERVAÇÕES SERÃO INJETADAS AQUI VIA JS -->
                         </ul>
                     </div>
                     
@@ -669,966 +667,970 @@
     </div>
 
 <script>
-    // ====================================================================================
-    // PASSO 1: COLE AQUI A "FICHA DE CADASTRO" (JSON) DO NOVO CLIENTE
-    // ====================================================================================
-    const dadosDoContrato = {
-        "cliente": {
-            "nome": "Juliana Costa"
-        },
-        "obra": {
-            "endereco": "Rua Marechal Deodoro, 500, Apto 101 - Centro, Curitiba - PR",
-            "prazoExecucao": "15-20 dias úteis",
-            "particularidades": [
-                "Obra a ser realizada em apartamento ocupado.",
-                "Condomínio com restrição de ruído das 12:00h às 14:00h.",
-                "Acesso de materiais e equipe via elevador de serviço."
-            ]
-        },
-        "escopo": {
-            "incluiART": true
-        },
-        "proposta": {
-            "validadeDias": 15
-        },
-        "servicos": [
-            { "nome": "Demolição de Cozinha", "detalhes": "Remoção de revestimentos de piso e parede, e bancada antiga.", "preco": 1800.00 },
-            { "nome": "Instalação de Revestimentos", "detalhes": "Assentamento de novo porcelanato no piso e azulejos na parede.", "preco": 3500.00 },
-            { "nome": "Pintura", "detalhes": "Pintura geral do teto e paredes da cozinha e lavanderia.", "preco": 1200.00 }
+// ====================================================================================
+// PASSO 1: COLE AQUI A "FICHA DE CADASTRO" (JSON) DO NOVO CLIENTE
+// ====================================================================================
+const dadosDoContrato = {
+    "cliente": {
+        "nome": "Bruno Brand e Ana Paula Giffoni Neubauer"
+    },
+    "obra": {
+        "endereco": "R. Eng. Niepce da Silva, 144 - Portão, Curitiba - PR, 80610-280 (Condomínio Le Jardin)",
+        "prazoExecucao": "45-90 dias",
+        "particularidades": [
+            "Não inclui emissão de Anotação de Responsabilidade Técnica (ART).",
+            "O cliente se compromete a fornecer as caçambas para a remoção dos entulhos.",
+            "Serviços extras (elétrica, iluminação) não estão no escopo e serão cobrados à parte (apenas mão de obra)."
+        ]
+    },
+    "escopo": {
+        "incluiART": false
+    },
+    "proposta": {
+        "validadeDias": 30
+    },
+    "servicos": [
+        { "nome": "ETAPA 1 – Proteções, Abertura, Demolição e Retiradas", "detalhes": "Proteção de bens, retirada de itens, demolição de paredes/pisos e aberturas.", "preco": 10000.00 },
+        { "nome": "ETAPA 2 – Instalação de Revestimento e Regularizações", "detalhes": "Instalação de porcelanato, azulejos, rejunte e regularização de portas.", "preco": 10000.00 },
+        { "nome": "ETAPA 3 - Pintura e Conclusão", "detalhes": "Pintura lisa interna completa e retoques finais.", "preco": 5000.00 },
+        { "nome": "Administração de Obra", "detalhes": "Gerenciamento completo da obra e assistência na compra de materiais.", "preco": 4200.00 }
+    ],
+    "materiais": {
+        "itens": [
+            { "nome": "Responsabilidade do Cliente", "detalhes": "O cliente é responsável pela aquisição dos materiais." },
+            { "nome": "Assistência na Compra", "detalhes": "A administração da obra oferecerá assistência, buscando melhores preços." }
         ],
-        "materiais": {
-            "itens": [
-                { "nome": "Revestimentos", "detalhes": "Porcelanato, argamassa colante e rejunte." },
-                { "nome": "Pintura", "detalhes": "Tinta acrílica, massa corrida para retoques, lixas e rolos." }
-            ],
-            "subtotal": 2650.00
-        },
-        "financeiro": {
-            "subtotalServicos": 6500.00,
-            "valorOrcadoOriginal": 9150.00,
-            "valorFinalComDesconto": 8800.00,
-            "motivoDesconto": "Desconto de parceria e indicação.",
-            "pagamentoParcelas": [
-                { "etapa": "Entrada", "percentual": 0.50, "descricao": "na assinatura do contrato" },
-                { "etapa": "Conclusão", "percentual": 0.50, "descricao": "na entrega final da obra" }
-            ]
-        },
-        "observacoes": [
-            "Proposta não inclui a compra ou instalação de eletrodomésticos e marcenaria.",
-            "A remoção de todo o entulho gerado está inclusa no valor."
-        ],
-        "tokens": {
-            "tokenAddress": "EQCUgsVus4fW5TY2bxBQWSyiwLETOr2iNlVied-szVuJ1t4W",
-            "walletAddress": "UQCI80_zNVLySHf1DZbxfVw52DMPQj8EAOMcDn9TlvsjC341",
-            "limitePercentual": 0.40,
-            "descontoPercentual": 0.10,
-            "cashbackPercentual": 0.03
-        }
-    };
-    // ====================================================================================
-    // FIM DA ÁREA DE EDIÇÃO
-    // ====================================================================================
+        "subtotal": 0.00
+    },
+    "financeiro": {
+        "subtotalServicos": 29200.00,
+        "valorOrcadoOriginal": 29200.00,
+        "valorFinalComDesconto": 27740.00,
+        "motivoDesconto": "Desconto de 5% para pagamento via PIX.",
+        "pagamentoParcelas": [
+            { "etapa": "Entrada (Execução Etapa 1)", "percentual": 0.3424657534, "descricao": "40% do subtotal de execução" },
+            { "etapa": "Início (Administração)", "percentual": 0.0719178082, "descricao": "50% do subtotal de administração" },
+            { "etapa": "Conclusão Etapa 2", "percentual": 0.3424657534, "descricao": "40% do subtotal de execução" },
+            { "etapa": "Conclusão Etapa 3", "percentual": 0.1712328767, "descricao": "20% do subtotal de execução" },
+            { "etapa": "Conclusão Final (Administração)", "percentual": 0.0719178082, "descricao": "50% do subtotal de administração" }
+        ]
+    },
+    "observacoes": [
+        "Equipamentos necessários são de responsabilidade dos profissionais contratados."
+    ],
+    "tokens": {
+        "tokenAddress": "EQCUgsVus4fW5TY2bxBQWSyiwLETOr2iNlVied-szVuJ1t4W",
+        "walletAddress": "UQCI80_zNVLySHf1DZbxfVw52DMPQj8EAOMcDn9TlvsjC341",
+        "limitePercentual": 0.40,
+        "descontoPercentual": 0.10,
+        "cashbackPercentual": 0.03
+    }
+};
+// ====================================================================================
+// FIM DA ÁREA DE EDIÇÃO
+// ====================================================================================
 
 
-    const TOKEN_MAEOKA = dadosDoContrato.tokens.tokenAddress;
-    const CARTEIRA_MAEOKA_OFICIAL = dadosDoContrato.tokens.walletAddress;
-    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwBZ1yMroV2ejwzOYXAm-ZsuiqOI-vnpxJxO3AultPFEj8hVgSijBGZhPnsNj8vsZc_1w/exec';
-    let VALOR_OBRA = dadosDoContrato.financeiro.valorFinalComDesconto;
-    const LIMITE_PERCENTUAL_TOKENS = dadosDoContrato.tokens.limitePercentual;
-    let currentPage = 1;
-    let highestStepCompleted = 1;
-    let totalPages = 5;
-    let contracts = JSON.parse(localStorage.getItem('maeokaContracts')) || [];
-    // Variáveis do sistema de tokens
-    let saldoUsuario = 0;
-    let enderecoUsuarioRaw = ''; 
-    let tonweb = null;
-    let tonConnectUI = null;
-    let metodoPagamentoSelecionado = null;
+const TOKEN_MAEOKA = dadosDoContrato.tokens.tokenAddress;
+const CARTEIRA_MAEOKA_OFICIAL = dadosDoContrato.tokens.walletAddress;
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwBZ1yMroV2ejwzOYXAm-ZsuiqOI-vnpxJxO3AultPFEj8hVgSijBGZhPnsNj8vsZc_1w/exec';
+let VALOR_OBRA = dadosDoContrato.financeiro.valorFinalComDesconto;
+const LIMITE_PERCENTUAL_TOKENS = dadosDoContrato.tokens.limitePercentual;
+let currentPage = 1;
+let highestStepCompleted = 1;
+let totalPages = 5;
+let contracts = JSON.parse(localStorage.getItem('maeokaContracts')) || [];
+// Variáveis do sistema de tokens
+let saldoUsuario = 0;
+let enderecoUsuarioRaw = ''; 
+let tonweb = null;
+let tonConnectUI = null;
+let metodoPagamentoSelecionado = null;
 
-    const statusCarteira = document.getElementById('statusCarteira');
-    const walletInfo = document.getElementById('walletInfo');
-    const enderecoCarteira = document.getElementById('enderecoCarteira');
-    const saldoTokens = document.getElementById('saldoTokens');
-    const calculadoraTokens = document.getElementById('calculadoraTokens');
-    const sliderTokens = document.getElementById('sliderTokens');
-    const tokenInput = document.getElementById('tokenInput');
-    const btnEnviarTokens = document.getElementById('btnEnviarTokens');
-    const continueTokenBtn = document.getElementById('continueTokenBtn');
-    const modal = document.getElementById('llmModal');
-    const modalTitle = document.getElementById('modalTitle');
-    const modalBody = document.getElementById('modalBody');
-    const modalButtons = document.getElementById('modalButtons');
-    // Elementos do resumo
-    const resumoTokens = document.getElementById('resumoTokens');
-    const resumoDesconto = document.getElementById('resumoDesconto');
-    const resumoDinheiro = document.getElementById('resumoDinheiro');
-    const resumoTotal = document.getElementById('resumoTotal');
-    const resumoEconomia = document.getElementById('resumoEconomia');
-    const valorOriginalObra = document.getElementById('valorOriginalObra');
-    const termsContainer = document.getElementById('termsContainer');
-    const submitBtn = document.getElementById('submitBtn');
+const statusCarteira = document.getElementById('statusCarteira');
+const walletInfo = document.getElementById('walletInfo');
+const enderecoCarteira = document.getElementById('enderecoCarteira');
+const saldoTokens = document.getElementById('saldoTokens');
+const calculadoraTokens = document.getElementById('calculadoraTokens');
+const sliderTokens = document.getElementById('sliderTokens');
+const tokenInput = document.getElementById('tokenInput');
+const btnEnviarTokens = document.getElementById('btnEnviarTokens');
+const continueTokenBtn = document.getElementById('continueTokenBtn');
+const modal = document.getElementById('llmModal');
+const modalTitle = document.getElementById('modalTitle');
+const modalBody = document.getElementById('modalBody');
+const modalButtons = document.getElementById('modalButtons');
+// Elementos do resumo
+const resumoTokens = document.getElementById('resumoTokens');
+const resumoDesconto = document.getElementById('resumoDesconto');
+const resumoDinheiro = document.getElementById('resumoDinheiro');
+const resumoTotal = document.getElementById('resumoTotal');
+const resumoEconomia = document.getElementById('resumoEconomia');
+const valorOriginalObra = document.getElementById('valorOriginalObra');
+const termsContainer = document.getElementById('termsContainer');
+const submitBtn = document.getElementById('submitBtn');
 
-    function popularDadosIniciais() {
-        // Página 1
-        document.getElementById('infoClienteNome').textContent = dadosDoContrato.cliente.nome;
-        document.getElementById('infoObraEndereco').textContent = dadosDoContrato.obra.endereco;
-        document.getElementById('infoPropostaData').textContent = new Date().toLocaleDateString('pt-BR');
+function popularDadosIniciais() {
+    // Página 1
+    document.getElementById('infoClienteNome').textContent = dadosDoContrato.cliente.nome;
+    document.getElementById('infoObraEndereco').textContent = dadosDoContrato.obra.endereco;
+    document.getElementById('infoPropostaData').textContent = new Date().toLocaleDateString('pt-BR');
 
-        document.getElementById('prazoExecucao').textContent = dadosDoContrato.obra.prazoExecucao;
+    document.getElementById('prazoExecucao').textContent = dadosDoContrato.obra.prazoExecucao;
 
-        const listaServicos = document.getElementById('listaServicos');
-        listaServicos.innerHTML = '';
-        dadosDoContrato.servicos.forEach(s => {
-            listaServicos.innerHTML += `
-                <div class="bg-white border-l-4 border-blue-500 rounded-r-lg p-5 shadow-md transition-transform hover:scale-[1.02] service-item">
-                    <p class="font-semibold text-lg text-gray-800">${s.nome}</p>
-                    <div class="flex justify-between items-center text-sm mt-2 text-gray-600 service-details">
-                        <div class="flex-1 pr-4">${s.detalhes}</div>
-                        <div class="font-bold text-blue-700 text-base md:text-lg price">${formatCurrency(s.preco)}</div>
-                    </div>
-                </div>`;
+    const listaServicos = document.getElementById('listaServicos');
+    listaServicos.innerHTML = '';
+    dadosDoContrato.servicos.forEach(s => {
+        listaServicos.innerHTML += `
+            <div class="bg-white border-l-4 border-blue-500 rounded-r-lg p-5 shadow-md transition-transform hover:scale-[1.02] service-item">
+                <p class="font-semibold text-lg text-gray-800">${s.nome}</p>
+                <div class="flex justify-between items-center text-sm mt-2 text-gray-600 service-details">
+                    <div class="flex-1 pr-4">${s.detalhes}</div>
+                    <div class="font-bold text-blue-700 text-base md:text-lg price">${formatCurrency(s.preco)}</div>
+                </div>
+            </div>`;
+    });
+
+    document.getElementById('subtotalServicos').textContent = formatCurrency(dadosDoContrato.financeiro.subtotalServicos);
+
+    if(dadosDoContrato.materiais && dadosDoContrato.materiais.itens.length > 0) {
+        const listaMateriais = document.getElementById('listaMateriais');
+        listaMateriais.innerHTML = '';
+        dadosDoContrato.materiais.itens.forEach(m => {
+            listaMateriais.innerHTML += `
+            <div class="bg-white border-l-4 border-blue-500 rounded-md p-3">
+                <p class="font-medium text-sm">${m.nome}</p>
+                <p class="text-xs text-gray-500">${m.detalhes}</p>
+            </div>`;
         });
+        document.getElementById('subtotalMateriais').textContent = formatCurrency(dadosDoContrato.materiais.subtotal);
+    } else {
+        document.getElementById('materiaisContainer').style.display = 'none';
+    }
 
-        document.getElementById('subtotalServicos').textContent = formatCurrency(dadosDoContrato.financeiro.subtotalServicos);
+    const listaObservacoes = document.getElementById('listaObservacoes');
+    listaObservacoes.innerHTML = '';
+    dadosDoContrato.observacoes.forEach(o => {
+        listaObservacoes.innerHTML += `<li>${o}</li>`;
+    });
+    
+    const artContainer = document.getElementById('servicoInclusoART');
+    if (dadosDoContrato.escopo && dadosDoContrato.escopo.incluiART) {
+        artContainer.style.display = 'block';
+    } else {
+        artContainer.style.display = 'none';
+    }
 
-        if(dadosDoContrato.materiais && dadosDoContrato.materiais.itens.length > 0) {
-            const listaMateriais = document.getElementById('listaMateriais');
-            listaMateriais.innerHTML = '';
-            dadosDoContrato.materiais.itens.forEach(m => {
-                listaMateriais.innerHTML += `
-                <div class="bg-white border-l-4 border-blue-500 rounded-md p-3">
-                    <p class="font-medium text-sm">${m.nome}</p>
-                    <p class="text-xs text-gray-500">${m.detalhes}</p>
-                </div>`;
-            });
-            document.getElementById('subtotalMateriais').textContent = formatCurrency(dadosDoContrato.materiais.subtotal);
-        } else {
-            document.getElementById('materiaisContainer').style.display = 'none';
-        }
-
-        const listaObservacoes = document.getElementById('listaObservacoes');
-        listaObservacoes.innerHTML = '';
-        dadosDoContrato.observacoes.forEach(o => {
-            listaObservacoes.innerHTML += `<li>${o}</li>`;
-        });
-        
-        const artContainer = document.getElementById('servicoInclusoART');
-        if (dadosDoContrato.escopo && dadosDoContrato.escopo.incluiART) {
-            artContainer.style.display = 'block';
-        } else {
-            artContainer.style.display = 'none';
-        }
-
-        // Página 2
-        const particularidadesContainer = document.getElementById('listaParticularidades');
-        particularidadesContainer.innerHTML = '';
-        if (dadosDoContrato.obra.particularidades && dadosDoContrato.obra.particularidades.length > 0) {
-            dadosDoContrato.obra.particularidades.forEach(p => {
-                const li = document.createElement('li');
-                li.textContent = p;
-                particularidadesContainer.appendChild(li);
-            });
-        } else {
+    // Página 2
+    const particularidadesContainer = document.getElementById('listaParticularidades');
+    particularidadesContainer.innerHTML = '';
+    if (dadosDoContrato.obra.particularidades && dadosDoContrato.obra.particularidades.length > 0) {
+        dadosDoContrato.obra.particularidades.forEach(p => {
             const li = document.createElement('li');
-            li.textContent = 'Nenhuma particularidade específica para esta obra.';
+            li.textContent = p;
             particularidadesContainer.appendChild(li);
-        }
-
-
-        // Página 3
-        const tokenOffer = `Use até ${dadosDoContrato.tokens.limitePercentual * 100}% em tokens e ganhe ${dadosDoContrato.tokens.descontoPercentual * 100}% de desconto`;
-        document.getElementById('tokenOfferText').textContent = tokenOffer;
-        document.getElementById('tokenCalculatorOfferText').innerHTML = `Use até <strong class="text-blue-700">${dadosDoContrato.tokens.limitePercentual * 100}%</strong> do valor em tokens e ganhe <strong class="text-green-600">${dadosDoContrato.tokens.descontoPercentual * 100}% de desconto</strong> sobre o valor usado.`;
-        document.getElementById('resumoDescontoLabel').textContent = `Desconto de ${dadosDoContrato.tokens.descontoPercentual * 100}%:`;
-        document.getElementById('cashbackContainer').innerHTML = `<i class="fa-solid fa-gift mr-2" aria-hidden="true"></i><strong>Cashback:</strong> Você receberá <span id="cashbackInfo">0</span> MAEOKA de volta após a conclusão da obra (${dadosDoContrato.tokens.cashbackPercentual * 100}% sobre o total)!`;
-        
-        updateCalculations();
-    }
-
-    function updateStepper() {
-        const progressBar = document.getElementById('stepper-progress-bar');
-        const progress = ((currentPage - 1) / (totalPages - 1)) * 100;
-        if(progressBar) progressBar.style.width = `${progress}%`;
-
-        document.querySelectorAll('.step').forEach((step, index) => {
-            const stepNumber = index + 1;
-            step.classList.remove('active', 'completed', 'future');
-
-            if (stepNumber < currentPage) {
-                step.classList.add('completed');
-            } else if (stepNumber === currentPage) {
-                step.classList.add('active');
-            }
-            
-            if (stepNumber > highestStepCompleted) {
-                step.classList.add('future');
-            } else {
-                step.classList.remove('future');
-            }
         });
+    } else {
+        const li = document.createElement('li');
+        li.textContent = 'Nenhuma particularidade específica para esta obra.';
+        particularidadesContainer.appendChild(li);
     }
 
-    function showPage(pageNumber) {
-        if (pageNumber > highestStepCompleted) {
-            console.warn(`Navegação bloqueada: Etapa ${pageNumber} ainda não foi alcançada.`);
-            return;
+
+    // Página 3
+    const tokenOffer = `Use até ${dadosDoContrato.tokens.limitePercentual * 100}% em tokens e ganhe ${dadosDoContrato.tokens.descontoPercentual * 100}% de desconto`;
+    document.getElementById('tokenOfferText').textContent = tokenOffer;
+    document.getElementById('tokenCalculatorOfferText').innerHTML = `Use até <strong class="text-blue-700">${dadosDoContrato.tokens.limitePercentual * 100}%</strong> do valor em tokens e ganhe <strong class="text-green-600">${dadosDoContrato.tokens.descontoPercentual * 100}% de desconto</strong> sobre o valor usado.`;
+    document.getElementById('resumoDescontoLabel').textContent = `Desconto de ${dadosDoContrato.tokens.descontoPercentual * 100}%:`;
+    document.getElementById('cashbackContainer').innerHTML = `<i class="fa-solid fa-gift mr-2" aria-hidden="true"></i><strong>Cashback:</strong> Você receberá <span id="cashbackInfo">0</span> MAEOKA de volta após a conclusão da obra (${dadosDoContrato.tokens.cashbackPercentual * 100}% sobre o total)!`;
+    
+    updateCalculations();
+}
+
+function updateStepper() {
+    const progressBar = document.getElementById('stepper-progress-bar');
+    const progress = ((currentPage - 1) / (totalPages - 1)) * 100;
+    if(progressBar) progressBar.style.width = `${progress}%`;
+
+    document.querySelectorAll('.step').forEach((step, index) => {
+        const stepNumber = index + 1;
+        step.classList.remove('active', 'completed', 'future');
+
+        if (stepNumber < currentPage) {
+            step.classList.add('completed');
+        } else if (stepNumber === currentPage) {
+            step.classList.add('active');
         }
-
-        const pages = document.querySelectorAll('.page');
-        pages.forEach(page => page.classList.remove('active'));
-        const pageToShow = document.getElementById(`page${pageNumber}`);
-        if (pageToShow) {
-            pageToShow.classList.add('active');
-            currentPage = pageNumber;
-            updateStepper();
-            window.scrollTo(0, 0);
-        }
-
-        if (pageNumber === 3) {
-            updatePaymentPageDisplay();
-        }
-
-        if (pageNumber === 2) {
-            setupTermsScroll(); 
-        }
-
-        if (pageNumber === 5) {
-            // Show loading by default
-            document.getElementById('loadingState').style.display = 'flex';
-            document.getElementById('successState').classList.add('hidden');
-            finalizeContract();
-        }
-    }
-
-    function nextPage() {
-        if (currentPage === 2) {
-            const termsAccepted = document.getElementById('agreeTerms').checked;
-            if (!termsAccepted) {
-                showModal('Aviso', 'Por favor, aceite os Termos de Ciência e Responsabilidade para continuar.');
-                return;
-            }
-        } else if (currentPage === 4) {
-            const isFormValid = validateForm(true);
-            if (!isFormValid) {
-                if (!document.getElementById('lgpdAccepted').checked) {
-                    showModal('Aviso', 'É necessário aceitar os termos da LGPD para continuar.');
-                }
-                return; 
-            }
-        }
-
-        if (currentPage < totalPages) {
-            currentPage++;
-            if (currentPage > highestStepCompleted) {
-                highestStepCompleted = currentPage;
-            }
-            showPage(currentPage);
-        }
-    }
-
-    function prevPage() {
-        if (currentPage > 1) {
-            currentPage--;
-            showPage(currentPage);
-        }
-    }
-
-    function formatCurrency(value) {
-        return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-    }
-
-    function updateCalculations() {
-        const invoiceOptionEmitir = document.getElementById('invoiceOptionEmitir');
-        const originalPriceDisplay = document.getElementById('originalPriceDisplay');
-        const finalPriceDisplay = document.getElementById('finalPriceDisplay');
-        const discountExplanation = document.getElementById('discountExplanation');
-
-        let baseValue = dadosDoContrato.financeiro.valorFinalComDesconto;
         
-        if (invoiceOptionEmitir.checked) {
-            VALOR_OBRA = baseValue * 1.17; // 17% de acréscimo
-            discountExplanation.textContent = `Com desconto aplicado + acréscimo de 17% para emissão de NF.`;
+        if (stepNumber > highestStepCompleted) {
+            step.classList.add('future');
         } else {
-            VALOR_OBRA = baseValue;
-            discountExplanation.textContent = dadosDoContrato.financeiro.motivoDesconto;
+            step.classList.remove('future');
         }
-        
-        originalPriceDisplay.textContent = `Total orçado: ${formatCurrency(dadosDoContrato.financeiro.valorOrcadoOriginal)}`;
-        finalPriceDisplay.textContent = formatCurrency(VALOR_OBRA);
-        
+    });
+}
+
+function showPage(pageNumber) {
+    if (pageNumber > highestStepCompleted) {
+        console.warn(`Navegação bloqueada: Etapa ${pageNumber} ainda não foi alcançada.`);
+        return;
+    }
+
+    const pages = document.querySelectorAll('.page');
+    pages.forEach(page => page.classList.remove('active'));
+    const pageToShow = document.getElementById(`page${pageNumber}`);
+    if (pageToShow) {
+        pageToShow.classList.add('active');
+        currentPage = pageNumber;
+        updateStepper();
+        window.scrollTo(0, 0);
+    }
+
+    if (pageNumber === 3) {
         updatePaymentPageDisplay();
-        updateCashPaymentBreakdown();
     }
 
-    function updatePaymentPageDisplay() {
-        const originalPriceDisplayPage3 = document.getElementById('originalPriceDisplayPage3');
-        const finalPriceDisplayPage3 = document.getElementById('finalPriceDisplayPage3');
-        const discountExplanationPage3 = document.getElementById('discountExplanationPage3');
-
-        if(originalPriceDisplayPage3) {
-            originalPriceDisplayPage3.textContent = document.getElementById('originalPriceDisplay').textContent;
-            finalPriceDisplayPage3.textContent = document.getElementById('finalPriceDisplay').textContent;
-            discountExplanationPage3.textContent = document.getElementById('discountExplanation').textContent;
-        }
+    if (pageNumber === 2) {
+        setupTermsScroll(); 
     }
 
-    function updateCashPaymentBreakdown() {
-        const container = document.getElementById('cashPaymentBreakdown');
-        container.innerHTML = '';
-        dadosDoContrato.financeiro.pagamentoParcelas.forEach(parcela => {
-            const valorParcela = VALOR_OBRA * parcela.percentual;
-            const li = document.createElement('li');
-            li.innerHTML = `${parcela.etapa}: ${parcela.descricao} (${formatCurrency(valorParcela)})`;
-            container.appendChild(li);
-        });
-        const liPix = document.createElement('li');
-        liPix.className = 'font-bold mt-2';
-        liPix.textContent = 'Pagamentos via PIX';
-        container.appendChild(liPix);
-    }
-
-    function showCashPayment() {
-        hideAllPaymentSections();
-        document.getElementById('cashPaymentContent').classList.remove('hidden');
-        document.getElementById('mainPaymentChoices').classList.add('hidden');
-        metodoPagamentoSelecionado = 'cash';
-        document.getElementById('mainBackBtnContainer').classList.add('hidden');
-    }
-    function showTokenPayment() {
-        hideAllPaymentSections();
-        document.getElementById('tokenPaymentContent').classList.remove('hidden');
-        document.getElementById('mainPaymentChoices').classList.add('hidden');
-        metodoPagamentoSelecionado = 'tokens';
-        document.getElementById('mainBackBtnContainer').classList.add('hidden');
-
-        if (!tonConnectUI) {
-            setTimeout(() => {
-                initializeTonConnect();
-            }, 100);
-        }
-    }
-    function hideAllPaymentSections() {
-        document.getElementById('cashPaymentContent').classList.add('hidden');
-        document.getElementById('tokenPaymentContent').classList.add('hidden');
-        document.getElementById('mainPaymentChoices').classList.remove('hidden');
-        metodoPagamentoSelecionado = null;
-        document.getElementById('mainBackBtnContainer').classList.remove('hidden');
-    }
-
-    function initializeTonWeb() {
-        try {
-            tonweb = new TonWeb(new TonWeb.HttpProvider('https://toncenter.com/api/v2/jsonRPC'));
-            return true;
-        } catch (error) {
-            console.error('Erro ao inicializar TonWeb:', error);
-            return false;
-        }
-    }
-    function initializeTonConnect() {
-        try {
-            tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
-                manifestUrl: 'https://ton-connect.github.io/demo-dapp-with-wallet/tonconnect-manifest.json',
-                buttonRootId: 'tonConnectButton'
-            });
-            tonConnectUI.onStatusChange(walletInfo => {
-                if (walletInfo) {
-                    statusCarteira.innerHTML = `<span class="spinner mr-2"></span> Carregando saldo...`;
-                    statusCarteira.className = 'bg-blue-100 text-blue-800 font-semibold text-center py-3 rounded-lg border border-blue-300 mb-5';
-                    
-                    enderecoUsuarioRaw = walletInfo.account.address;
-                    const addressForDisplay = new TonWeb.utils.Address(enderecoUsuarioRaw);
-                    enderecoCarteira.textContent = addressForDisplay.toString(true, true, false);
-                    
-                    document.getElementById('walletInfo').classList.remove('hidden');
-                    buscarSaldoTokens();
-                    
-                } else {
-                    enderecoUsuarioRaw = '';
-                    document.getElementById('walletInfo').classList.add('hidden');
-                    calculadoraTokens.classList.add('hidden');
-                    document.getElementById('adjustedPaymentConditions').classList.add('hidden');
-                    statusCarteira.innerHTML = `<i class="fa-solid fa-link mr-2" aria-hidden="true"></i>Conecte sua carteira para pagar com tokens`;
-                    statusCarteira.className = 'bg-yellow-100 text-yellow-800 font-semibold text-center py-3 rounded-lg border border-yellow-300 mb-5';
-                }
-            });
-        
-            return true;
-        } catch (error) {
-            console.error('Erro ao inicializar TON Connect:', error);
-            return false;
-        }
-    }
-    async function buscarSaldoTokens() {
-        if (!enderecoUsuarioRaw) return;
-        try {
-            console.log('🔍 Consultando saldo real na blockchain para:', enderecoUsuarioRaw);
-        
-            let retries = 0;
-            const maxRetries = 5;
-            let delay = 1000;
-            while(retries < maxRetries) {
-                try {
-                    const jettonMinter = new TonWeb.token.jetton.JettonMinter(tonweb.provider, {
-                        address: TOKEN_MAEOKA
-                    });
-                    
-                    const userJettonWalletAddress = await jettonMinter.getJettonWalletAddress(
-                        new TonWeb.utils.Address(enderecoUsuarioRaw) 
-                    );
-                    
-                    const jettonWallet = new TonWeb.token.jetton.JettonWallet(tonweb.provider, {
-                        address: userJettonWalletAddress
-                    });
-                    
-                    const jettonData = await jettonWallet.getData();
-                    const saldoNano = jettonData.balance;
-                    saldoUsuario = parseFloat(TonWeb.utils.fromNano(saldoNano));
-                    
-                    console.log('✅ Saldo real obtido:', saldoUsuario, 'MAEOKA');
-                    break;
-                } catch (blockchainError) {
-                    console.warn('⚠️ Erro na consulta blockchain:', blockchainError);
-                    retries++;
-                    if (retries < maxRetries) {
-                        await new Promise(res => setTimeout(res, delay));
-                        delay *= 2;
-                    } else {
-                         console.error('❌ Erro final após múltiplas tentativas:', blockchainError);
-                         saldoUsuario = 0;
-                         throw blockchainError;
-                    }
-                }
-            }
-        
-            statusCarteira.innerHTML = `✅ Carteira Conectada - Saldo carregado!`;
-            statusCarteira.className = 'bg-green-100 text-green-800 font-semibold text-center py-3 rounded-lg border border-green-300 mb-5';
-        
-            saldoTokens.innerHTML = `<span class="font-bold">${saldoUsuario.toLocaleString('pt-BR', {minimumFractionDigits: 2})} MAEOKA</span>`;
-        
-            const maxTokensPorLimite = VALOR_OBRA * LIMITE_PERCENTUAL_TOKENS;
-            const maxTokens = Math.min(saldoUsuario, maxTokensPorLimite);
-        
-            sliderTokens.max = Math.floor(maxTokens);
-            tokenInput.max = Math.floor(maxTokens);
-            sliderTokens.value = 0;
-            tokenInput.value = 0;
-        
-            const valorOriginalObraEl = document.getElementById('valorOriginalObra');
-            if (valorOriginalObraEl) {
-                valorOriginalObraEl.textContent = formatCurrency(VALOR_OBRA);
-            }
-        
-            if (saldoUsuario === 0) {
-                statusCarteira.innerHTML = `⚠️ Carteira conectada - Sem tokens MAEOKA`;
-                statusCarteira.className = 'bg-yellow-100 text-yellow-800 font-semibold text-center py-3 rounded-lg border border-yellow-300 mb-5';
-            
-                calculadoraTokens.innerHTML = `
-                    <div class="bg-red-50 p-6 rounded-lg text-center border-2 border-red-300">
-                        <h3 class="text-xl font-bold text-red-800 mb-4"><i class="fa-solid fa-circle-exclamation mr-2" aria-hidden="true"></i>SEM TOKENS MAEOKA</h3>
-                        <p class="text-gray-700">Sua carteira não possui tokens MAEOKA.</p>
-                        <p class="text-sm text-gray-500 mt-2">Para usar esta opção de pagamento, você precisa ter tokens MAEOKA em sua carteira.</p>
-                        <a href="https://example.com/adquirir-tokens" target="_blank" class="text-blue-600 hover:underline">Como adquirir tokens?</a>
-                    </div>
-                `;
-                updateAdjustedPaymentConditions(VALOR_OBRA);
-                document.getElementById('adjustedPaymentConditions').classList.remove('hidden');
-            } else {
-                atualizarCalculos(0);
-            }
-        
-            calculadoraTokens.classList.remove('hidden');
-        
-        } catch (error) {
-            console.error('❌ Erro geral na busca de saldo:', error);
-            statusCarteira.innerHTML = `❌ Erro ao consultar saldo`;
-            statusCarteira.className = 'bg-red-100 text-red-800 font-semibold text-center py-3 rounded-lg border border-red-300 mb-5';
-        }
-    }
-    function atualizarCalculos(tokensValue) {
-        resumoTokens.textContent = `${tokensValue.toLocaleString('pt-BR')} MAEOKA (${formatCurrency(tokensValue)})`;
-
-        const desconto = tokensValue * dadosDoContrato.tokens.descontoPercentual;
-        resumoDesconto.textContent = `- ${formatCurrency(desconto)}`;
-
-        const valorDinheiro = VALOR_OBRA - tokensValue - desconto;
-        resumoDinheiro.textContent = formatCurrency(valorDinheiro);
-
-        resumoTotal.textContent = formatCurrency(valorDinheiro);
-
-        const economiaTotal = tokensValue + desconto;
-        resumoEconomia.textContent = formatCurrency(economiaTotal);
-
-        if (tokensValue > 0) {
-            btnEnviarTokens.disabled = false;
-            btnEnviarTokens.innerHTML = `
-                <div class="flex flex-col items-center justify-center">
-                    <span class="font-bold text-base md:text-lg">
-                        <i class="fa-solid fa-credit-card mr-2" aria-hidden="true"></i>
-                        PAGAR COM ${tokensValue.toLocaleString('pt-BR')} TOKENS
-                    </span>
-                    <span class="text-xs font-normal opacity-90 -mt-1">
-                        + restante em dinheiro
-                    </span>
-                </div>`;
-            continueTokenBtn.disabled = true;
-        } else {
-            btnEnviarTokens.disabled = true;
-            btnEnviarTokens.innerHTML = `
-                <div class="flex flex-col items-center justify-center">
-                    <span class="font-bold text-base md:text-lg">
-                        <i class="fa-solid fa-credit-card mr-2" aria-hidden="true"></i>
-                        PAGAR COM TOKENS
-                    </span>
-                    <span class="text-xs font-normal opacity-90 -mt-1">
-                        Selecione a quantidade acima
-                    </span>
-                </div>`;
-            continueTokenBtn.disabled = false;
-            continueTokenBtn.innerHTML = '✅ Continuar sem Tokens <i class="fa-solid fa-arrow-right ml-2" aria-hidden="true"></i>';
-        }
-        updateAdjustedPaymentConditions(valorDinheiro);
-        document.getElementById('adjustedPaymentConditions').classList.remove('hidden');
-    }
-    function updateAdjustedPaymentConditions(valorDinheiro) {
-        const container = document.getElementById('tokenPaymentBreakdown');
-        container.innerHTML = '';
-        dadosDoContrato.financeiro.pagamentoParcelas.forEach(parcela => {
-            const valorParcela = valorDinheiro * parcela.percentual;
-            const li = document.createElement('li');
-            li.innerHTML = `${parcela.etapa}: ${parcela.descricao} (<span class="font-bold">${formatCurrency(valorParcela)}</span>)`;
-            container.appendChild(li);
-        });
-        const liPix = document.createElement('li');
-        liPix.className = 'font-bold mt-2';
-        liPix.textContent = 'Pagamentos via PIX';
-        container.appendChild(liPix);
-
-        const cashback = Math.floor(VALOR_OBRA * dadosDoContrato.tokens.cashbackPercentual);
-        document.getElementById('cashbackInfo').textContent = `${cashback.toLocaleString('pt-BR')} MAEOKA`;
-    }
-    async function enviarTokens() {
-        const tokensValue = parseInt(sliderTokens.value);
-
-        if (tokensValue === 0) {
-            showModal('Aviso', 'Selecione uma quantidade de tokens para enviar!');
-            return;
-        }
-
-        if (tokensValue > saldoUsuario) {
-            showModal('Aviso', 'Você não tem tokens suficientes!');
-            return;
-        }
-
-        btnEnviarTokens.disabled = true;
-        btnEnviarTokens.innerHTML = '<span class="spinner mr-2"></span> Enviando tokens...';
-
-        try {
-            const jettonMinter = new TonWeb.token.jetton.JettonMinter(tonweb.provider, {
-                address: TOKEN_MAEOKA
-            });
-            
-            const userJettonWalletAddress = await jettonMinter.getJettonWalletAddress(
-                new TonWeb.utils.Address(enderecoUsuarioRaw)
-            );
-            
-            const jettonWallet = new TonWeb.token.jetton.JettonWallet(tonweb.provider, {
-                address: userJettonWalletAddress
-            });
-            
-            const jettonAmount = TonWeb.utils.toNano(tokensValue.toString());
-            const forwardAmount = TonWeb.utils.toNano('0.01');
-            
-            const shortClientName = dadosDoContrato.cliente.nome.split(' ')[0];
-            const commentText = `Pgto obra ${shortClientName} - ${tokensValue} MAEOKA`;
-            const commentCell = new TonWeb.boc.Cell();
-            commentCell.bits.writeUint(0, 32);
-            commentCell.bits.writeString(commentText);
-
-            const transferBody = await jettonWallet.createTransferBody({
-                jettonAmount: jettonAmount,
-                toAddress: new TonWeb.utils.Address(CARTEIRA_MAEOKA_OFICIAL),
-                forwardAmount: forwardAmount,
-                forwardPayload: commentCell,
-                responseAddress: new TonWeb.utils.Address(enderecoUsuarioRaw)
-            });
-            
-            const transaction = {
-                validUntil: Date.now() + 5 * 60 * 1000,
-                messages: [
-                    {
-                        address: userJettonWalletAddress.toString(false), 
-                        amount: TonWeb.utils.toNano('0.05').toString(),
-                        payload: TonWeb.utils.bytesToBase64(await transferBody.toBoc())
-                    }
-                ]
-            };
-            
-            console.log('Construindo transação:', JSON.stringify(transaction, null, 2));
-            const result = await tonConnectUI.sendTransaction(transaction);
-            console.log('Transação enviada, resultado:', result);
-            
-            const desconto = tokensValue * dadosDoContrato.tokens.descontoPercentual;
-            const valorFinalEmDinheiro = VALOR_OBRA - tokensValue - desconto;
-            const economiaTotal = tokensValue + desconto;
-            
-            showModal('SUCESSO', `✅ TOKENS ENVIADOS COM SUCESSO!<br><br>` +
-                `💰 Tokens enviados: ${tokensValue.toLocaleString('pt-BR')} MAEOKA<br>` +
-                `💸 Desconto obtido: ${formatCurrency(desconto)}<br>` +
-                `💵 Valor restante em dinheiro: ${formatCurrency(valorFinalEmDinheiro)}<br>` +
-                `🎁 Economia total: ${formatCurrency(economiaTotal)}<br><br>` +
-                `Agora você pode continuar para a próxima etapa!`);
-            
-            btnEnviarTokens.innerHTML = '<i class="fa-solid fa-check mr-2" aria-hidden="true"></i>Tokens Enviados com Sucesso!';
-            btnEnviarTokens.className = 'w-full bg-green-600 text-white text-lg font-semibold py-4 rounded-lg shadow-xl';
-            continueTokenBtn.disabled = false;
-            continueTokenBtn.innerHTML = '✅ Continuar para Próxima Etapa <i class="fa-solid fa-arrow-right ml-2" aria-hidden="true"></i>';
-            
-        } catch (error) {
-            console.error('Erro detalhado no envio:', error);
-            
-            btnEnviarTokens.disabled = false;
-            atualizarCalculos(tokensValue); // Reset button text
-            
-            if (error.message.includes('User declined')) {
-                showModal('Envio Cancelado', 'Envio cancelado pelo usuário.');
-            } else {
-                showModal('Erro no Envio', 'Ocorreu um erro ao tentar enviar a transação: ' + error.message);
-            }
-        }
-    }
-
-    function checkTermsAgreement() {
-        const agreeTermsCheckbox = document.getElementById('agreeTerms');
-        const confirmTermsBtn = document.getElementById('confirmTermsBtn');
-        confirmTermsBtn.disabled = !agreeTermsCheckbox.checked;
-    }
-
-    function showModal(title, message, isConfirm = false, callback = null) {
-        modalTitle.innerHTML = title;
-        modalBody.innerHTML = message;
-        modalButtons.innerHTML = '';
-        modal.classList.remove('hidden');
-        modal.focus();
-
-        if (isConfirm) {
-            const cancelBtn = document.createElement('button');
-            cancelBtn.className = 'px-6 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 transition';
-            cancelBtn.setAttribute('aria-label', 'Cancelar');
-            cancelBtn.textContent = 'Cancelar';
-            cancelBtn.onclick = closeModal;
-
-            const confirmBtn = document.createElement('button');
-            confirmBtn.className = 'px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition ml-4';
-            confirmBtn.setAttribute('aria-label', 'Confirmar');
-            confirmBtn.textContent = 'Confirmar';
-            confirmBtn.onclick = () => {
-                closeModal();
-                if (callback && typeof callback === 'function') {
-                    callback();
-                }
-            };
-
-            modalButtons.appendChild(cancelBtn);
-            modalButtons.appendChild(confirmBtn);
-
-        } else {
-            const okBtn = document.createElement('button');
-            okBtn.className = 'w-full bg-blue-600 text-white font-semibold py-3 px-8 rounded-lg hover:bg-blue-700 transition';
-            okBtn.textContent = 'OK';
-            okBtn.onclick = closeModal;
-            modalButtons.appendChild(okBtn);
-        }
-
-        modal.addEventListener('keydown', trapFocus);
-    }
-    function closeModal() {
-        modal.classList.add('hidden');
-        modal.removeEventListener('keydown', trapFocus);
-    }
-    function trapFocus(e) {
-        if (e.key === 'Tab') {
-            const focusable = modal.querySelectorAll('button, input, textarea, [tabindex]:not([tabindex="-1"])');
-            const first = focusable[0];
-            const last = focusable[focusable.length - 1];
-            if (e.shiftKey && document.activeElement === first) {
-                last.focus();
-                e.preventDefault();
-            } else if (!e.shiftKey && document.activeElement === last) {
-                first.focus();
-                e.preventDefault();
-            }
-        }
-    }
-    window.alert = function(message) {
-        showModal('Aviso', message);
-    };
-    window.confirm = function(message, callback) {
-        showModal('Confirmação', message, true, callback);
-    };
-
-    function generateProtocol() {
-        const now = new Date();
-        const year = now.getFullYear();
-        const counterKey = `contractCounter_${year}`;
-        let lastNumber = parseInt(localStorage.getItem(counterKey) || '99');
-        const newNumber = lastNumber + 1;
-        localStorage.setItem(counterKey, newNumber);
-        return `${year}-${newNumber}`;
-    }
-
-    // ====================================================================================
-    // FUNÇÃO CORRIGIDA
-    // ====================================================================================
-    function finalizeContract() {
-        const clientForm = document.getElementById('clientForm');
-        const clientData = {
-            fullName: clientForm.elements['fullName'].value,
-            cpf: clientForm.elements['cpf'].value,
-            email: clientForm.elements['email'].value,
-            phone: clientForm.elements['phone'].value,
-            address: clientForm.elements['address'].value,
-            observations: clientForm.elements['observations'].value,
-        };
-        const tokensUsados = metodoPagamentoSelecionado === 'tokens' ? Math.floor(parseFloat(sliderTokens.value)) : 0;
-        const descontoAplicado = metodoPagamentoSelecionado === 'tokens' ? tokensUsados * dadosDoContrato.tokens.descontoPercentual : 0;
-        const valorFinalDinheiro = VALOR_OBRA - tokensUsados - descontoAplicado;
-
-        const finalContractData = {
-            ...dadosDoContrato,
-            cliente: {
-                ...dadosDoContrato.cliente,
-                ...clientData
-            },
-            financeiro: {
-                ...dadosDoContrato.financeiro,
-                valorFinalDaObra: VALOR_OBRA,
-                metodoPagamento: metodoPagamentoSelecionado,
-                tokensUsados,
-                descontoAplicado,
-                valorFinalDinheiro,
-                emissaoNotaFiscal: document.getElementById('invoiceOptionEmitir').checked
-            },
-            protocolo: generateProtocol(),
-            dataContrato: new Date().toLocaleString('pt-BR'),
-            termosAceitos: document.getElementById('agreeTerms').checked,
-            lgpdAceito: document.getElementById('lgpdAccepted').checked,
-        };
-
-        contracts.push(finalContractData);
-        localStorage.setItem('maeokaContracts', JSON.stringify(contracts));
-        localStorage.setItem('currentContractDisplay', JSON.stringify(finalContractData));
-
-        // Mostra a tela de carregamento
+    if (pageNumber === 5) {
+        // Show loading by default
         document.getElementById('loadingState').style.display = 'flex';
         document.getElementById('successState').classList.add('hidden');
-        document.getElementById('statusMessage').innerHTML = 'Enviando contrato para a Maeoka Engenharia...';
-
-        // Despacha a requisição para o Apps Script
-        sendContractToAppsScript(finalContractData).then((dispatched) => {
-            // Usa um timeout para uma melhor experiência do usuário, permitindo que ele leia a mensagem de status
-            setTimeout(() => {
-                if (dispatched) {
-                    document.getElementById('statusMessage').innerHTML = '✅ Contrato enviado! Preparando o resumo final...';
-                } else {
-                    document.getElementById('statusMessage').innerHTML = '⚠️ Erro ao notificar. Por favor, baixe o documento e envie manualmente.';
-                }
-
-                // Preenche os detalhes do resumo final
-                document.getElementById('protocolNumber').textContent = finalContractData.protocolo;
-                document.getElementById('contractDateTime').textContent = finalContractData.dataContrato;
-
-                document.getElementById('finalSummary').innerHTML = `
-                    <div class="space-y-2 text-sm">
-                        <p><strong>Nome do Cliente:</strong> ${finalContractData.cliente.fullName}</p>
-                        <p><strong>CPF:</strong> ${finalContractData.cliente.cpf}</p>
-                        <p><strong>E-mail:</strong> ${finalContractData.cliente.email}</p>
-                        <p><strong>Endereço de Domicílio:</strong> ${finalContractData.cliente.address}</p>
-                        <p><strong>Método de Pagamento:</strong> ${finalContractData.financeiro.metodoPagamento === 'tokens' ? 'Tokens MAEOKA + Dinheiro' : 'Apenas Dinheiro'}</p>
-                        <p><strong>Valor Total da Obra:</strong> ${formatCurrency(finalContractData.financeiro.valorFinalDaObra)}</p>
-                        ${finalContractData.financeiro.metodoPagamento === 'tokens' ? `
-                        <p><strong>Tokens Usados:</strong> ${finalContractData.financeiro.tokensUsados.toLocaleString('pt-BR')} MAEOKA</p>
-                        <p><strong>Desconto com Tokens:</strong> ${formatCurrency(finalContractData.financeiro.descontoAplicado)}</p>
-                        <p><strong>Valor Final em Dinheiro:</strong> ${formatCurrency(finalContractData.financeiro.valorFinalDinheiro)}</p>
-                        <p class="text-green-600 font-semibold"><strong>Economia Total:</strong> ${formatCurrency(finalContractData.financeiro.tokensUsados + finalContractData.financeiro.descontoAplicado)}</p>
-                        ` : ''}
-                    </div>
-                `;
-
-                // Esconde o carregamento e mostra a tela de sucesso
-                document.getElementById('loadingState').style.display = 'none';
-                document.getElementById('successState').classList.remove('hidden');
-            }, 2500); // Espera 2.5 segundos antes de mostrar a tela final
-        });
+        finalizeContract();
     }
-    // ====================================================================================
+}
 
-    async function sendContractToAppsScript(contractData) {
-        try {
-            await fetch(APPS_SCRIPT_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    contractData: contractData
-                })
-            });
-            console.log('Requisição de envio de contrato despachada.');
-            return true;
-        } catch (error) {
-            console.error('Erro ao despachar para Apps Script:', error);
-            return false;
-        }
-    }
-
-    function downloadContractHTML() {
-        const contractData = JSON.parse(localStorage.getItem('currentContractDisplay'));
-
-        if (!contractData) {
-            showModal('Erro', 'Não há dados de contrato para download.');
+function nextPage() {
+    if (currentPage === 2) {
+        const termsAccepted = document.getElementById('agreeTerms').checked;
+        if (!termsAccepted) {
+            showModal('Aviso', 'Por favor, aceite os Termos de Ciência e Responsabilidade para continuar.');
             return;
         }
+    } else if (currentPage === 4) {
+        const isFormValid = validateForm(true);
+        if (!isFormValid) {
+            if (!document.getElementById('lgpdAccepted').checked) {
+                showModal('Aviso', 'É necessário aceitar os termos da LGPD para continuar.');
+            }
+            return; 
+        }
+    }
 
-        const servicesHTML = contractData.servicos.map(servico => `
-            <div style="background: #f0f0f0; padding: 12px; margin: 8px 0; border-radius: 5px;">
-                <strong>${servico.nome}</strong><br>
-                <span style="color: #666;">${servico.detalhes} = ${formatCurrency(servico.preco)}</span>
-            </div>
-        `).join('');
+    if (currentPage < totalPages) {
+        currentPage++;
+        if (currentPage > highestStepCompleted) {
+            highestStepCompleted = currentPage;
+        }
+        showPage(currentPage);
+    }
+}
 
-        const materialsHTML = contractData.materiais.itens.map(item => `
-            <div style="background: #f0f0f0; padding: 12px; margin: 8px 0; border-radius: 5px;">
-                <strong>${item.nome}</strong><br>
-                <span style="color: #666;">${item.detalhes}</span>
-            </div>
-        `).join('');
+function prevPage() {
+    if (currentPage > 1) {
+        currentPage--;
+        showPage(currentPage);
+    }
+}
 
-        const observationsHTML = contractData.observacoes.map(item => `<li>${item}</li>`).join('');
+function formatCurrency(value) {
+    return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+}
 
-        let paymentBreakdownHTML = '';
-        const valorBaseParcela = contractData.financeiro.metodoPagamento === 'tokens' ? contractData.financeiro.valorFinalDinheiro : contractData.financeiro.valorFinalDaObra;
-        
-        contractData.financeiro.pagamentoParcelas.forEach(p => {
-            paymentBreakdownHTML += `<p>• ${p.etapa}: ${p.descricao} (${formatCurrency(valorBaseParcela * p.percentual)})</p>`;
+function updateCalculations() {
+    const invoiceOptionEmitir = document.getElementById('invoiceOptionEmitir');
+    const originalPriceDisplay = document.getElementById('originalPriceDisplay');
+    const finalPriceDisplay = document.getElementById('finalPriceDisplay');
+    const discountExplanation = document.getElementById('discountExplanation');
+
+    let baseValue = dadosDoContrato.financeiro.valorFinalComDesconto;
+    
+    if (invoiceOptionEmitir.checked) {
+        VALOR_OBRA = baseValue * 1.17; // 17% de acréscimo
+        discountExplanation.textContent = `Com desconto aplicado + acréscimo de 17% para emissão de NF.`;
+    } else {
+        VALOR_OBRA = baseValue;
+        discountExplanation.textContent = dadosDoContrato.financeiro.motivoDesconto;
+    }
+    
+    originalPriceDisplay.textContent = `Total orçado: ${formatCurrency(dadosDoContrato.financeiro.valorOrcadoOriginal)}`;
+    finalPriceDisplay.textContent = formatCurrency(VALOR_OBRA);
+    
+    updatePaymentPageDisplay();
+    updateCashPaymentBreakdown();
+}
+
+function updatePaymentPageDisplay() {
+    const originalPriceDisplayPage3 = document.getElementById('originalPriceDisplayPage3');
+    const finalPriceDisplayPage3 = document.getElementById('finalPriceDisplayPage3');
+    const discountExplanationPage3 = document.getElementById('discountExplanationPage3');
+
+    if(originalPriceDisplayPage3) {
+        originalPriceDisplayPage3.textContent = document.getElementById('originalPriceDisplay').textContent;
+        finalPriceDisplayPage3.textContent = document.getElementById('finalPriceDisplay').textContent;
+        discountExplanationPage3.textContent = document.getElementById('discountExplanation').textContent;
+    }
+}
+
+function updateCashPaymentBreakdown() {
+    const container = document.getElementById('cashPaymentBreakdown');
+    container.innerHTML = '';
+    dadosDoContrato.financeiro.pagamentoParcelas.forEach(parcela => {
+        const valorParcela = VALOR_OBRA * parcela.percentual;
+        const li = document.createElement('li');
+        li.innerHTML = `${parcela.etapa}: ${parcela.descricao} (${formatCurrency(valorParcela)})`;
+        container.appendChild(li);
+    });
+    const liPix = document.createElement('li');
+    liPix.className = 'font-bold mt-2';
+    liPix.textContent = 'Pagamentos via PIX';
+    container.appendChild(liPix);
+}
+
+function showCashPayment() {
+    hideAllPaymentSections();
+    document.getElementById('cashPaymentContent').classList.remove('hidden');
+    document.getElementById('mainPaymentChoices').classList.add('hidden');
+    metodoPagamentoSelecionado = 'cash';
+    document.getElementById('mainBackBtnContainer').classList.add('hidden');
+}
+function showTokenPayment() {
+    hideAllPaymentSections();
+    document.getElementById('tokenPaymentContent').classList.remove('hidden');
+    document.getElementById('mainPaymentChoices').classList.add('hidden');
+    metodoPagamentoSelecionado = 'tokens';
+    document.getElementById('mainBackBtnContainer').classList.add('hidden');
+
+    if (!tonConnectUI) {
+        setTimeout(() => {
+            initializeTonConnect();
+        }, 100);
+    }
+}
+function hideAllPaymentSections() {
+    document.getElementById('cashPaymentContent').classList.add('hidden');
+    document.getElementById('tokenPaymentContent').classList.add('hidden');
+    document.getElementById('mainPaymentChoices').classList.remove('hidden');
+    metodoPagamentoSelecionado = null;
+    document.getElementById('mainBackBtnContainer').classList.remove('hidden');
+}
+
+function initializeTonWeb() {
+    try {
+        tonweb = new TonWeb(new TonWeb.HttpProvider('https://toncenter.com/api/v2/jsonRPC'));
+        return true;
+    } catch (error) {
+        console.error('Erro ao inicializar TonWeb:', error);
+        return false;
+    }
+}
+function initializeTonConnect() {
+    try {
+        tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
+            manifestUrl: 'https://ton-connect.github.io/demo-dapp-with-wallet/tonconnect-manifest.json',
+            buttonRootId: 'tonConnectButton'
         });
-
-        const htmlContent = `
-        <!DOCTYPE html>
-        <html lang="pt-BR">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Contrato ${contractData.protocolo} - Maeoka Engenharia</title>
-            <style>
-                body { font-family: 'Poppins', Arial, sans-serif; margin: 20px; color: #333; line-height: 1.6; font-size: 12px; }
-                .header { background: #1e3a8a; color: white; padding: 25px; text-align: center; margin-bottom: 30px; }
-                .logo { font-size: 24px; font-weight: bold; margin-bottom: 8px; }
-                .subtitle { font-size: 12px; opacity: 0.9; }
-                .section { margin: 25px 0; padding: 20px; border-left: 4px solid #1e3a8a; background: #f8f9fa; border-radius: 0 8px 8px 0; }
-                .total { background: #1e3a8a; color: white; padding: 20px; text-align: center; font-size: 18px; font-weight: bold; border-radius: 8px; margin: 20px 0; }
-                .signature-area { border: 2px dashed #1e3a8a; padding: 40px; margin-top: 50px; text-align: center; border-radius: 8px; }
-                .signature-line { border-bottom: 1px solid #333; width: 80%; margin: 30px auto 10px auto; height: 30px; }
-                h2 { color: #1e3a8a; border-bottom: 2px solid #1e3a8a; padding-bottom: 10px; margin-bottom: 20px; text-align: center; font-size: 22px; }
-                h3 { color: #2563eb; margin-top: 25px; margin-bottom: 15px; font-size: 18px; }
-                @media print {
-                    body { margin: 0; }
-                    .header, .total { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
-                }
-            </style>
-        </head>
-        <body>
-            <div class="header">
-                <div class="logo">MAEOKA ENGENHARIA</div>
-                <div class="subtitle">CNPJ: 19.924.627/0001-67 • Eng. Kioma Maeoka (CREA 159.328/D-PR)</div>
-            </div>
-            <h2>CONTRATO DE PRESTAÇÃO DE SERVIÇOS DE ENGENHARIA</h2>
-        
-            <div style="background: #e0e7ff; padding: 15px; border-radius: 8px; margin-bottom: 25px;">
-                <p><strong>Protocolo:</strong> ${contractData.protocolo}</p>
-                <p><strong>Data de Aceite Digital:</strong> ${contractData.dataContrato}</p>
-            </div>
-            <div class="section">
-                <h3>👤 DADOS DO CONTRATANTE</h3>
-                <p><strong>Nome Completo:</strong> ${contractData.cliente.fullName}</p>
-                <p><strong>CPF:</strong> ${contractData.cliente.cpf}</p>
-                <p><strong>E-mail:</strong> ${contractData.cliente.email}</p>
-                <p><strong>Telefone:</strong> ${contractData.cliente.phone}</p>
-                <p><strong>Endereço de Domicílio:</strong> ${contractData.cliente.address}</p>
-            </div>
-            <div class="section">
-                <h3>📍 DADOS DA OBRA</h3>
-                <p><strong>Endereço da Obra:</strong> ${contractData.obra.endereco}</p>
-                <p><strong>Prazo de Execução:</strong> ${contractData.obra.prazoExecucao}</p>
-            </div>
-            <div class="section">
-                <h3>🔨 SERVIÇOS CONTRATADOS</h3>
-                ${servicesHTML}
-                <p style="text-align: right; font-weight: bold; color: #2563eb;">SUBTOTAL SERVIÇOS: ${formatCurrency(contractData.financeiro.subtotalServicos)}</p>
-            </div>
-            <div class="section">
-                <h3>📦 MATERIAIS INCLUSOS</h3>
-                ${materialsHTML}
-                <p style="text-align: right; font-weight: bold; color: #2563eb;">SUBTOTAL MATERIAIS: ${formatCurrency(contractData.materiais.subtotal)}</p>
-            </div>
-            <div class="section">
-                <h3>💰 CONDIÇÕES COMERCIAIS</h3>
-                <p><strong>Valor Total Orçado:</strong> ${formatCurrency(contractData.financeiro.valorOrcadoOriginal)}</p>
-                <p><strong>Valor Final com Desconto:</strong> ${formatCurrency(contractData.financeiro.valorFinalComDesconto)}</p>
-                ${contractData.financeiro.emissaoNotaFiscal ? `<p><strong>Acréscimo de NF (17%):</strong> ${formatCurrency(contractData.financeiro.valorFinalComDesconto * 0.17)}</p>` : ''}
-                <div class="total">VALOR TOTAL DO CONTRATO: ${formatCurrency(contractData.financeiro.valorFinalDaObra)}</div>
-                ${contractData.financeiro.metodoPagamento === 'tokens' ? `
-                    <p><strong>Tokens Usados:</strong> ${contractData.financeiro.tokensUsados.toLocaleString('pt-BR')} MAEOKA</p>
-                    <p><strong>Desconto Adicional com Tokens:</strong> ${formatCurrency(contractData.financeiro.descontoAplicado)}</p>
-                    <p><strong>Valor a ser pago em Dinheiro (PIX):</strong> ${formatCurrency(contractData.financeiro.valorFinalDinheiro)}</p>
-                ` : ''}
-            </div>
-            <div class="section">
-                <h3>🗓️ PARCELAMENTO (PAGAMENTO EM DINHEIRO)</h3>
-                ${paymentBreakdownHTML}
-            </div>
-            <div class="section">
-                <h3>⚠️ OBSERVAÇÕES IMPORTANTES</h3>
-                <ul>${observationsHTML}</ul>
-            </div>
-            ${contractData.cliente.observations && contractData.cliente.observations.trim() !== '' ? `
-            <div class="section">
-                <h3>📝 OBSERVAÇÕES ADICIONAIS DO CLIENTE</h3>
-                <p>${contractData.cliente.observations}</p>
-            </div>
-            ` : ''}
-            <div class="signature-area">
-                <h3>✍️ ASSINATURAS</h3>
-                <p>Curitiba/PR, ${new Date().toLocaleDateString('pt-BR', {day: 'numeric', month: 'long', year: 'numeric'})}</p>
+        tonConnectUI.onStatusChange(walletInfo => {
+            if (walletInfo) {
+                statusCarteira.innerHTML = `<span class="spinner mr-2"></span> Carregando saldo...`;
+                statusCarteira.className = 'bg-blue-100 text-blue-800 font-semibold text-center py-3 rounded-lg border border-blue-300 mb-5';
                 
-                <div style="display: flex; justify-content: space-around; margin-top: 50px;">
-                    <div style="text-align: center; width: 45%;">
-                        <div class="signature-line"></div>
-                        <p><strong>CONTRATANTE</strong></p>
-                        <p>${contractData.cliente.fullName}</p>
-                        <p>CPF: ${contractData.cliente.cpf}</p>
-                    </div>
-                    <div style="text-align: center; width: 45%;">
-                        <div class="signature-line"></div>
-                        <p><strong>CONTRATADA</strong></p>
-                        <p>Kioma Maeoka</p>
-                        <p>Engenheiro Civil - CREA 159.328/D-PR</p>
-                        <p>Maeoka Engenharia</p>
-                    </div>
+                enderecoUsuarioRaw = walletInfo.account.address;
+                const addressForDisplay = new TonWeb.utils.Address(enderecoUsuarioRaw);
+                enderecoCarteira.textContent = addressForDisplay.toString(true, true, false);
+                
+                document.getElementById('walletInfo').classList.remove('hidden');
+                buscarSaldoTokens();
+                
+            } else {
+                enderecoUsuarioRaw = '';
+                document.getElementById('walletInfo').classList.add('hidden');
+                calculadoraTokens.classList.add('hidden');
+                document.getElementById('adjustedPaymentConditions').classList.add('hidden');
+                statusCarteira.innerHTML = `<i class="fa-solid fa-link mr-2" aria-hidden="true"></i>Conecte sua carteira para pagar com tokens`;
+                statusCarteira.className = 'bg-yellow-100 text-yellow-800 font-semibold text-center py-3 rounded-lg border border-yellow-300 mb-5';
+            }
+        });
+    
+        return true;
+    } catch (error) {
+        console.error('Erro ao inicializar TON Connect:', error);
+        return false;
+    }
+}
+async function buscarSaldoTokens() {
+    if (!enderecoUsuarioRaw) return;
+    try {
+        console.log('🔍 Consultando saldo real na blockchain para:', enderecoUsuarioRaw);
+    
+        let retries = 0;
+        const maxRetries = 5;
+        let delay = 1000;
+        while(retries < maxRetries) {
+            try {
+                const jettonMinter = new TonWeb.token.jetton.JettonMinter(tonweb.provider, {
+                    address: TOKEN_MAEOKA
+                });
+                
+                const userJettonWalletAddress = await jettonMinter.getJettonWalletAddress(
+                    new TonWeb.utils.Address(enderecoUsuarioRaw) 
+                );
+                
+                const jettonWallet = new TonWeb.token.jetton.JettonWallet(tonweb.provider, {
+                    address: userJettonWalletAddress
+                });
+                
+                const jettonData = await jettonWallet.getData();
+                const saldoNano = jettonData.balance;
+                saldoUsuario = parseFloat(TonWeb.utils.fromNano(saldoNano));
+                
+                console.log('✅ Saldo real obtido:', saldoUsuario, 'MAEOKA');
+                break;
+            } catch (blockchainError) {
+                console.warn('⚠️ Erro na consulta blockchain:', blockchainError);
+                retries++;
+                if (retries < maxRetries) {
+                    await new Promise(res => setTimeout(res, delay));
+                    delay *= 2;
+                } else {
+                    console.error('❌ Erro final após múltiplas tentativas:', blockchainError);
+                    saldoUsuario = 0;
+                    throw blockchainError;
+                }
+            }
+        }
+    
+        statusCarteira.innerHTML = `✅ Carteira Conectada - Saldo carregado!`;
+        statusCarteira.className = 'bg-green-100 text-green-800 font-semibold text-center py-3 rounded-lg border border-green-300 mb-5';
+    
+        saldoTokens.innerHTML = `<span class="font-bold">${saldoUsuario.toLocaleString('pt-BR', {minimumFractionDigits: 2})} MAEOKA</span>`;
+    
+        const maxTokensPorLimite = VALOR_OBRA * LIMITE_PERCENTUAL_TOKENS;
+        const maxTokens = Math.min(saldoUsuario, maxTokensPorLimite);
+    
+        sliderTokens.max = Math.floor(maxTokens);
+        tokenInput.max = Math.floor(maxTokens);
+        sliderTokens.value = 0;
+        tokenInput.value = 0;
+    
+        const valorOriginalObraEl = document.getElementById('valorOriginalObra');
+        if (valorOriginalObraEl) {
+            valorOriginalObraEl.textContent = formatCurrency(VALOR_OBRA);
+        }
+    
+        if (saldoUsuario === 0) {
+            statusCarteira.innerHTML = `⚠️ Carteira conectada - Sem tokens MAEOKA`;
+            statusCarteira.className = 'bg-yellow-100 text-yellow-800 font-semibold text-center py-3 rounded-lg border border-yellow-300 mb-5';
+        
+            calculadoraTokens.innerHTML = `
+                <div class="bg-red-50 p-6 rounded-lg text-center border-2 border-red-300">
+                    <h3 class="text-xl font-bold text-red-800 mb-4"><i class="fa-solid fa-circle-exclamation mr-2" aria-hidden="true"></i>SEM TOKENS MAEOKA</h3>
+                    <p class="text-gray-700">Sua carteira não possui tokens MAEOKA.</p>
+                    <p class="text-sm text-gray-500 mt-2">Para usar esta opção de pagamento, você precisa ter tokens MAEOKA em sua carteira.</p>
+                    <a href="https://example.com/adquirir-tokens" target="_blank" class="text-blue-600 hover:underline">Como adquirir tokens?</a>
+                </div>
+            `;
+            updateAdjustedPaymentConditions(VALOR_OBRA);
+            document.getElementById('adjustedPaymentConditions').classList.remove('hidden');
+        } else {
+            atualizarCalculos(0);
+        }
+    
+        calculadoraTokens.classList.remove('hidden');
+    
+    } catch (error) {
+        console.error('❌ Erro geral na busca de saldo:', error);
+        statusCarteira.innerHTML = `❌ Erro ao consultar saldo`;
+        statusCarteira.className = 'bg-red-100 text-red-800 font-semibold text-center py-3 rounded-lg border border-red-300 mb-5';
+    }
+}
+function atualizarCalculos(tokensValue) {
+    resumoTokens.textContent = `${tokensValue.toLocaleString('pt-BR')} MAEOKA (${formatCurrency(tokensValue)})`;
+
+    const desconto = tokensValue * dadosDoContrato.tokens.descontoPercentual;
+    resumoDesconto.textContent = `- ${formatCurrency(desconto)}`;
+
+    const valorDinheiro = VALOR_OBRA - tokensValue - desconto;
+    resumoDinheiro.textContent = formatCurrency(valorDinheiro);
+
+    resumoTotal.textContent = formatCurrency(valorDinheiro);
+
+    const economiaTotal = tokensValue + desconto;
+    resumoEconomia.textContent = formatCurrency(economiaTotal);
+
+    if (tokensValue > 0) {
+        btnEnviarTokens.disabled = false;
+        btnEnviarTokens.innerHTML = `
+            <div class="flex flex-col items-center justify-center">
+                <span class="font-bold text-base md:text-lg">
+                    <i class="fa-solid fa-credit-card mr-2" aria-hidden="true"></i>
+                    PAGAR COM ${tokensValue.toLocaleString('pt-BR')} TOKENS
+                </span>
+                <span class="text-xs font-normal opacity-90 -mt-1">
+                    + restante em dinheiro
+                </span>
+            </div>`;
+        continueTokenBtn.disabled = true;
+    } else {
+        btnEnviarTokens.disabled = true;
+        btnEnviarTokens.innerHTML = `
+            <div class="flex flex-col items-center justify-center">
+                <span class="font-bold text-base md:text-lg">
+                    <i class="fa-solid fa-credit-card mr-2" aria-hidden="true"></i>
+                    PAGAR COM TOKENS
+                </span>
+                <span class="text-xs font-normal opacity-90 -mt-1">
+                    Selecione a quantidade acima
+                </span>
+            </div>`;
+        continueTokenBtn.disabled = false;
+        continueTokenBtn.innerHTML = '✅ Continuar sem Tokens <i class="fa-solid fa-arrow-right ml-2" aria-hidden="true"></i>';
+    }
+    updateAdjustedPaymentConditions(valorDinheiro);
+    document.getElementById('adjustedPaymentConditions').classList.remove('hidden');
+}
+function updateAdjustedPaymentConditions(valorDinheiro) {
+    const container = document.getElementById('tokenPaymentBreakdown');
+    container.innerHTML = '';
+    dadosDoContrato.financeiro.pagamentoParcelas.forEach(parcela => {
+        const valorParcela = valorDinheiro * parcela.percentual;
+        const li = document.createElement('li');
+        li.innerHTML = `${parcela.etapa}: ${parcela.descricao} (<span class="font-bold">${formatCurrency(valorParcela)}</span>)`;
+        container.appendChild(li);
+    });
+    const liPix = document.createElement('li');
+    liPix.className = 'font-bold mt-2';
+    liPix.textContent = 'Pagamentos via PIX';
+    container.appendChild(liPix);
+
+    const cashback = Math.floor(VALOR_OBRA * dadosDoContrato.tokens.cashbackPercentual);
+    document.getElementById('cashbackInfo').textContent = `${cashback.toLocaleString('pt-BR')} MAEOKA`;
+}
+async function enviarTokens() {
+    const tokensValue = parseInt(sliderTokens.value);
+
+    if (tokensValue === 0) {
+        showModal('Aviso', 'Selecione uma quantidade de tokens para enviar!');
+        return;
+    }
+
+    if (tokensValue > saldoUsuario) {
+        showModal('Aviso', 'Você não tem tokens suficientes!');
+        return;
+    }
+
+    btnEnviarTokens.disabled = true;
+    btnEnviarTokens.innerHTML = '<span class="spinner mr-2"></span> Enviando tokens...';
+
+    try {
+        const jettonMinter = new TonWeb.token.jetton.JettonMinter(tonweb.provider, {
+            address: TOKEN_MAEOKA
+        });
+        
+        const userJettonWalletAddress = await jettonMinter.getJettonWalletAddress(
+            new TonWeb.utils.Address(enderecoUsuarioRaw)
+        );
+        
+        const jettonWallet = new TonWeb.token.jetton.JettonWallet(tonweb.provider, {
+            address: userJettonWalletAddress
+        });
+        
+        const jettonAmount = TonWeb.utils.toNano(tokensValue.toString());
+        const forwardAmount = TonWeb.utils.toNano('0.01');
+        
+        const shortClientName = dadosDoContrato.cliente.nome.split(' ')[0];
+        const commentText = `Pgto obra ${shortClientName} - ${tokensValue} MAEOKA`;
+        const commentCell = new TonWeb.boc.Cell();
+        commentCell.bits.writeUint(0, 32);
+        commentCell.bits.writeString(commentText);
+
+        const transferBody = await jettonWallet.createTransferBody({
+            jettonAmount: jettonAmount,
+            toAddress: new TonWeb.utils.Address(CARTEIRA_MAEOKA_OFICIAL),
+            forwardAmount: forwardAmount,
+            forwardPayload: commentCell,
+            responseAddress: new TonWeb.utils.Address(enderecoUsuarioRaw)
+        });
+        
+        const transaction = {
+            validUntil: Date.now() + 5 * 60 * 1000,
+            messages: [
+                {
+                    address: userJettonWalletAddress.toString(false), 
+                    amount: TonWeb.utils.toNano('0.05').toString(),
+                    payload: TonWeb.utils.bytesToBase64(await transferBody.toBoc())
+                }
+            ]
+        };
+        
+        console.log('Construindo transação:', JSON.stringify(transaction, null, 2));
+        const result = await tonConnectUI.sendTransaction(transaction);
+        console.log('Transação enviada, resultado:', result);
+        
+        const desconto = tokensValue * dadosDoContrato.tokens.descontoPercentual;
+        const valorFinalEmDinheiro = VALOR_OBRA - tokensValue - desconto;
+        const economiaTotal = tokensValue + desconto;
+        
+        showModal('SUCESSO', `✅ TOKENS ENVIADOS COM SUCESSO!<br><br>` +
+            `💰 Tokens enviados: ${tokensValue.toLocaleString('pt-BR')} MAEOKA<br>` +
+            `💸 Desconto obtido: ${formatCurrency(desconto)}<br>` +
+            `💵 Valor restante em dinheiro: ${formatCurrency(valorFinalEmDinheiro)}<br>` +
+            `🎁 Economia total: ${formatCurrency(economiaTotal)}<br><br>` +
+            `Agora você pode continuar para a próxima etapa!`);
+        
+        btnEnviarTokens.innerHTML = '<i class="fa-solid fa-check mr-2" aria-hidden="true"></i>Tokens Enviados com Sucesso!';
+        btnEnviarTokens.className = 'w-full bg-green-600 text-white text-lg font-semibold py-4 rounded-lg shadow-xl';
+        continueTokenBtn.disabled = false;
+        continueTokenBtn.innerHTML = '✅ Continuar para Próxima Etapa <i class="fa-solid fa-arrow-right ml-2" aria-hidden="true"></i>';
+        
+    } catch (error) {
+        console.error('Erro detalhado no envio:', error);
+        
+        btnEnviarTokens.disabled = false;
+        atualizarCalculos(tokensValue); // Reset button text
+        
+        if (error.message.includes('User declined')) {
+            showModal('Envio Cancelado', 'Envio cancelado pelo usuário.');
+        } else {
+            showModal('Erro no Envio', 'Ocorreu um erro ao tentar enviar a transação: ' + error.message);
+        }
+    }
+}
+
+function checkTermsAgreement() {
+    const agreeTermsCheckbox = document.getElementById('agreeTerms');
+    const confirmTermsBtn = document.getElementById('confirmTermsBtn');
+    confirmTermsBtn.disabled = !agreeTermsCheckbox.checked;
+}
+
+function showModal(title, message, isConfirm = false, callback = null) {
+    modalTitle.innerHTML = title;
+    modalBody.innerHTML = message;
+    modalButtons.innerHTML = '';
+    modal.classList.remove('hidden');
+    modal.focus();
+
+    if (isConfirm) {
+        const cancelBtn = document.createElement('button');
+        cancelBtn.className = 'px-6 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 transition';
+        cancelBtn.setAttribute('aria-label', 'Cancelar');
+        cancelBtn.textContent = 'Cancelar';
+        cancelBtn.onclick = closeModal;
+
+        const confirmBtn = document.createElement('button');
+        confirmBtn.className = 'px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition ml-4';
+        confirmBtn.setAttribute('aria-label', 'Confirmar');
+        confirmBtn.textContent = 'Confirmar';
+        confirmBtn.onclick = () => {
+            closeModal();
+            if (callback && typeof callback === 'function') {
+                callback();
+            }
+        };
+
+        modalButtons.appendChild(cancelBtn);
+        modalButtons.appendChild(confirmBtn);
+
+    } else {
+        const okBtn = document.createElement('button');
+        okBtn.className = 'w-full bg-blue-600 text-white font-semibold py-3 px-8 rounded-lg hover:bg-blue-700 transition';
+        okBtn.textContent = 'OK';
+        okBtn.onclick = closeModal;
+        modalButtons.appendChild(okBtn);
+    }
+
+    modal.addEventListener('keydown', trapFocus);
+}
+function closeModal() {
+    modal.classList.add('hidden');
+    modal.removeEventListener('keydown', trapFocus);
+}
+function trapFocus(e) {
+    if (e.key === 'Tab') {
+        const focusable = modal.querySelectorAll('button, input, textarea, [tabindex]:not([tabindex="-1"])');
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+            last.focus();
+            e.preventDefault();
+        } else if (!e.shiftKey && document.activeElement === last) {
+            first.focus();
+            e.preventDefault();
+        }
+    }
+}
+window.alert = function(message) {
+    showModal('Aviso', message);
+};
+window.confirm = function(message, callback) {
+    showModal('Confirmação', message, true, callback);
+};
+
+function generateProtocol() {
+    const now = new Date();
+    const year = now.getFullYear().toString().slice(-2);
+    const month = (now.getMonth() + 1).toString().padStart(2, '0');
+    const day = now.getDate().toString().padStart(2, '0');
+    const hour = now.getHours().toString().padStart(2, '0');
+    const minute = now.getMinutes().toString().padStart(2, '0');
+    const second = now.getSeconds().toString().padStart(2, '0');
+    return `MAE-${year}${month}${day}-${hour}${minute}${second}`;
+}
+
+// ====================================================================================
+// FUNÇÃO CORRIGIDA
+// ====================================================================================
+function finalizeContract() {
+    const clientForm = document.getElementById('clientForm');
+    const clientData = {
+        fullName: clientForm.elements['fullName'].value,
+        cpf: clientForm.elements['cpf'].value,
+        email: clientForm.elements['email'].value,
+        phone: clientForm.elements['phone'].value,
+        address: clientForm.elements['address'].value,
+        observations: clientForm.elements['observations'].value,
+    };
+    const tokensUsados = metodoPagamentoSelecionado === 'tokens' ? Math.floor(parseFloat(sliderTokens.value)) : 0;
+    const descontoAplicado = metodoPagamentoSelecionado === 'tokens' ? tokensUsados * dadosDoContrato.tokens.descontoPercentual : 0;
+    const valorFinalDinheiro = VALOR_OBRA - tokensUsados - descontoAplicado;
+
+    const finalContractData = {
+        ...dadosDoContrato,
+        cliente: {
+            ...dadosDoContrato.cliente,
+            ...clientData
+        },
+        financeiro: {
+            ...dadosDoContrato.financeiro,
+            valorFinalDaObra: VALOR_OBRA,
+            metodoPagamento: metodoPagamentoSelecionado,
+            tokensUsados,
+            descontoAplicado,
+            valorFinalDinheiro,
+            emissaoNotaFiscal: document.getElementById('invoiceOptionEmitir').checked
+        },
+        protocolo: generateProtocol(),
+        dataContrato: new Date().toLocaleString('pt-BR'),
+        termosAceitos: document.getElementById('agreeTerms').checked,
+        lgpdAceito: document.getElementById('lgpdAccepted').checked,
+    };
+
+    contracts.push(finalContractData);
+    localStorage.setItem('maeokaContracts', JSON.stringify(contracts));
+    localStorage.setItem('currentContractDisplay', JSON.stringify(finalContractData));
+
+    // Mostra a tela de carregamento
+    document.getElementById('loadingState').style.display = 'flex';
+    document.getElementById('successState').classList.add('hidden');
+    document.getElementById('statusMessage').innerHTML = 'Enviando contrato para a Maeoka Engenharia...';
+
+    // Despacha a requisição para o Apps Script
+    sendContractToAppsScript(finalContractData).then((dispatched) => {
+        // Usa um timeout para uma melhor experiência do usuário, permitindo que ele leia a mensagem de status
+        setTimeout(() => {
+            if (dispatched) {
+                document.getElementById('statusMessage').innerHTML = '✅ Contrato enviado! Preparando o resumo final...';
+            } else {
+                document.getElementById('statusMessage').innerHTML = '⚠️ Erro ao notificar. Por favor, baixe o documento e envie manualmente.';
+            }
+
+            // Preenche os detalhes do resumo final
+            document.getElementById('protocolNumber').textContent = finalContractData.protocolo;
+            document.getElementById('contractDateTime').textContent = finalContractData.dataContrato;
+
+            document.getElementById('finalSummary').innerHTML = `
+                <div class="space-y-2 text-sm">
+                    <p><strong>Nome do Cliente:</strong> ${finalContractData.cliente.fullName}</p>
+                    <p><strong>CPF:</strong> ${finalContractData.cliente.cpf}</p>
+                    <p><strong>E-mail:</strong> ${finalContractData.cliente.email}</p>
+                    <p><strong>Endereço de Domicílio:</strong> ${finalContractData.cliente.address}</p>
+                    <p><strong>Método de Pagamento:</strong> ${finalContractData.financeiro.metodoPagamento === 'tokens' ? 'Tokens MAEOKA + Dinheiro' : 'Apenas Dinheiro'}</p>
+                    <p><strong>Valor Total da Obra:</strong> ${formatCurrency(finalContractData.financeiro.valorFinalDaObra)}</p>
+                    ${finalContractData.financeiro.metodoPagamento === 'tokens' ? `
+                    <p><strong>Tokens Usados:</strong> ${finalContractData.financeiro.tokensUsados.toLocaleString('pt-BR')} MAEOKA</p>
+                    <p><strong>Desconto com Tokens:</strong> ${formatCurrency(finalContractData.financeiro.descontoAplicado)}</p>
+                    <p><strong>Valor Final em Dinheiro:</strong> ${formatCurrency(finalContractData.financeiro.valorFinalDinheiro)}</p>
+                    <p class="text-green-600 font-semibold"><strong>Economia Total:</strong> ${formatCurrency(finalContractData.financeiro.tokensUsados + finalContractData.financeiro.descontoAplicado)}</p>
+                    ` : ''}
+                </div>
+            `;
+
+            // Esconde o carregamento e mostra a tela de sucesso
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('successState').classList.remove('hidden');
+        }, 2500); // Espera 2.5 segundos antes de mostrar a tela final
+    });
+}
+// ====================================================================================
+
+async function sendContractToAppsScript(contractData) {
+    try {
+        await fetch(APPS_SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                contractData: contractData
+            })
+        });
+        console.log('Requisição de envio de contrato despachada.');
+        return true;
+    } catch (error) {
+        console.error('Erro ao despachar para Apps Script:', error);
+        return false;
+    }
+}
+
+function downloadContractHTML() {
+    const contractData = JSON.parse(localStorage.getItem('currentContractDisplay'));
+
+    if (!contractData) {
+        showModal('Erro', 'Não há dados de contrato para download.');
+        return;
+    }
+
+    const servicesHTML = contractData.servicos.map(servico => `
+        <div style="background: #f0f0f0; padding: 12px; margin: 8px 0; border-radius: 5px;">
+            <strong>${servico.nome}</strong><br>
+            <span style="color: #666;">${servico.detalhes} = ${formatCurrency(servico.preco)}</span>
+        </div>
+    `).join('');
+
+    const materialsHTML = contractData.materiais.itens.map(item => `
+        <div style="background: #f0f0f0; padding: 12px; margin: 8px 0; border-radius: 5px;">
+            <strong>${item.nome}</strong><br>
+            <span style="color: #666;">${item.detalhes}</span>
+        </div>
+    `).join('');
+
+    const observationsHTML = contractData.observacoes.map(item => `<li>${item}</li>`).join('');
+
+    let paymentBreakdownHTML = '';
+    const valorBaseParcela = contractData.financeiro.metodoPagamento === 'tokens' ? contractData.financeiro.valorFinalDinheiro : contractData.financeiro.valorFinalDaObra;
+    
+    contractData.financeiro.pagamentoParcelas.forEach(p => {
+        paymentBreakdownHTML += `<p>• ${p.etapa}: ${p.descricao} (${formatCurrency(valorBaseParcela * p.percentual)})</p>`;
+    });
+
+    const htmlContent = `
+    <!DOCTYPE html>
+    <html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Contrato ${contractData.protocolo} - Maeoka Engenharia</title>
+        <style>
+            body { font-family: 'Poppins', Arial, sans-serif; margin: 20px; color: #333; line-height: 1.6; font-size: 12px; }
+            .header { background: #1e3a8a; color: white; padding: 25px; text-align: center; margin-bottom: 30px; }
+            .logo { font-size: 24px; font-weight: bold; margin-bottom: 8px; }
+            .subtitle { font-size: 12px; opacity: 0.9; }
+            .section { margin: 25px 0; padding: 20px; border-left: 4px solid #1e3a8a; background: #f8f9fa; border-radius: 0 8px 8px 0; }
+            .total { background: #1e3a8a; color: white; padding: 20px; text-align: center; font-size: 18px; font-weight: bold; border-radius: 8px; margin: 20px 0; }
+            .signature-area { border: 2px dashed #1e3a8a; padding: 40px; margin-top: 50px; text-align: center; border-radius: 8px; }
+            .signature-line { border-bottom: 1px solid #333; width: 80%; margin: 30px auto 10px auto; height: 30px; }
+            h2 { color: #1e3a8a; border-bottom: 2px solid #1e3a8a; padding-bottom: 10px; margin-bottom: 20px; text-align: center; font-size: 22px; }
+            h3 { color: #2563eb; margin-top: 25px; margin-bottom: 15px; font-size: 18px; }
+            @media print {
+                body { margin: 0; }
+                .header, .total { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="header">
+            <div class="logo">MAEOKA ENGENHARIA</div>
+            <div class="subtitle">CNPJ: 19.924.627/0001-67 • Eng. Kioma Maeoka (CREA 159.328/D-PR)</div>
+        </div>
+        <h2>CONTRATO DE PRESTAÇÃO DE SERVIÇOS DE ENGENHARIA</h2>
+    
+        <div style="background: #e0e7ff; padding: 15px; border-radius: 8px; margin-bottom: 25px;">
+            <p><strong>Protocolo:</strong> ${contractData.protocolo}</p>
+            <p><strong>Data de Aceite Digital:</strong> ${contractData.dataContrato}</p>
+        </div>
+        <div class="section">
+            <h3>👤 DADOS DO CONTRATANTE</h3>
+            <p><strong>Nome Completo:</strong> ${contractData.cliente.fullName}</p>
+            <p><strong>CPF:</strong> ${contractData.cliente.cpf}</p>
+            <p><strong>E-mail:</strong> ${contractData.cliente.email}</p>
+            <p><strong>Telefone:</strong> ${contractData.cliente.phone}</p>
+            <p><strong>Endereço de Domicílio:</strong> ${contractData.cliente.address}</p>
+        </div>
+        <div class="section">
+            <h3>📍 DADOS DA OBRA</h3>
+            <p><strong>Endereço da Obra:</strong> ${contractData.obra.endereco}</p>
+            <p><strong>Prazo de Execução:</strong> ${contractData.obra.prazoExecucao}</p>
+        </div>
+        <div class="section">
+            <h3>🔨 SERVIÇOS CONTRATADOS</h3>
+            ${servicesHTML}
+            <p style="text-align: right; font-weight: bold; color: #2563eb;">SUBTOTAL SERVIÇOS: ${formatCurrency(contractData.financeiro.subtotalServicos)}</p>
+        </div>
+        <div class="section">
+            <h3>📦 MATERIAIS INCLUSOS</h3>
+            ${materialsHTML}
+            <p style="text-align: right; font-weight: bold; color: #2563eb;">SUBTOTAL MATERIAIS: ${formatCurrency(contractData.materiais.subtotal)}</p>
+        </div>
+        <div class="section">
+            <h3>💰 CONDIÇÕES COMERCIAIS</h3>
+            <p><strong>Valor Total Orçado:</strong> ${formatCurrency(contractData.financeiro.valorOrcadoOriginal)}</p>
+            <p><strong>Valor Final com Desconto:</strong> ${formatCurrency(contractData.financeiro.valorFinalComDesconto)}</p>
+            ${contractData.financeiro.emissaoNotaFiscal ? `<p><strong>Acréscimo de NF (17%):</strong> ${formatCurrency(contractData.financeiro.valorFinalComDesconto * 0.17)}</p>` : ''}
+            <div class="total">VALOR TOTAL DO CONTRATO: ${formatCurrency(contractData.financeiro.valorFinalDaObra)}</div>
+            ${contractData.financeiro.metodoPagamento === 'tokens' ? `
+                <p><strong>Tokens Usados:</strong> ${contractData.financeiro.tokensUsados.toLocaleString('pt-BR')} MAEOKA</p>
+                <p><strong>Desconto Adicional com Tokens:</strong> ${formatCurrency(contractData.financeiro.descontoAplicado)}</p>
+                <p><strong>Valor a ser pago em Dinheiro (PIX):</strong> ${formatCurrency(contractData.financeiro.valorFinalDinheiro)}</p>
+            ` : ''}
+        </div>
+        <div class="section">
+            <h3>🗓️ PARCELAMENTO (PAGAMENTO EM DINHEIRO)</h3>
+            ${paymentBreakdownHTML}
+        </div>
+        <div class="section">
+            <h3>⚠️ OBSERVAÇÕES IMPORTANTES</h3>
+            <ul>${observationsHTML}</ul>
+        </div>
+        ${contractData.cliente.observations && contractData.cliente.observations.trim() !== '' ? `
+        <div class="section">
+            <h3>📝 OBSERVAÇÕES ADICIONAIS DO CLIENTE</h3>
+            <p>${contractData.cliente.observations}</p>
+        </div>
+        ` : ''}
+        <div class="signature-area">
+            <h3>✍️ ASSINATURAS</h3>
+            <p>Curitiba/PR, ${new Date().toLocaleDateString('pt-BR', {day: 'numeric', month: 'long', year: 'numeric'})}</p>
+            
+            <div style="display: flex; justify-content: space-around; margin-top: 50px;">
+                <div style="text-align: center; width: 45%;">
+                    <div class="signature-line"></div>
+                    <p><strong>CONTRATANTE</strong></p>
+                    <p>${contractData.cliente.fullName}</p>
+                    <p>CPF: ${contractData.cliente.cpf}</p>
+                </div>
+                <div style="text-align: center; width: 45%;">
+                    <div class="signature-line"></div>
+                    <p><strong>CONTRATADA</strong></p>
+                    <p>Kioma Maeoka</p>
+                    <p>Engenheiro Civil - CREA 159.328/D-PR</p>
+                    <p>Maeoka Engenharia</p>
                 </div>
             </div>
-            <div style="margin-top: 40px; font-size: 10px; color: #666; text-align: center; border-top: 1px solid #ddd; padding-top: 20px;">
-                <p><strong>Maeoka Engenharia</strong></p>
-                <p>Curitiba/PR • WhatsApp: (41) 98839-1153</p>
-                <p>E-mail: contato@maeokaengenharia.com.br</p>
-                <p style="margin-top: 15px; font-style: italic;">
-                    Este documento foi gerado digitalmente em ${new Date().toLocaleString('pt-BR')}
-                </p>
-            </div>
-        </body>
-        </html>
-        `;
+        </div>
+        <div style="margin-top: 40px; font-size: 10px; color: #666; text-align: center; border-top: 1px solid #ddd; padding-top: 20px;">
+            <p><strong>Maeoka Engenharia</strong></p>
+            <p>Curitiba/PR • WhatsApp: (41) 98839-1153</p>
+            <p>E-mail: contato@maeokaengenharia.com.br</p>
+            <p style="margin-top: 15px; font-style: italic;">
+                Este documento foi gerado digitalmente em ${new Date().toLocaleString('pt-BR')}
+            </p>
+        </div>
+    </body>
+    </html>
+    `;
     const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
