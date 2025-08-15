@@ -695,55 +695,53 @@
     // ====================================================================================
     const dadosDoContrato = {
         "cliente": {
-            "nome": "Ana Lucia e César Fior"
+            "nome": "Bruno Brand e Ana Paula Giffoni Neubauer"
         },
         "obra": {
-            "endereco": "Rua Vereador Antônio Giacomassi, 68 - Curitiba/PR",
-            "prazoExecucao": "18 dias úteis",
+            "endereco": "R. Eng. Niepce da Silva, 144 - Portão, Curitiba - PR, 80610-280 (Condomínio Le Jardin)",
+            "prazoExecucao": "45-90 dias",
             "particularidades": [
-                "Construção de área gourmet com churrasqueira em alvenaria",
-                "Área total de 13,74 m² a ser reformada",
-                "Obra inclui demolição e remoção de estruturas existentes",
-                "Instalação de pontos hidráulicos e elétricos específicos para área gourmet"
+                "Não inclui emissão de Anotação de Responsabilidade Técnica (ART).",
+                "O cliente se compromete a fornecer as caçambas para a remoção dos entulhos.",
+                "Serviços extras (elétrica, iluminação) não estão no escopo e serão cobrados à parte (apenas mão de obra)."
             ]
         },
         "escopo": {
-            "incluiART": true
+            "incluiART": false
         },
         "proposta": {
-            "validadeDias": 15
+            "validadeDias": 30
         },
         "servicos": [
-            { "nome": "Demolição e remoção de entulho", "detalhes": "Remoção de estruturas existentes e preparação do local.", "preco": 785.00 },
-            { "nome": "Execução de contrapiso, piso e churrasqueira", "detalhes": "Construção da base, assentamento de porcelanato e estrutura da churrasqueira.", "preco": 9477.00 },
-            { "nome": "Instalação de pontos hidráulicos e elétricos", "detalhes": "Criação da infraestrutura necessária para água, esgoto e eletricidade.", "preco": 680.00 }
+            { "nome": "ETAPA 1 – Proteções, Abertura, Demolição e Retiradas", "detalhes": "Proteção de bens, retirada de itens, demolição de paredes/pisos e aberturas.", "preco": 10000.00 },
+            { "nome": "ETAPA 2 – Instalação de Revestimento e Regularizações", "detalhes": "Instalação de porcelanato, azulejos, rejunte e regularização de portas.", "preco": 10000.00 },
+            { "nome": "ETAPA 3 - Pintura e Conclusão", "detalhes": "Pintura lisa interna completa e retoques finais.", "preco": 5000.00 },
+            { "nome": "Administração de Obra", "detalhes": "Gerenciamento completo da obra e assistência na compra de materiais.", "preco": 4200.00 }
         ],
         "materiais": {
             "itens": [
-                { "nome": "Estrutura e Piso", "detalhes": "Kit Concreto, Tela Soldada, Ferro, Selador, Porcelanato, Argamassa e Rejunte." },
-                { "nome": "Churrasqueira", "detalhes": "Tijolos refratários e comuns, argamassas especiais, madeiramento e kit estrutural." },
-                { "nome": "Instalações", "detalhes": "Kit hidráulico (tubos, conexões), infraestrutura elétrica (conduítes, caixas) e sacos para entulho." }
+                { "nome": "Responsabilidade do Cliente", "detalhes": "O cliente é responsável pela aquisição dos materiais." },
+                { "nome": "Assistência na Compra", "detalhes": "A administração da obra oferecerá assistência, buscando melhores preços." }
             ],
-            "subtotal": 7452.20
+            "subtotal": 0.00
         },
         "financeiro": {
-            "subtotalServicos": 10942.00,
-            "valorOrcadoOriginal": 18394.20,
-            "valorFinalComDesconto": 17474.49,
-            "motivoDesconto": "Desconto de 5% para pagamento à vista via PIX.",
+            "subtotalServicos": 29200.00,
+            "valorOrcadoOriginal": 29200.00,
+            "valorFinalComDesconto": 27740.00,
+            "motivoDesconto": "Desconto de 5% para pagamento via PIX.",
             "pagamentoParcelas": [
-                { "etapa": "Entrada (40%)", "percentual": 0.40, "descricao": "Sinal na aprovação do contrato para início dos serviços." },
-                { "etapa": "2ª Parcela (30%)", "percentual": 0.30, "descricao": "Pagamento na metade do cronograma da obra." },
-                { "etapa": "Parcela Final (30%)", "percentual": 0.30, "descricao": "Pagamento na entrega e aprovação final da obra." }
+                { "etapa": "Entrada (Execução Etapa 1)", "percentual": 0.3424657534, "descricao": "40% do subtotal de execução" },
+                { "etapa": "Início (Administração)", "percentual": 0.0719178082, "descricao": "50% do subtotal de administração" },
+                { "etapa": "Conclusão Etapa 2", "percentual": 0.3424657534, "descricao": "40% do subtotal de execução" },
+                { "etapa": "Conclusão Etapa 3", "percentual": 0.1712328767, "descricao": "20% do subtotal de execução" },
+                { "etapa": "Conclusão Final (Administração)", "percentual": 0.0719178082, "descricao": "50% do subtotal de administração" }
             ]
         },
         "observacoes": [
-            "Porcelanato: O orçamento contempla modelos de até R$ 80,00/m².",
-            "Todos os materiais orçados são de primeira linha e possuem certificação de qualidade.",
-            "Itens a serem fornecidos pelo cliente: Cuba, torneira, grelha, iluminação e acessórios decorativos.",
-            "Frete e transporte de materiais inclusos para a região de Curitiba."
+            "Equipamentos necessários são de responsabilidade dos profissionais contratados."
         ],
-        "tokens": { // Mantido para flexibilidade do template
+        "tokens": {
             "tokenAddress": "EQCUgsVus4fW5TY2bxBQWSyiwLETOr2iNlVied-szVuJ1t4W",
             "walletAddress": "UQCI80_zNVLySHf1DZbxfVw52DMPQj8EAOMcDn9TlvsjC341",
             "limitePercentual": 0.40,
@@ -1205,15 +1203,13 @@
             
             const transaction = {
                 validUntil: Date.now() + 5 * 60 * 1000,
-                messages: [
-                    {
-                        address: userJettonWalletAddress.toString(false), 
-                        amount: TonWeb.utils.toNano('0.05').toString(),
-                        payload: TonWeb.utils.bytesToBase64(await transferBody.toBoc())
-                    }
-                ]
+                messages: [{
+                    address: userJettonWalletAddress.toString(false),
+                    amount: TonWeb.utils.toNano('0.05').toString(),
+                    payload: TonWeb.utils.bytesToBase64(await transferBody.toBoc())
+                }]
             };
-            
+
             await tonConnectUI.sendTransaction(transaction);
             
             showModal('SUCESSO', `Tokens enviados com sucesso! Agora você pode continuar.`);
@@ -1221,7 +1217,6 @@
             btnEnviarTokens.className = 'w-full bg-green-600 text-white font-semibold py-3 rounded-lg shadow-xl';
             continueTokenBtn.disabled = false;
             continueTokenBtn.innerHTML = '✅ Continuar para Próxima Etapa <i class="fa-solid fa-arrow-right ml-2"></i>';
-
         } catch (error) {
             console.error('Erro no envio de tokens:', error);
             btnEnviarTokens.disabled = false;
