@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contrato Digital - Maeoka Engenharia</title>
     
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" xintegrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@tonconnect/ui@2.0.9/dist/tonconnect-ui.min.js"></script>
     <script src="https://unpkg.com/tonweb/dist/tonweb.js"></script>
@@ -291,7 +291,6 @@
 
             <main class="p-4 sm:p-6 md:p-10 flex-grow">
                 
-                <!-- PÁGINA 1: PROPOSTA -->
                 <div class="page active" id="page1">
                     <h2 class="font-bold text-blue-900 text-center mb-8 pb-4 border-b-2">
                         Contrato de Prestação de Serviço
@@ -305,8 +304,7 @@
 
                     <h3 class="text-xl md:text-2xl font-semibold text-blue-800 mb-6 border-b pb-2">Serviços Contratados:</h3>
                     <div class="space-y-4 mb-8" id="listaServicos">
-                        <!-- SERVIÇOS SERÃO INJETADOS AQUI VIA JS -->
-                    </div>
+                        </div>
                     <div class="bg-blue-100 text-blue-900 font-bold text-center py-4 mt-6 rounded-lg text-lg md:text-xl" id="subtotalServicosContainer">
                         Subtotal Serviços: <span id="subtotalServicos"></span>
                     </div>
@@ -328,8 +326,7 @@
                         <div class="bg-gray-100 rounded-lg p-4 md:p-6 shadow-sm" id="materiaisContainer">
                             <h4 class="text-lg md:text-xl font-semibold text-gray-900 mb-4">Materiais Inclusos:</h4>
                             <div class="space-y-3" id="listaMateriais">
-                                <!-- MATERIAIS SERÃO INJETADOS AQUI VIA JS -->
-                            </div>
+                                </div>
                             <div class="bg-blue-100 text-blue-900 font-bold text-center py-4 mt-6 rounded-lg text-lg md:text-xl" id="subtotalMateriaisContainer">
                                 Subtotal Materiais: <span id="subtotalMateriais"></span>
                             </div>
@@ -339,8 +336,7 @@
                     <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 md:p-6 mt-8 shadow-sm">
                         <h4 class="text-lg md:text-xl font-semibold text-yellow-800 mb-4">Observações Importantes</h4>
                         <ul id="listaObservacoes" class="list-disc list-inside text-sm text-gray-600 space-y-1">
-                            <!-- OBSERVAÇÕES SERÃO INJETADAS AQUI VIA JS -->
-                        </ul>
+                            </ul>
                     </div>
                     
                     <div class="bg-gray-100 border-l-4 border-blue-500 rounded-lg p-4 md:p-6 mt-8 shadow-sm">
@@ -374,7 +370,6 @@
                     </div>
                 </div>
 
-                <!-- PÁGINA 2: TERMOS -->
                 <div class="page" id="page2">
                     <h2 class="font-bold text-blue-900 text-center mb-8 pb-4 border-b-2">
                         Termo de Ciência e Responsabilidade
@@ -412,8 +407,7 @@
                         <div>
                             <h3 class="text-lg md:text-xl font-semibold text-gray-900 mb-3">Particularidades da Obra</h3>
                             <ul id="listaParticularidades" class="list-disc list-inside text-sm text-gray-700 space-y-2">
-                                <!-- ITENS INJETADOS VIA JS -->
-                            </ul>
+                                </ul>
                         </div>
                     </div>
                     
@@ -434,7 +428,6 @@
                     </div>
                 </div>
 
-                <!-- PÁGINA 3: PAGAMENTO -->
                 <div class="page" id="page3">
                     <h2 class="font-bold text-blue-900 text-center mb-8 pb-4 border-b-2">
                         Condições de Pagamento
@@ -469,13 +462,11 @@
                         </button>
                     </div>
 
-                    <!-- Seção Dinheiro -->
                     <div class="hidden mt-8" id="cashPaymentContent">
                         <h3 class="text-xl md:text-2xl font-semibold text-gray-900 mb-5">Condições de Pagamento</h3>
                         <div class="bg-gray-50 border-l-4 border-green-500 rounded-lg p-4 md:p-6 shadow-sm">
                             <ul class="list-disc list-inside text-sm md:text-base text-gray-700 space-y-2" id="cashPaymentBreakdown">
-                                <!-- PARCELAS SERÃO INJETADAS AQUI -->
-                            </ul>
+                                </ul>
                         </div>
                         <div class="flex flex-col md:flex-row gap-4 mt-8">
                             <button class="flex-1 bg-gray-500 text-white font-semibold py-4 rounded-lg shadow-md hover:bg-gray-600 transition-colors duration-300" aria-label="Voltar para escolhas de pagamento" onclick="hideAllPaymentSections()">
@@ -488,7 +479,6 @@
                         </div>
                     </div>
 
-                    <!-- Seção Tokens -->
                     <div class="hidden mt-8" id="tokenPaymentContent">
                         <h4 class="text-xl md:text-2xl font-semibold text-gray-900 mb-5">Pagamento com Tokens MAEOKA</h4>
                         <div class="bg-yellow-100 text-yellow-800 font-semibold text-center py-3 rounded-lg border border-yellow-300 mb-5" id="statusCarteira">
@@ -540,7 +530,6 @@
                     </div>
                 </div>
 
-                <!-- PÁGINA 4: DADOS -->
                 <div class="page" id="page4">
                     <h2 class="font-bold text-blue-900 text-center mb-8 pb-4 border-b-2">
                         Dados do Contratante
@@ -610,7 +599,6 @@
                     </form>
                 </div>
 
-                <!-- PÁGINA 5: FINALIZAÇÃO -->
                 <div class="page" id="page5">
                     <div id="loadingState" class="flex flex-col items-center justify-center text-center h-full pt-10">
                         <div class="spinner" style="width: 50px; height: 50px; border-top-color: #3b82f6; border-width: 5px;"></div>
@@ -733,7 +721,8 @@ const dadosDoContrato = {
 
 const TOKEN_MAEOKA = dadosDoContrato.tokens.tokenAddress;
 const CARTEIRA_MAEOKA_OFICIAL = dadosDoContrato.tokens.walletAddress;
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwBZ1yMroV2ejwzOYXAm-ZsuiqOI-vnpxJxO3AultPFEj8hVgSijBGZhPnsNj8vsZc_1w/exec';
+// COLE AQUI A NOVA URL DE IMPLANTAÇÃO DO SEU SCRIPT
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby-2tMU4FGH3bSM8OlD02Ezw1hXjYm5B83k7GoP6fiyCZYkFQwXPuB3LWU_5QEYwcNqNg/exec';
 let VALOR_OBRA = dadosDoContrato.financeiro.valorFinalComDesconto;
 const LIMITE_PERCENTUAL_TOKENS = dadosDoContrato.tokens.limitePercentual;
 let currentPage = 1;
@@ -1379,10 +1368,11 @@ function generateProtocol() {
     return `MAE-${year}${month}${day}-${hour}${minute}${second}`;
 }
 
+
 // ====================================================================================
-// FUNÇÃO CORRIGIDA
+// FUNÇÃO CORRIGIDA - AGORA USA ASYNC/AWAIT
 // ====================================================================================
-function finalizeContract() {
+async function finalizeContract() {
     const clientForm = document.getElementById('clientForm');
     const clientData = {
         fullName: clientForm.elements['fullName'].value,
@@ -1396,12 +1386,10 @@ function finalizeContract() {
     const descontoAplicado = metodoPagamentoSelecionado === 'tokens' ? tokensUsados * dadosDoContrato.tokens.descontoPercentual : 0;
     const valorFinalDinheiro = VALOR_OBRA - tokensUsados - descontoAplicado;
 
-    const finalContractData = {
+    // Monta o objeto final, ainda com um protocolo temporário
+    let finalContractData = {
         ...dadosDoContrato,
-        cliente: {
-            ...dadosDoContrato.cliente,
-            ...clientData
-        },
+        cliente: { ...dadosDoContrato.cliente, ...clientData },
         financeiro: {
             ...dadosDoContrato.financeiro,
             valorFinalDaObra: VALOR_OBRA,
@@ -1411,65 +1399,74 @@ function finalizeContract() {
             valorFinalDinheiro,
             emissaoNotaFiscal: document.getElementById('invoiceOptionEmitir').checked
         },
-        protocolo: generateProtocol(),
+        protocolo: generateProtocol(), // Protocolo temporário
         dataContrato: new Date().toLocaleString('pt-BR'),
         termosAceitos: document.getElementById('agreeTerms').checked,
         lgpdAceito: document.getElementById('lgpdAccepted').checked,
     };
 
-    contracts.push(finalContractData);
-    localStorage.setItem('maeokaContracts', JSON.stringify(contracts));
-    localStorage.setItem('currentContractDisplay', JSON.stringify(finalContractData));
-
     // Mostra a tela de carregamento
     document.getElementById('loadingState').style.display = 'flex';
     document.getElementById('successState').classList.add('hidden');
-    document.getElementById('statusMessage').innerHTML = 'Enviando contrato para a Maeoka Engenharia...';
+    document.getElementById('statusMessage').innerHTML = 'Enviando e registrando o contrato...';
 
-    // Despacha a requisição para o Apps Script
-    sendContractToAppsScript(finalContractData).then((dispatched) => {
-        // Usa um timeout para uma melhor experiência do usuário, permitindo que ele leia a mensagem de status
-        setTimeout(() => {
-            if (dispatched) {
-                document.getElementById('statusMessage').innerHTML = '✅ Contrato enviado! Preparando o resumo final...';
-            } else {
-                document.getElementById('statusMessage').innerHTML = '⚠️ Erro ao notificar. Por favor, baixe o documento e envie manualmente.';
-            }
+    // Despacha a requisição e AGUARDA a resposta
+    const serverResponse = await sendContractToAppsScript(finalContractData);
 
-            // Preenche os detalhes do resumo final
-            document.getElementById('protocolNumber').textContent = finalContractData.protocolo;
-            document.getElementById('contractDateTime').textContent = finalContractData.dataContrato;
+    // Usa um timeout para uma melhor experiência do usuário
+    setTimeout(() => {
+        if (serverResponse && serverResponse.success) {
+            document.getElementById('statusMessage').innerHTML = '✅ Contrato registrado! Preparando o resumo final...';
+            
+            // ---- ALTERAÇÃO CRÍTICA ----
+            // Atualiza o protocolo no objeto e no localStorage com o número real vindo do servidor
+            finalContractData.protocolo = serverResponse.protocolo; 
+            localStorage.setItem('currentContractDisplay', JSON.stringify(finalContractData));
+            // ----------------------------
 
-            document.getElementById('finalSummary').innerHTML = `
-                <div class="space-y-2 text-sm">
-                    <p><strong>Nome do Cliente:</strong> ${finalContractData.cliente.fullName}</p>
-                    <p><strong>CPF:</strong> ${finalContractData.cliente.cpf}</p>
-                    <p><strong>E-mail:</strong> ${finalContractData.cliente.email}</p>
-                    <p><strong>Endereço de Domicílio:</strong> ${finalContractData.cliente.address}</p>
-                    <p><strong>Método de Pagamento:</strong> ${finalContractData.financeiro.metodoPagamento === 'tokens' ? 'Tokens MAEOKA + Dinheiro' : 'Apenas Dinheiro'}</p>
-                    <p><strong>Valor Total da Obra:</strong> ${formatCurrency(finalContractData.financeiro.valorFinalDaObra)}</p>
-                    ${finalContractData.financeiro.metodoPagamento === 'tokens' ? `
-                    <p><strong>Tokens Usados:</strong> ${finalContractData.financeiro.tokensUsados.toLocaleString('pt-BR')} MAEOKA</p>
-                    <p><strong>Desconto com Tokens:</strong> ${formatCurrency(finalContractData.financeiro.descontoAplicado)}</p>
-                    <p><strong>Valor Final em Dinheiro:</strong> ${formatCurrency(finalContractData.financeiro.valorFinalDinheiro)}</p>
-                    <p class="text-green-600 font-semibold"><strong>Economia Total:</strong> ${formatCurrency(finalContractData.financeiro.tokensUsados + finalContractData.financeiro.descontoAplicado)}</p>
-                    ` : ''}
-                </div>
-            `;
+        } else {
+            document.getElementById('statusMessage').innerHTML = '⚠️ Erro ao registrar. Por favor, baixe o documento e envie manualmente.';
+            // Mesmo com erro, ainda salva localmente para download
+            localStorage.setItem('currentContractDisplay', JSON.stringify(finalContractData));
+        }
 
-            // Esconde o carregamento e mostra a tela de sucesso
-            document.getElementById('loadingState').style.display = 'none';
-            document.getElementById('successState').classList.remove('hidden');
-        }, 2500); // Espera 2.5 segundos antes de mostrar a tela final
-    });
+        // Preenche os detalhes do resumo final (agora com o protocolo correto)
+        document.getElementById('protocolNumber').textContent = finalContractData.protocolo;
+        document.getElementById('contractDateTime').textContent = finalContractData.dataContrato;
+        
+        // (O resto da sua função que preenche o #finalSummary permanece igual)
+        document.getElementById('finalSummary').innerHTML = `
+            <div class="space-y-2 text-sm">
+                <p><strong>Nome do Cliente:</strong> ${finalContractData.cliente.fullName}</p>
+                <p><strong>CPF:</strong> ${finalContractData.cliente.cpf}</p>
+                <p><strong>E-mail:</strong> ${finalContractData.cliente.email}</p>
+                <p><strong>Endereço de Domicílio:</strong> ${finalContractData.cliente.address}</p>
+                <p><strong>Método de Pagamento:</strong> ${finalContractData.financeiro.metodoPagamento === 'tokens' ? 'Tokens MAEOKA + Dinheiro' : 'Apenas Dinheiro'}</p>
+                <p><strong>Valor Total da Obra:</strong> ${formatCurrency(finalContractData.financeiro.valorFinalDaObra)}</p>
+                ${finalContractData.financeiro.metodoPagamento === 'tokens' ? `
+                <p><strong>Tokens Usados:</strong> ${finalContractData.financeiro.tokensUsados.toLocaleString('pt-BR')} MAEOKA</p>
+                <p><strong>Desconto com Tokens:</strong> ${formatCurrency(finalContractData.financeiro.descontoAplicado)}</p>
+                <p><strong>Valor Final em Dinheiro:</strong> ${formatCurrency(finalContractData.financeiro.valorFinalDinheiro)}</p>
+                <p class="text-green-600 font-semibold"><strong>Economia Total:</strong> ${formatCurrency(finalContractData.financeiro.tokensUsados + finalContractData.financeiro.descontoAplicado)}</p>
+                ` : ''}
+            </div>
+        `;
+
+        // Esconde o carregamento e mostra a tela de sucesso
+        document.getElementById('loadingState').style.display = 'none';
+        document.getElementById('successState').classList.remove('hidden');
+    }, 1500); // Espera 1.5 segundos 
 }
 // ====================================================================================
 
+// ====================================================================================
+// FUNÇÃO CORRIGIDA - AGORA LÊ A RESPOSTA DO SERVIDOR
+// ====================================================================================
 async function sendContractToAppsScript(contractData) {
     try {
-        await fetch(APPS_SCRIPT_URL, {
+        const response = await fetch(APPS_SCRIPT_URL, {
             method: 'POST',
-            mode: 'no-cors',
+            // mode: 'no-cors', // <-- REMOVIDO! Isso nos permite ler a resposta.
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -1477,13 +1474,16 @@ async function sendContractToAppsScript(contractData) {
                 contractData: contractData
             })
         });
-        console.log('Requisição de envio de contrato despachada.');
-        return true;
+        console.log('Requisição enviada, aguardando resposta do servidor...');
+        const result = await response.json(); // <-- NOVO: processa a resposta JSON
+        console.log('✅ Resposta recebida do Apps Script:', result);
+        return result; // Retorna o objeto completo {success: true, protocolo: "MAE-1001"}
     } catch (error) {
-        console.error('Erro ao despachar para Apps Script:', error);
-        return false;
+        console.error('❌ Erro ao comunicar com o Apps Script:', error);
+        return { success: false, error: error.toString() }; // Retorna um objeto de erro
     }
 }
+// ====================================================================================
 
 function downloadContractHTML() {
     const contractData = JSON.parse(localStorage.getItem('currentContractDisplay'));
