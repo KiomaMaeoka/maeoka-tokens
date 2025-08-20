@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maeoka - Tokenização Imobiliária | Apresentação para Investidores</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .phase-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .phase-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        
+        .roi-badge {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        
+        .scroll-indicator {
+            animation: bounce 2s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-10px);
+            }
+            60% {
+                transform: translateY(-5px);
+            }
+        }
+        
+        .timeline-line {
+            background: linear-gradient(to bottom, #667eea, #764ba2);
+        }
+        
+        .stat-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+
+    <!-- Hero Section -->
+    <section class="gradient-bg text-white min-h-screen flex items-center relative">
+        <div class="container mx-auto px-4 py-20">
+            <div class="max-w-4xl mx-auto text-center">
+                <div class="mb-8">
+                    <h1 class="text-5xl md:text-7xl font-bold mb-6">
+                        Invista em Imóveis
+                        <span class="block text-3xl md:text-5xl mt-4 text-yellow-300">a partir de R$ 1.000</span>
+                    </h1>
+                    <p class="text-xl md:text-2xl opacity-90 mb-8">
+                        Tokenização imobiliária com NFTs fracionáveis na blockchain
+                    </p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                    <div class="bg-white/10 backdrop-blur rounded-xl p-6">
+                        <div class="text-4xl font-bold text-yellow-300">18%</div>
+                        <div class="text-sm uppercase tracking-wider">ROI Anual</div>
+                    </div>
+                    <div class="bg-white/10 backdrop-blur rounded-xl p-6">
+                        <div class="text-4xl font-bold text-yellow-300">100%</div>
+                        <div class="text-sm uppercase tracking-wider">Liquidez</div>
+                    </div>
+                    <div class="bg-white/10 backdrop-blur rounded-xl p-6">
+                        <div class="text-4xl font-bold text-yellow-300">R$ 1k</div>
+                        <div class="text-sm uppercase tracking-wider">Entrada Mínima</div>
+                    </div>
+                </div>
+                
+                <div class="flex flex-col md:flex-row gap-4 justify-center">
+                    <a href="#projeto" class="bg-white text-purple-700 px-8 py-4 rounded-full font-bold text-lg hover:bg-yellow-300 transition">
+                        Conhecer o Projeto
+                    </a>
+                    <a href="#simulador" class="border-2 border-white px-8 py-4 rounded-full font-bold text-lg hover:bg-white hover:text-purple-700 transition">
+                        Simular Investimento
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 scroll-indicator">
+            <i class="fas fa-chevron-down text-2xl"></i>
+        </div>
+    </section>
+
+    <!-- Sobre o Projeto -->
+    <section id="projeto" class="py-20">
+        <div class="container mx-auto px-4">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl font-bold mb-4 gradient-text">Residencial Jardim das Flores</h2>
+                    <p class="text-xl text-gray-600">Primeiro empreendimento 100% tokenizado do Brasil</p>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-12 items-center mb-16">
+                    <div>
+                        <h3 class="text-2xl font-bold mb-6">O Empreendimento</h3>
+                        <ul class="space-y-4">
+                            <li class="flex items-start">
+                                <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+                                <div>
+                                    <strong>50 casas residenciais</strong> de 60m² com 2 quartos
+                                </div>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+                                <div>
+                                    <strong>Localização privilegiada</strong> em Curitiba/PR
+                                </div>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+                                <div>
+                                    <strong>Terreno de 10.000m²</strong> já disponível
+                                </div>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+                                <div>
+                                    <strong>Demanda comprovada</strong> - déficit de 50.000 unidades na região
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="bg-white rounded-2xl shadow-xl p-8">
+                        <h4 class="font-bold text-lg mb-6 text-center">Números do Projeto</h4>
+                        <div class="space-y-4">
+                            <div class="flex justify-between pb-3 border-b">
+                                <span class="text-gray-600">Investimento Total</span>
+                                <span class="font-bold">R$ 4.000.000</span>
+                            </div>
+                            <div class="flex justify-between pb-3 border-b">
+                                <span class="text-gray-600">Valor de Mercado</span>
+                                <span class="font-bold text-green-600">R$ 8.000.000</span>
+                            </div>
+                            <div class="flex justify-between pb-3 border-b">
+                                <span class="text-gray-600">Receita Mensal</span>
+                                <span class="font-bold">R$ 60.000</span>
+                            </div>
+                            <div class="flex justify-between pb-3 border-b">
+                                <span class="text-gray-600">Receita Anual</span>
+                                <span class="font-bold">R$ 720.000</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Cap Rate</span>
+                                <span class="font-bold text-purple-600">18% a.a.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Estrutura de Participação -->
+                <div class="bg-gradient-to-r from-purple-100 to-blue-100 rounded-2xl p-8 mb-16">
+                    <h3 class="text-2xl font-bold mb-6 text-center">Estrutura de Participação</h3>
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div class="bg-white rounded-xl p-6">
+                            <div class="flex items-center mb-4">
+                                <i class="fas fa-hard-hat text-3xl text-purple-600 mr-4"></i>
+                                <div>
+                                    <h4 class="font-bold">Fundador (37,5%)</h4>
+                                    <p class="text-sm text-gray-600">Terreno como investimento</p>
+                                </div>
+                            </div>
+                            <div class="text-2xl font-bold text-purple-600">R$ 1.500.000</div>
+                            <p class="text-sm text-gray-500 mt-2">Kioma Maeoka aporta o terreno e recebe NFTs</p>
+                        </div>
+                        
+                        <div class="bg-white rounded-xl p-6">
+                            <div class="flex items-center mb-4">
+                                <i class="fas fa-users text-3xl text-blue-600 mr-4"></i>
+                                <div>
+                                    <h4 class="font-bold">Investidores (62,5%)</h4>
+                                    <p class="text-sm text-gray-600">Capital para construção</p>
+                                </div>
+                            </div>
+                            <div class="text-2xl font-bold text-blue-600">R$ 2.500.000</div>
+                            <p class="text-sm text-gray-500 mt-2">100% do capital vai para a obra</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Fases do Investimento -->
+    <section class="py-20 bg-gray-100">
+        <div class="container mx-auto px-4">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl font-bold mb-4">Fases do Investimento</h2>
+                    <p class="text-xl text-gray-600">Entre na fase ideal para seu perfil de risco</p>
+                </div>
+                
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <!-- Fase 1 -->
+                    <div class="phase-card bg-white rounded-xl p-6 border-t-4 border-red-500">
+                        <div class="text-center mb-4">
+                            <div class="text-4xl mb-3">🌱</div>
+                            <h3 class="font-bold text-xl">Fase 1: Fundação</h3>
+                            <p class="text-sm text-gray-600">Meses 1-3</p>
+                        </div>
+                        
+                        <div class="space-y-3 text-sm">
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Captação:</span>
+                                <span class="font-bold">R$ 500k</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Risco:</span>
+                                <span class="font-bold text-red-600">Alto</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Valorização:</span>
+                                <span class="font-bold text-green-600">+100%</span>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6 p-3 bg-red-50 rounded-lg">
+                            <p class="text-xs text-center">
+                                <strong>R$ 10.000</strong> = 0,40% do projeto<br>
+                                <strong>Retorno:</strong> R$ 20.000 + renda
+                            </p>
+                        </div>
+                        
+                        <div class="mt-4 roi-badge text-white text-center py-2 rounded-full text-sm font-bold">
+                            ROI: 88% primeiro ano
+                        </div>
+                    </div>
+                    
+                    <!-- Fase 2 -->
+                    <div class="phase-card bg-white rounded-xl p-6 border-t-4 border-orange-500">
+                        <div class="text-center mb-4">
+                            <div class="text-4xl mb-3">📋</div>
+                            <h3 class="font-bold text-xl">Fase 2: Preparação</h3>
+                            <p class="text-sm text-gray-600">Meses 4-6</p>
+                        </div>
+                        
+                        <div class="space-y-3 text-sm">
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Captação:</span>
+                                <span class="font-bold">R$ 500k</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Risco:</span>
+                                <span class="font-bold text-orange-600">Médio-Alto</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Valorização:</span>
+                                <span class="font-bold text-green-600">+60%</span>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6 p-3 bg-orange-50 rounded-lg">
+                            <p class="text-xs text-center">
+                                <strong>R$ 10.000</strong> = 0,32% do projeto<br>
+                                <strong>Retorno:</strong> R$ 16.000 + renda
+                            </p>
+                        </div>
+                        
+                        <div class="mt-4 roi-badge text-white text-center py-2 rounded-full text-sm font-bold">
+                            ROI: 55% primeiro ano
+                        </div>
+                    </div>
+                    
+                    <!-- Fase 3 -->
+                    <div class="phase-card bg-white rounded-xl p-6 border-t-4 border-blue-500">
+                        <div class="text-center mb-4">
+                            <div class="text-4xl mb-3">🏗️</div>
+                            <h3 class="font-bold text-xl">Fase 3: Construção</h3>
+                            <p class="text-sm text-gray-600">Meses 7-18</p>
+                        </div>
+                        
+                        <div class="space-y-3 text-sm">
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Captação:</span>
+                                <span class="font-bold">R$ 1M</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Risco:</span>
+                                <span class="font-bold text-blue-600">Médio</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Valorização:</span>
+                                <span class="font-bold text-green-600">+28%</span>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6 p-3 bg-blue-50 rounded-lg">
+                            <p class="text-xs text-center">
+                                <strong>R$ 10.000</strong> = 0,25% do projeto<br>
+                                <strong>Retorno:</strong> R$ 12.800 + renda
+                            </p>
+                        </div>
+                        
+                        <div class="mt-4 roi-badge text-white text-center py-2 rounded-full text-sm font-bold">
+                            ROI: 28% primeiro ano
+                        </div>
+                    </div>
+                    
+                    <!-- Fase 4 -->
+                    <div class="phase-card bg-white rounded-xl p-6 border-t-4 border-green-500">
+                        <div class="text-center mb-4">
+                            <div class="text-4xl mb-3">🏘️</div>
+                            <h3 class="font-bold text-xl">Fase 4: Operação</h3>
+                            <p class="text-sm text-gray-600">Mês 19+</p>
+                        </div>
+                        
+                        <div class="space-y-3 text-sm">
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Captação:</span>
+                                <span class="font-bold">R$ 500k</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Risco:</span>
+                                <span class="font-bold text-green-600">Baixo</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Renda:</span>
+                                <span class="font-bold text-green-600">Imediata</span>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6 p-3 bg-green-50 rounded-lg">
+                            <p class="text-xs text-center">
+                                <strong>R$ 10.000</strong> = 0,167% do projeto<br>
+                                <strong>Renda:</strong> R$ 100/mês
+                            </p>
+                        </div>
+                        
+                        <div class="mt-4 bg-green-500 text-white text-center py-2 rounded-full text-sm font-bold">
+                            ROI: 12% ao ano (renda)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sistema de Fracionamento -->
+    <section class="py-20">
+        <div class="container mx-auto px-4">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl font-bold mb-4">NFTs Fracionáveis</h2>
+                    <p class="text-xl text-gray-600">Liquidez total através de fracionamento automático</p>
+                </div>
+                
+                <div class="bg-white rounded-2xl shadow-xl p-8">
+                    <div class="grid md:grid-cols-2 gap-12 items-center">
+                        <div>
+                            <h3 class="text-2xl font-bold mb-6">Como Funciona</h3>
+                            <div class="space-y-4">
+                                <div class="flex items-start">
+                                    <div class="bg-purple-100 rounded-full w-8 h-8 flex items-center justify-center mr-3 mt-1">
+                                        <span class="text-purple-600 font-bold text-sm">1</span>
+                                    </div>
+                                    <div>
+                                        <strong>Investimento Inicial</strong>
+                                        <p class="text-gray-600">Você recebe um NFT representando sua participação</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-start">
+                                    <div class="bg-purple-100 rounded-full w-8 h-8 flex items-center justify-center mr-3 mt-1">
+                                        <span class="text-purple-600 font-bold text-sm">2</span>
+                                    </div>
+                                    <div>
+                                        <strong>Venda Parcial</strong>
+                                        <p class="text-gray-600">Pode vender qualquer percentual do seu NFT</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-start">
+                                    <div class="bg-purple-100 rounded-full w-8 h-8 flex items-center justify-center mr-3 mt-1">
+                                        <span class="text-purple-600 font-bold text-sm">3</span>
+                                    </div>
+                                    <div>
+                                        <strong>Fracionamento Automático</strong>
+                                        <p class="text-gray-600">Sistema cria 2 novos NFTs com as proporções corretas</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-start">
+                                    <div class="bg-purple-100 rounded-full w-8 h-8 flex items-center justify-center mr-3 mt-1">
+                                        <span class="text-purple-600 font-bold text-sm">4</span>
+                                    </div>
+                                    <div>
+                                        <strong>Contratos Válidos</strong>
+                                        <p class="text-gray-600">Cada NFT tem contrato SCP juridicamente válido</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-gradient-to-br from-purple-50 to-blue-50 rounded-xl p-6">
+                            <h4 class="font-bold mb-4">Exemplo Prático</h4>
+                            <div class="space-y-3 text-sm">
+                                <div class="bg-white rounded-lg p-3">
+                                    <strong>João investe R$ 50.000</strong>
+                                    <p class="text-gray-600">Recebe NFT-001 (2% do projeto)</p>
+                                </div>
+                                
+                                <div class="text-center">
+                                    <i class="fas fa-arrow-down text-purple-600"></i>
+                                </div>
+                                
+                                <div class="bg-white rounded-lg p-3">
+                                    <strong>João vende 60% para Maria</strong>
+                                    <p class="text-gray-600">NFT-001 é queimado</p>
+                                </div>
+                                
+                                <div class="text-center">
+                                    <i class="fas fa-arrow-down text-purple-600"></i>
+                                </div>
+                                
+                                <div class="grid grid-cols-2 gap-2">
+                                    <div class="bg-white rounded-lg p-3">
+                                        <strong class="text-green-600">NFT-001-1</strong>
+                                        <p class="text-xs text-gray-600">Maria: 1,2%</p>
+                                    </div>
+                                    <div class="bg-white rounded-lg p-3">
+                                        <strong class="text-blue-600">NFT-001-2</strong>
+                                        <p class="text-xs text-gray-600">João: 0,8%</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Simulador de Investimento -->
+    <section id="simulador" class="py-20 bg-gray-100">
+        <div class="container mx-auto px-4">
+            <div class="max-w-4xl mx-auto">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl font-bold mb-4">Simule seu Investimento</h2>
+                    <p class="text-xl text-gray-600">Calcule seu retorno potencial</p>
+                </div>
+                
+                <div class="bg-white rounded-2xl shadow-xl p-8">
+                    <div class="grid md:grid-cols-2 gap-8 mb-8">
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Valor do Investimento</label>
+                            <div class="relative">
+                                <span class="absolute left-3 top-3 text-gray-500">R$</span>
+                                <input type="number" id="investmentAmount" value="10000" min="1000" step="1000"
+                                       class="w-full pl-10 p-3 border rounded-lg focus:ring-2 focus:ring-purple-500"
+                                       onchange="calculateROI()">
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Fase de Entrada</label>
+                            <select id="investmentPhase" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-purple-500"
+                                    onchange="calculateROI()">
+                                <option value="1">Fase 1 - Fundação (Alto Risco)</option>
+                                <option value="2">Fase 2 - Preparação (Médio-Alto)</option>
+                                <option value="3">Fase 3 - Construção (Médio)</option>
+                                <option value="4">Fase 4 - Operação (Baixo)</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div id="simulationResults" class="hidden">
+                        <div class="border-t pt-8">
+                            <h3 class="font-bold text-xl mb-6">Projeção de Retorno</h3>
+                            
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                                <div class="text-center p-4 bg-purple-50 rounded-lg">
+                                    <p class="text-sm text-gray-600">Participação</p>
+                                    <p class="text-2xl font-bold text-purple-600" id="participation">0%</p>
+                                </div>
+                                <div class="text-center p-4 bg-green-50 rounded-lg">
+                                    <p class="text-sm text-gray-600">Valor em 18 meses</p>
+                                    <p class="text-2xl font-bold text-green-600" id="futureValue">R$ 0</p>
+                                </div>
+                                <div class="text-center p-4 bg-blue-50 rounded-lg">
+                                    <p class="text-sm text-gray-600">Renda Mensal</p>
+                                    <p class="text-2xl font-bold text-blue-600" id="monthlyIncome">R$ 0</p>
+                                </div>
+                                <div class="text-center p-4 bg-orange-50 rounded-lg">
+                                    <p class="text-sm text-gray-600">ROI Anual</p>
+                                    <p class="text-2xl font-bold text-orange-600" id="annualROI">0%</p>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-gradient-to-r from-purple-100 to-blue-100 rounded-lg p-6">
+                                <h4 class="font-bold mb-3">Projeção 5 Anos</h4>
+                                <div class="space-y-2 text-sm">
+                                    <div class="flex justify-between">
+                                        <span>Valorização do NFT:</span>
+                                        <strong id="appreciation5y">R$ 0</strong>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span>Renda acumulada:</span>
+                                        <strong id="income5y">R$ 0</strong>
+                                    </div>
+                                    <div class="flex justify-between border-t pt-2">
+                                        <span>Retorno Total:</span>
+                                        <strong class="text-lg text-green-600" id="totalReturn5y">R$ 0</strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Garantias -->
+    <section class="py-20">
+        <div class="container mx-auto px-4">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl font-bold mb-4">Segurança e Transparência</h2>
+                    <p class="text-xl text-gray-600">Seu investimento protegido</p>
+                </div>
+                
+                <div class="grid md:grid-cols-3 gap-8">
+                    <div class="text-center">
+                        <div class="bg-green-100 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-shield-alt text-green-600 text-3xl"></i>
+                        </div>
+                        <h3 class="font-bold text-xl mb-2">Garantia Real</h3>
+                        <p class="text-gray-600">Terreno e construção como garantia do investimento</p>
+                    </div>
+                    
+                    <div class="text-center">
+                        <div class="bg-blue-100 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-gavel text-blue-600 text-3xl"></i>
+                        </div>
+                        <h3 class="font-bold text-xl mb-2">Base Legal Sólida</h3>
+                        <p class="text-gray-600">Contratos SCP com validade jurídica (Arts. 991-996 CC)</p>
+                    </div>
+                    
+                    <div class="text-center">
+                        <div class="bg-purple-100 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-chart-line text-purple-600 text-3xl"></i>
+                        </div>
+                        <h3 class="font-bold text-xl mb-2">Transparência Total</h3>
+                        <p class="text-gray-600">Relatórios mensais e auditoria independente</p>
+                    </div>
+                </div>
+                
+                <div class="mt-16 bg-gradient-to-r from-green-50 to-blue-50 rounded-2xl p-8">
+                    <div class="grid md:grid-cols-2 gap-8 items-center">
+                        <div>
+                            <h3 class="text-2xl font-bold mb-4">Fundador All-In</h3>
+                            <p class="text-gray-700 mb-4">
+                                "Estou aportando meu terreno de R$ 1,5 milhão como investimento, 
+                                recebendo NFTs como qualquer investidor. Se o projeto der errado, 
+                                perco junto. Se der certo, ganho proporcionalmente."
+                            </p>
+                            <div class="flex items-center">
+                                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='40' fill='%23667eea'/%3E%3C/svg%3E" 
+                                     alt="Kioma" class="w-12 h-12 rounded-full mr-3">
+                                <div>
+                                    <p class="font-bold">Eng. Kioma Maeoka</p>
+                                    <p class="text-sm text-gray-600">CREA 159.328/D-PR</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white rounded-xl p-6">
+                            <h4 class="font-bold mb-4">Distribuição de Investimento</h4>
+                            <div class="space-y-3">
+                                <div>
+                                    <div class="flex justify-between text-sm mb-1">
+                                        <span>Fundador (Terreno)</span>
+                                        <span>37,5%</span>
+                                    </div>
+                                    <div class="bg-gray-200 rounded-full h-3">
+                                        <div class="bg-purple-600 h-3 rounded-full" style="width: 37.5%"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between text-sm mb-1">
+                                        <span>Investidores</span>
+                                        <span>62,5%</span>
+                                    </div>
+                                    <div class="bg-gray-200 rounded-full h-3">
+                                        <div class="bg-blue-600 h-3 rounded-full" style="width: 62.5%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Timeline -->
+    <section class="py-20 bg-gray-100">
+        <div class="container mx-auto px-4">
+            <div class="max-w-4xl mx-auto">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl font-bold mb-4">Cronograma do Projeto</h2>
+                    <p class="text-xl text-gray-600">18 meses do início ao rendimento</p>
+                </div>
+                
+                <div class="relative">
+                    <div class="absolute left-8 top-0 bottom-0 w-1 timeline-line"></div>
+                    
+                    <div class="space-y-8">
+                        <div class="flex items-center">
+                            <div class="bg-purple-600 text-white rounded-full w-16 h-16 flex items-center justify-center font-bold z-10">
+                                Q1
+                            </div>
+                            <div class="ml-8 bg-white rounded-lg p-4 flex-1">
+                                <h4 class="font-bold">Estruturação e Captação Inicial</h4>
+                                <p class="text-sm text-gray-600">Documentação, projetos e Fase 1</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center">
+                            <div class="bg-purple-600 text-white rounded-full w-16 h-16 flex items-center justify-center font-bold z-10">
+                                Q2
+                            </div>
+                            <div class="ml-8 bg-white rounded-lg p-4 flex-1">
+                                <h4 class="font-bold">Preparação e Terraplanagem</h4>
+                                <p class="text-sm text-gray-600">Aprovações e Fase 2</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center">
+                            <div class="bg-purple-600 text-white rounded-full w-16 h-16 flex items-center justify-center font-bold z-10">
+                                Q3-Q4
+                            </div>
+                            <div class="ml-8 bg-white rounded-lg p-4 flex-1">
+                                <h4 class="font-bold">Construção</h4>
+                                <p class="text-sm text-gray-600">Estrutura e acabamento - Fase 3</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center">
+                            <div class="bg-green-600 text-white rounded-full w-16 h-16 flex items-center justify-center font-bold z-10">
+                                Q5
+                            </div>
+                            <div class="ml-8 bg-white rounded-lg p-4 flex-1">
+                                <h4 class="font-bold">Entrega e Operação</h4>
+                                <p class="text-sm text-gray-600">Início dos aluguéis - Fase 4</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Final -->
+    <section class="gradient-bg text-white py-20">
+        <div class="container mx-auto px-4">
+            <div class="max-w-4xl mx-auto text-center">
+                <h2 class="text-4xl font-bold mb-6">
+                    Faça Parte da Revolução Imobiliária
+                </h2>
+                <p class="text-xl mb-8 opacity-90">
+                    Seja um dos primeiros investidores do primeiro empreendimento<br>
+                    100% tokenizado do Brasil
+                </p>
+                
+                <div class="bg-white/10 backdrop-blur rounded-2xl p-8 mb-8">
+                    <div class="grid md:grid-cols-3 gap-6 mb-6">
+                        <div>
+                            <div class="text-3xl font-bold text-yellow-300">R$ 1.000</div>
+                            <div class="text-sm">Investimento mínimo</div>
+                        </div>
+                        <div>
+                            <div class="text-3xl font-bold text-yellow-300">100%</div>
+                            <div class="text-sm">Liquidez via fracionamento</div>
+                        </div>
+                        <div>
+                            <div class="text-3xl font-bold text-yellow-300">18% a.a.</div>
+                            <div class="text-sm">Rentabilidade projetada</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex flex-col md:flex-row gap-4 justify-center">
+                    <a href="#" class="bg-yellow-300 text-purple-700 px-8 py-4 rounded-full font-bold text-lg hover:bg-white transition">
+                        Quero Investir Agora
+                    </a>
+                    <a href="#" class="border-2 border-white px-8 py-4 rounded-full font-bold text-lg hover:bg-white hover:text-purple-700 transition">
+                        Falar com Consultor
+                    </a>
+                </div>
+                
+                <p class="mt-8 text-sm opacity-75">
+                    MAEOKA ENGENHARIA LTDA • CNPJ: 19.924.627/0001-67<br>
+                    Eng. Responsável: Kioma Maeoka • CREA: 159.328/D-PR
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Função de cálculo do simulador
+        function calculateROI() {
+            const amount = parseFloat(document.getElementById('investmentAmount').value) || 0;
+            const phase = parseInt(document.getElementById('investmentPhase').value);
+            
+            if (amount < 1000) {
+                document.getElementById('simulationResults').classList.add('hidden');
+                return;
+            }
+            
+            let participation, futureValue, monthlyIncome, annualROI;
+            
+            switch(phase) {
+                case 1:
+                    participation = (amount / 2500000) * 62.5;
+                    futureValue = amount * 2;
+                    monthlyIncome = participation * 0.01 * 60000 / 62.5;
+                    annualROI = 88;
+                    break;
+                case 2:
+                    participation = (amount / 2500000) * 62.5 * 0.8;
+                    futureValue = amount * 1.6;
+                    monthlyIncome = participation * 0.01 * 60000 / 62.5;
+                    annualROI = 55;
+                    break;
+                case 3:
+                    participation = (amount / 2500000) * 62.5 * 0.625;
+                    futureValue = amount * 1.28;
+                    monthlyIncome = participation * 0.01 * 60000 / 62.5;
+                    annualROI = 28;
+                    break;
+                case 4:
+                    participation = (amount / 3000000) * 62.5; // Entrada com desconto
+                    futureValue = amount * 1.33; // Potencial valorização
+                    monthlyIncome = participation * 0.01 * 60000 / 62.5;
+                    annualROI = 12;
+                    break;
+            }
+            
+            const appreciation5y = futureValue - amount;
+            const income5y = monthlyIncome * 60;
+            const totalReturn5y = appreciation5y + income5y;
+            
+            // Atualizar UI
+            document.getElementById('participation').textContent = participation.toFixed(3) + '%';
+            document.getElementById('futureValue').textContent = 'R$ ' + futureValue.toLocaleString('pt-BR');
+            document.getElementById('monthlyIncome').textContent = 'R$ ' + monthlyIncome.toFixed(0);
+            document.getElementById('annualROI').textContent = annualROI + '%';
+            
+            document.getElementById('appreciation5y').textContent = 'R$ ' + appreciation5y.toLocaleString('pt-BR');
+            document.getElementById('income5y').textContent = 'R$ ' + income5y.toLocaleString('pt-BR');
+            document.getElementById('totalReturn5y').textContent = 'R$ ' + totalReturn5y.toLocaleString('pt-BR');
+            
+            document.getElementById('simulationResults').classList.remove('hidden');
+        }
+        
+        // Calcular ao carregar
+        calculateROI();
+        
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>
